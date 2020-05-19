@@ -1,0 +1,806 @@
+\section{Evaluation}\label{sec:eval}
+
+We evaluate the performance of \sysname{} on several microbenchmarks and 
+on the standard YCSB application benchmark\cite{ycsb}. We compare this
+performance against that of two state-of-the-art key-value stores,
+RocksDB and PebblesDB.
+The following questions drive our evaluation:
+%In our evaluation, we first wish to demonstrate \sysname's macro performance.
+%Then, we would like to understand the performance impacts of several specific
+%design decisions in \sysname, and to quantify both the advantages and drawbacks
+%of these choices. Specifically we hope to answer the following questions:
+\begin{itemize}
+   \item Does \sysname achieve its primary goal of improved insertion
+      performance?
+   \item To what extent is this performance achieved through reduced write
+      amplification as opposed to other factors?
+   \item Does increasing insert performance come at a cost to [range] query
+     performance?  In particular, do queries in \sysname require more I/O, due to
+     size tiering, than in non-size-tiered systems?
+   \item Are sequential (or otherwise local) insertions faster as predicted on
+     \sysname? Do they have lower write amplification?
+   \item Can \sysname utilize device bandwidth for large range queries?
+   \item \sysname is designed to be highly concurrent; do point lookups scale
+      with the number of threads?
+\end{itemize}
+
+\subsection{Setup and Workloads}\label{sec:setup}
+
+All results are collected on a Dell PowerEdge R720 with a 32-core
+2.00 GHz Intel Xeon CPU, 256 GiB RAM and a 960GiB Intel Optane 905p PCI Express
+3.0 NVMe device. The block size used was 4096 bytes.
+
+In general, we use workloads derived from YCSB traces with 24B keys. We
+generally use 100B values, but also include a set of YCSB benchmarks for 1KiB
+values.  We instrumented dry runs of YCSB in order to collect workload traces
+for the load and $A-F$ YCSB workloads and replay them on each of the databases
+evaluated.  In order to eliminate the overhead of reading from a trace file
+during the experiment, the trace replayer \texttt{mmap}s the trace file before
+starting the experiment.  We use the same traces for each system.
+
+In general, we limit the available memory to 10\% of the dataset size or less.
+In order to perform the benchmarks on reasonably sized datasets, we restrict
+the available system memory with a type 1 Linux \texttt{cgroup}, sized to the
+target memory size plus the size of the trace, which we pin so that it cannot
+be swapped out. Unless otherwise noted, the target memory size is 4GiB.
+PebblesDB has an apparent memory leak, which causes it to consume the available
+memory, so we allow it to use the full system memory. On the YCSB load
+benchmarks, this causes it to swap for a small portion at the end, but this was
+less than 10\% of the  run time.
+
+Unless otherwise noted, \sysname{} uses a max fanout of 8, a memtable size of
+24MiB and a total cache size of 3.25GiB. The difference between this cache size
+and the target memory size of 4GiB is to accommodate other in-memory data
+structures maintained by \sysname.
+
+Each system is run with the thread count which yields the highest throughput.
+RocksDB is configured to use background threads equal to the number of cores
+minus the number of foreground threads, with a minimum of 4. PebblesDB uses its
+default number of background compaction threads. \sysname is configured without
+background compaction threads.
+
+\subsection{YCSB}\label{sec:ycsb}
+
+We measure application performance using the Yahoo Cloud Services Benchmark
+(YCSB). The core YCSB workloads consist of load phases and run phases.
+The load phases create a dataset by inserting uniformly random
+key-value pairs. 
+The run phases emulate various workload mixes. Workload A is 
+50\% updates, 50\% reads, workload B is 95\% reads, 5\%
+updates), workload C is 100\% reads, workload D is read latest (95\%
+reads, 5\% insertions), workload E is short range scans (95\% scans, 5\% insertions)
+and workload F is read-modify-writes (50\% reads, 50\% RMWs).
+
+The results with 100B values is shown in 
+ \Cref{fig:ycsb-100B,fig:ycsb-amp-100B}, and we also use a version
+with 24B keys and 1kib values \alex{need this figure}.  
+
+On the load phase, \sysname is faster by almost an order of magnitude.  Because
+of size-tiering and its compaction/flushing policy \sysname has about $1/2$ the
+write amplification of the other systems. Note PebblesDB performs almost no
+reads because it was given unlimited memory.  Surprisingly PebblesDB does not
+show substantially lower write amplification than RocksDB.
+
+On the run phases, which the exception of E, \sysname is 40--150\% faster than
+RocksDB, the next fastest system. On E, \sysname is roughly half as fast as
+RocksDB.
+
+\begin{figure*}
+      \centering
+      \ref{ycsb-legend} \\
+      \begin{subfigure}{0.52\linewidth}
+         \begin{tikzpicture}
+            \begin{axis}[
+                  ybar=1pt,
+                  bar width=5.5pt,
+                  enlarge x limits=0.1,
+                  width = \columnwidth,
+                  height = 1.75in,
+                  symbolic x coords = {Load, A, B, C, D, E, F},
+                  xtick = data,
+                  major x tick style = transparent,
+                  ymin = 0,
+                  ymax = 2750,
+                  yticklabel style = {rotate=90},
+                  ylabel near ticks,
+                  /pgf/number format/1000 sep={},
+                  nodes near coords,
+                  every node near coord/.append style={rotate=90, anchor=west, font=\tiny},
+                  ylabel={Operations/Second \\ (Thousands)},
+                  xlabel={YCSB Workload (24B keys, 100B values)},
+                  label style={font=\small, align=center},
+                  legend columns=5,
+                  %legend style={at={(0.98, 0.98)}, anchor=north east}
+                  legend to name={ycsb-legend}
+               ]
+               \addplot[style={Plum,fill=Plum,mark=none} ]
+               table [col sep=space] {data/ycsb-100b/splinterdb.csv};
+               \addplot[style={RoyalBlue,fill=RoyalBlue,mark=none}]
+               table [col sep=space] {data/ycsb-100b/rocksdb.csv};
+               \addplot[style={ForestGreen,fill=ForestGreen,mark=none}]
+               table [col sep=space] {data/ycsb-100b/pebblesdb.csv};
+               \legend{\sysname, RocksDB, PebblesDB};
+            \end{axis}
+         \end{tikzpicture}
+         \caption{Throughput on YCSB workloads with 24B keys and 100B values.
+         Load is 673M operations, E is 20M operations and others are 160M
+         operations. Higher is better.}\label{fig:ycsb-100B}
+      \end{subfigure}
+      \hspace{0.0\linewidth}
+      \begin{subfigure}{0.40\linewidth}
+         \centering
+            \begin{tikzpicture}
+               \begin{axis}[
+                     ybar=1pt,
+                     bar width=5.5pt,
+                     enlarge x limits=0.1,
+                     width = \columnwidth,
+                     height = 1.75in,
+                     symbolic x coords = {Load, A, B, C, D, E, F},
+                     xtick = data,
+                     major x tick style = transparent,
+                     ymin = 0,
+                     ymax = 900,
+                     yticklabel style = {rotate=90},
+                     ylabel near ticks,
+                     /pgf/number format/1000 sep={},
+                     nodes near coords,
+                     every node near coord/.append style={rotate=90, anchor=west, font=\tiny},
+                     ylabel={Operations/Second \\ (Thousands)},
+                     xlabel={YCSB Workload (24B keys, 1KiB values)},
+                     label style={font=\small, align=center},
+                     legend columns=1,
+                     legend style={at={(0.98, 0.98)}, anchor=north east}
+                     %legend to name={ycsb-legend}
+                  ]
+                  \addplot[style={Plum,fill=Plum,mark=none} ]
+                  table [col sep=space] {data/ycsb-1kib/splinterdb.csv};
+                  \addplot[style={RoyalBlue,fill=RoyalBlue,mark=none}]
+                  table [col sep=space] {data/ycsb-1kib/rocksdb.csv};
+                  %\addplot[style={ForestGreen,fill=ForestGreen,mark=none}]
+                  %table [col sep=space] {data/ycsb-1kib/pebblesdb.csv};
+                  %\legend{\sysname, RocksDB};%, PebblesDB};
+            \end{axis}
+         \end{tikzpicture}
+         \caption{Throughput on YCSB workload with 24B keys and 1KiB values.
+         Load is 84M operations, E is 1.3M operations and others are 10M
+         operations. Higher is better.}\label{fig:ycsb-1kib}
+      \end{subfigure}
+      \caption{YCSB throughput and I/O benchmark results.}
+\end{figure*}
+
+\begin{figure}
+   \begin{tikzpicture}
+      \begin{axis}[
+            ybar=1pt,
+            bar width=10pt,
+            enlarge x limits=0.3,
+            width = \columnwidth,
+            height = 1.35in,
+            symbolic x coords = {load-write, load-total, c-read},
+            xticklabel style = {align=center},
+            xticklabels = {Load:\\Write Amp, Load:\\Total I/O Amp, Run C:\\Read Amp},
+            xtick = data,
+            xticklabel style = {font=\small},
+            major x tick style = transparent,
+            ymin = 0,
+            ymax = 37,
+            ylabel={I/O Amplification},
+            ylabel near ticks,
+            xlabel={YCSB IO Amplification (24B keys, 100B values)},
+            label style = {font=\small},
+            nodes near coords,
+            every node near coord/.append style={font=\scriptsize},
+            nodes near coords style={/pgf/number format/.cd, fixed zerofill, precision=1},
+            %legend columns=1,
+            %legend style={font=\scriptsize, at={(0.02, 0.98)}, anchor=north west},
+         ]
+         \addplot[style={Plum,fill=Plum,mark=none}]
+         table [col sep=space] {data/ycsb-amp-100b/splinterdb.csv};
+         \addplot[style={RoyalBlue,fill=RoyalBlue,mark=none}]
+         table [col sep=space] {data/ycsb-amp-100b/rocksdb.csv};
+         \addplot[style={ForestGreen,fill=ForestGreen,mark=none}]
+         table [col sep=space] {data/ycsb-amp-100b/pebblesdb.csv};
+         %\legend{\sysname, \sysname (12 threads), RocksDB, PebblesDB};
+      \end{axis}
+   \end{tikzpicture}
+   \caption{IO amplification on YCSB load and Run C workloads, as
+   measured with iostat. Lower is better.}\label{fig:ycsb-amp-100B}
+\end{figure}
+
+\subsection{KVell}\label{sec:kvell}
+
+KVell~\cite{!kvell} is a key-value store also designed to utilize full NVMe bandwidth.
+It has an in-memory B-tree index that maps all keys to disk page offsets.
+It does well on large (4KiB) key-value pairs, but on small key-value pairs, the overhead
+of the in-memory index becomes a significant fraction of the dataset size.
+In particular, it was impossible to run KVell in a memory \texttt{cgroup} of 4GiB.
+Figure~\ref{fig:kvell} shows KVell's performance on the YCSB workload with 100B values,
+for different memory sizes. At 22GiB, which is around the size of the in-memory index,
+KVell's performance starts to drop. At 20GiB, KVell becomes unusable. Therefore in realistic
+memory settings, KVell is not a viable option for the small key-value sizes that \sysname targets.
+
+\begin{figure}
+   \begin{tikzpicture}
+      \begin{axis}[
+            ybar=1pt,
+            bar width=3.5pt,
+            enlarge x limits=0.1,
+            width = \columnwidth,
+            height = 1.85in,
+            symbolic x coords = {Load, A, B, C, D, E, F},
+            xtick = data,
+            major x tick style = transparent,
+            ymin = 0,
+            ymax = 3700,
+            yticklabel style = {rotate=90},
+            ylabel near ticks,
+            /pgf/number format/1000 sep={},
+            nodes near coords,
+            every node near coord/.append style={/pgf/number format/fixed, rotate=90, anchor=west, font=\tiny},
+            ylabel={Operations/Second \\ (Thousands)},
+            xlabel={YCSB Workload (24B keys, 100B values)},
+            label style = {font=\small, align=center},
+            legend columns=2,
+            legend style={at={(0.98, 0.98)}, anchor=north east, font=\scriptsize}
+            %legend to name={ycsb-legend}
+         ]
+         \addplot[style={Red,fill=Red!25!white,mark=none} ]
+         table [col sep=space] {data/ycsb-100b/kvell20.csv};
+         \addplot[style={Red,fill=Red!50!white,mark=none} ]
+         table [col sep=space] {data/ycsb-100b/kvell22.csv};
+         \addplot[style={Red,fill=Red,mark=none} ]
+         table [col sep=space] {data/ycsb-100b/kvell24.csv};
+         \addplot[style={Red,fill=Red!50!black,mark=none} ]
+         table [col sep=space] {data/ycsb-100b/kvell26.csv};
+         \addplot[style={Red,fill=Red!25!black,mark=none} ]
+         table [col sep=space] {data/ycsb-100b/kvell28.csv};
+         \legend{20GiB, 22GiB, 24GiB, 26GiB, 28GiB};
+      \end{axis}
+   \end{tikzpicture}
+   \caption{Throughput of Kvell on YCSB workloads with varying amounts of
+   available RAM. Load consists of 673M operations, E consists of 20M
+   operations and all other workloads consist of 160M operations. Higher is
+   better.}\label{fig:kvell}
+\end{figure}
+
+\subsection{Sequential Insertion Performance}\label{sec:seq}
+
+Because \sysname{} is based on an \datastruct{} and makes use of a
+flush-then-compact policy, we predict that its performance will
+improve substantially on insertion workloads with a high degree of
+locality (see \cref{sec:flush-compact}). We test this hypothesis by
+performing 20GiB of single-threaded insertions from a trace composed of
+interleaved sequential and random keys in different proportions. For
+comparison, we perform the same workload on RocksDB.
+
+As shown in \cref{fig:sequential}, \sysname's performance improves smoothly
+from 349K insertions per second for a purely random workload to 614K insertions
+per second for a purely sequential workload, which is 76\% faster. This
+improvement is partially obscured by the log, which adds a constant additive IO
+overhead. If we disable the log, \sysname improves from 430K insertions per
+second on a purely random workload to 866K operations per second on a purely
+sequential workload, 100\% faster. Note that we would expect the intermediate
+throughputs in the best case to be the [weighted] harmonic mean of the pure
+cases, because they are rates. At 50\% random, 50\% sequential for \sysname
+with no log this is 575K insertions/second, so its actual performance of 521K
+insertions/second captures a substantial amount of the potential improvement.
+
+RocksDB also improves as the workload becomes more sequential, but this effect
+is much smaller, a 35\% speedup. Furthermore, RocksDB shows less than 20\%
+speedup until the workloads becomes 99\% sequential.
+
+\Cref{fig:sequential-amp} shows that as predicted, \sysname incurs less IO
+amplification on more sequential workloads. With the log disabled, its write
+amp approaches 1 as the workload approaches purely sequential.  In contrast,
+while RocksDB also has less IO amplification on more sequential workloads, it
+still incurs write amplification of 4.1 even when 99\% of the keys are
+sequential. It is only when the workload becomes 100\% sequential that the
+write amplification becomes close to 1 (because of caching it even falls below
+1).
+
+\begin{figure*}
+  \centering
+  \ref{seq-legend} \\
+  \begin{subfigure}{0.45\linewidth}
+   \begin{tikzpicture}
+      \begin{axis} [
+            width = \columnwidth,
+            height = 1.75in,
+            xtick = data,
+            ytick distance = 500,
+            minor y tick num = 4,
+            enlarge x limits = 0.05,
+            symbolic x coords = {0, 50, 90, 99, 100},
+            %major x tick style = transparent,
+            ymin = 0,
+            ymax = 999,
+            ylabel={Operations/Second \\ (Thousands)},
+            yticklabel style = {rotate=90},
+            ylabel near ticks,
+            label style = {font=\small, align=center},
+            xmin = 0,
+            xmax = 100,
+            nodes near coords,
+            xlabel={Percentage Sequential Insertions},
+            %legend cell align={left},
+            legend to name=seq-legend,
+            legend columns=3,
+            %legend style={at={(0.02, 0.98)}, anchor=north west}
+         ]
+      \addplot [
+         style={Plum},
+         line width=1.5pt,
+         mark=*,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         %visualization depends on=\thisrow{YShift} \as \yshift,
+         every node near coord/.append style={font=\scriptsize, anchor=north}
+      ]
+         table [
+            col sep=space,
+         ] {data/sequential/splinterdb.csv};
+      \addplot [
+         style={VioletRed},
+         line width=1.5pt,
+         mark=*,
+         %visualization depends on=\thisrow{Alignment} \as \alignment,
+         %visualization depends on=\thisrow{YShift} \as \yshift,
+         every node near coord/.append style={font=\scriptsize, anchor = south},
+      ]
+         table [
+            col sep=space,
+         ] {data/sequential/splinterdb-no-log.csv};
+      \addplot [
+         style={RoyalBlue},
+         line width=1.5pt,
+         mark=square*,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         %visualization depends on=\thisrow{YShift} \as \yshift,
+         every node near coord/.append style={font=\scriptsize, anchor=south}
+      ]
+         table [
+            col sep=space,
+         ] {data/sequential/rocksdb.csv};
+         \legend{\sysname, \sysname (no log), RocksDB};
+      \end{axis}
+   \end{tikzpicture}
+   \caption{Single-threaded insertion throughput by locality. X-axis indicates
+   the percentage of sequential keys.  X-axis not to scale. Higher is
+   better.}\label{fig:sequential}
+\end{subfigure}
+\hspace{0.075\linewidth}
+\begin{subfigure}{0.45\linewidth}
+   \begin{tikzpicture}
+      \begin{axis} [
+            width = \columnwidth,
+            height = 1.75in,
+            xtick = data,
+            minor y tick num = 4,
+            symbolic x coords = {0, 50, 90, 99, 100},
+            enlarge x limits = 0.05,
+            %major x tick style = transparent,
+            ymin = 0,
+            ymax = 14.9,
+            ylabel={I/O Amplification},
+            yticklabel style = {rotate=90},
+            ylabel near ticks,
+            label style = {font=\small},
+            xmin = 0,
+            xmax = 100,
+            xlabel={Percentage Sequential Insertions},
+            %legend cell align={left},
+            %legend style={at={(0.98, 0.98)}, anchor=north east},
+            %legend columns = 1
+         ]
+      \addplot [
+         style={Plum},
+         line width=1pt,
+         mark=*,
+         nodes near coords,
+         %visualization depends on=\thisrow{WriteAlignment} \as \alignment,
+         %visualization depends on=\thisrow{WriteOpacity} \as \opacity,
+         every node near coord/.append style={font=\scriptsize, anchor=south, rotate = 0},
+      ]
+         table [
+            col sep=space,
+            y=Write,
+         ] {data/sequential-amp/splinterdb.csv};
+      \addplot [
+         style={Plum},
+         line width=1pt,
+         mark=o,
+         mark options={solid},
+         %dashed,
+         %nodes near coords,
+         %visualization depends on=\thisrow{TotalAlignment} \as \alignment,
+         %every node near coord/.append style={font=\scriptsize, anchor=\alignment},
+         forget plot
+      ]
+         table [
+            col sep=space,
+            y=Total
+         ] {data/sequential-amp/splinterdb.csv};
+      \addplot [
+         style={VioletRed},
+         line width=1pt,
+         mark=*,
+         nodes near coords,
+         %visualization depends on=\thisrow{WriteAlignment} \as \alignment,
+         %visualization depends on=\thisrow{WriteOpacity} \as \opacity,
+         every node near coord/.append style={font=\scriptsize, anchor=north, rotate = 0},
+      ]
+         table [
+            col sep=space,
+            y=Write,
+         ] {data/sequential-amp/splinterdb-no-log.csv};
+      \addplot [
+         style={VioletRed},
+         line width=1pt,
+         mark=o,
+         mark options={solid},
+         dashed,
+         %nodes near coords,
+         %visualization depends on=\thisrow{TotalAlignment} \as \alignment,
+         %every node near coord/.append style={font=\scriptsize, anchor=\alignment},
+         forget plot
+      ]
+         table [
+            col sep=space,
+            y=Total
+         ] {data/sequential-amp/splinterdb-no-log.csv};
+      \addplot [
+         style={RoyalBlue},
+         line width=1pt,
+         mark=square*,
+         nodes near coords,
+         %visualization depends on=\thisrow{WriteAlignment} \as \alignment,
+         %visualization depends on=\thisrow{WriteOpacity} \as \opacity,
+         every node near coord/.append style={font=\scriptsize, anchor=south, rotate = 0},
+      ]
+         table [
+            col sep=space,
+            y=Write
+         ] {data/sequential-amp/rocksdb.csv};
+      \addplot [
+         style={RoyalBlue},
+         line width=1pt,
+         mark=square,
+         mark options={solid},
+         dashed,
+         %nodes near coords,
+         %visualization depends on=\thisrow{TotalAlignment} \as \alignment,
+         %every node near coord/.append style={font=\scriptsize, anchor=\alignment},
+         forget plot
+      ]
+         table [
+            col sep=space,
+            y=Total
+         ] {data/sequential-amp/rocksdb.csv};
+         %\legend{\sysname, \sysname (no log), RocksDB};
+      \end{axis}
+   \end{tikzpicture}
+   \caption{I/O amplification of mixed sequential/random insertion
+     workloads. Shown are write amplification (solid) and
+     total IO amplification (dashed) as measured with
+     \texttt{iostat}. X-axis not to scale. Lower is
+     better.}\label{fig:sequential-amp}
+\end{subfigure}
+\caption{Insertion throughput and I/O amplification as a function of workload locality.}
+\end{figure*}
+
+
+\subsection{Concurrency Scaling}\label{sec:scaling}
+
+\Sysname is designed to scale with the number of available cores up to the
+performance limits of the storage device. This is especially true for reads,
+where the use of distributed reader-writer locks and a highly concurrent cache
+design, together with a careful avoidance of dirtying cache lines, can avoid
+almost all contention between threads.
+
+\paragraph{Read Concurrency}
+We test the read concurrency scaling of \sysname{} by running YCSB
+workload C with 160M key-value pairs, where (as in \cref{fig:ycsb-100B} each
+instance of the test divides the keys into $N$ evenly divided batches, which
+are then performed in parallel by $N$ threads. The results are in
+\cref{fig:read-concurrency}.
+
+The results show nearly linear scaling---throughput with 24 threads is
+18.5$\times$ the single-threaded throughput. Between roughly 24 and 32 threads,
+the scaling flattens out, but at that point the measured throughput is
+2.07--2.24 GiB/sec, which is 88--95\% of the device's advertised random read
+capability.
+
+While RocksDB also scales well, its throughput with 24 threads is 17.4$\times$
+its single-threaded throughput, and with 32 threads it uses 91\% of the
+device's advertized random read capability. Therefore, even though \sysname can
+perform more operations per second, RocksDB is still making nearly full use of
+the device for reads. We conclude here that SplinterDB is making better use of
+the available memory for caching, since it has noticeably lower read
+amplification.
+
+\alex{Say something about Pebbles?}
+
+\paragraph{Insertion Concurrency}
+We test the insertion concurrency scaling of \sysname by running the YCSB load
+workload with 673M key-value pairs divided into $N$ batches, each of which
+is inserted in parallel by a different thread. \cref{fig:write-concurrency}
+shows selected $N$ for each system, including its peak throughput.
+
+The results show that \sysname scales almost linearly up to 10 threads. With
+10+ threads, it performs 2.0-2.4M insertions per second with IO amplification
+around 7.5, which implies that it uses 1.9-2.2GiB/sec of bandwidth, which is at
+or near the device's sequential bandwidth of 2.2GiB/sec.
+
+RocksDB's insertion performance also scales as the number of threads increase
+up to 14 threads, by a factor of 2.7. At its peak, it uses 754GiB/sec of
+bandwidth. PebblesDB scales slightly as well.  For both RocksDB and PebblesDB,
+as many background threads as available are used for flushing and compaction
+during this benchmark.
+
+\begin{figure}
+   \begin{tikzpicture}
+      \begin{axis} [
+            width = \columnwidth,
+            height = 0.7\columnwidth,
+            xtick distance = 4,
+            major x tick style = transparent,
+            ymin = 0,
+            ymax = 950,
+            yticklabel style = {rotate=90},
+            ylabel={Operations/Second (Thousands)},
+            xlabel={Number of Concurrent Threads},
+            label style = {font=\small},
+            xmin = 0,
+            xmax = 32,
+            legend style={at={(0.02, 0.98)}, anchor=north west, font=\small}
+         ]
+      %\draw[dotted, very thick] (axis cs: 0,669) -- (axis cs: 33,669)
+      %   node[pos=.65, above] {relative device limit};
+      \addplot [
+         style={Plum},
+         line width=1.5pt,
+         mark=*,
+         nodes near coords,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         visualization depends on=\thisrow{YShift} \as \yshift,
+         %visualization depends on=\thisrow{Opacity} \as \opacity,
+         every node near coord/.append style={font=\scriptsize, anchor=west, rotate=90}
+      ]
+         table [
+            col sep=space,
+         ] {data/read-concurrency/splinterdb.csv};
+      \addplot [
+         style={RoyalBlue},
+         line width=1.5pt,
+         mark=square*,
+         nodes near coords,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         visualization depends on=\thisrow{YShift} \as \yshift,
+         visualization depends on=\thisrow{Opacity} \as \opacity,
+         every node near coord/.append style={font=\scriptsize, anchor=west, rotate = 330}
+      ]
+         table [
+            col sep=space,
+         ] {data/read-concurrency/rocksdb.csv};
+      \addplot [
+         style={ForestGreen},
+         line width=1.5pt,
+         mark=triangle*,
+         nodes near coords,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         visualization depends on=\thisrow{YShift} \as \yshift,
+         visualization depends on=\thisrow{Opacity} \as \opacity,
+         every node near coord/.append style={font=\scriptsize, anchor=north west, rotate = 330}
+      ]
+         table [
+            col sep=space,
+         ] {data/read-concurrency/pebblesdb.csv};
+         \legend{\sysname, RocksDB, PebblesDB};
+      \end{axis}
+   \end{tikzpicture}
+   \caption{Read throughput performance (YCSB workload C) by number of threads.
+   Each instance performs 160M reads divided evenly between threads. Higher is
+   better.}\label{fig:read-concurrency}
+\end{figure}
+
+\begin{figure}
+   \begin{tikzpicture}
+      \begin{axis} [
+            width = \columnwidth,
+            height = 0.6\columnwidth,
+            xtick distance = 4,
+            major x tick style = transparent,
+            ymin = 0,
+            ymax = 2499,
+            yticklabel style = {rotate=90},
+            ylabel={Operations/Second \\ (Thousands)},
+            xlabel={Number of Concurrent Threads},
+            label style = {font=\small, align=center},
+            xmin = 0,
+            xmax = 32,
+            legend style={at={(0.95, 0.5)}, anchor=east, font=\small}
+         ]
+      %\draw[dotted, very thick] (axis cs: 0,669) -- (axis cs: 33,669)
+      %   node[pos=.65, above] {relative device limit};
+      \addplot [
+         style={Plum},
+         line width=1.5pt,
+         mark=*,
+         nodes near coords,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         visualization depends on=\thisrow{YShift} \as \yshift,
+         every node near coord/.append style={font=\scriptsize, anchor=west,yshift=-1,rotate=-45}
+      ]
+         table [
+            col sep=space,
+         ] {data/write-concurrency/splinterdb.csv};
+      \addplot [
+         style={RoyalBlue},
+         line width=1.5pt,
+         mark=square*,
+         nodes near coords,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         visualization depends on=\thisrow{YShift} \as \yshift,
+         every node near coord/.append style={font=\scriptsize, anchor=west,rotate=90}
+      ]
+         table [
+            col sep=space,
+         ] {data/write-concurrency/rocksdb.csv};
+         \legend{\sysname, RocksDB};
+      \addplot [
+         style={ForestGreen},
+         line width=1.5pt,
+         mark=triangle*,
+         nodes near coords,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         visualization depends on=\thisrow{YShift} \as \yshift,
+         every node near coord/.append style={font=\scriptsize, anchor=south east,rotate=0}
+      ]
+         table [
+            col sep=space,
+         ] {data/write-concurrency/pebblesdb.csv};
+         \legend{\sysname, RocksDB, PebblesDB};
+      \end{axis}
+   \end{tikzpicture}
+   \caption{Write throughput performance (YCSB Load) by number of threads.
+   Each instance performs 673M writes divided evenly between threads.  Higher
+   is better.}\label{fig:write-concurrency}
+\end{figure}
+
+\subsection{Scan Performance}\label{sec:scan}
+
+\begin{figure}
+   \begin{tikzpicture}
+      \begin{axis} [
+            width = \columnwidth,
+            height = 0.6\columnwidth,
+            xmode = log,
+            %xtick = data,
+            major x tick style = transparent,
+            /pgf/number format/1000 sep={},
+            ylabel near ticks,
+            label style = {font=\small, align=center},
+            xmin = 1,
+            xmax = 100000,
+            enlarge x limits=0.1,
+            ymin = 0,
+            ymax = 2990,
+            yticklabel style = {rotate=90},
+            ylabel={Effective Throughput \\ (MiB/sec)},
+            xlabel={Scan Length in Number of Key-Value Pairs},
+            legend style={at={(0.02, 0.99)}, anchor=north west, font=\small},
+            every node near coord/.append style={font=\scriptsize},
+         ]
+      \draw[dotted, very thick] (axis cs: 0,2600) -- (axis cs: 400000,2600)
+         node[pos=.6, above] {device read throughput};
+      \addplot [
+         style={Plum},
+         line width=1.5pt,
+         mark=*,
+         nodes near coords,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         every node near coord/.append style={anchor=\alignment}
+      ]
+         table [
+            col sep=space,
+         ] {data/scans/splinterdb.csv};
+      \addplot [
+         style={RoyalBlue},
+         line width=1.5pt,
+         mark=*,
+         nodes near coords,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         every node near coord/.append style={anchor=\alignment}
+      ]
+         table [
+            col sep=space,
+         ] {data/scans/rocksdb.csv};
+      \addplot [
+         style={ForestGreen},
+         line width=1.5pt,
+         mark=*,
+         nodes near coords,
+         visualization depends on=\thisrow{Alignment} \as \alignment,
+         every node near coord/.append style={anchor=\alignment}
+      ]
+         table [
+            col sep=space,
+         ] {data/scans/pebblesdb.csv};
+         \legend{\sysname, RocksDB, PebblesDB};
+      \end{axis}
+   \end{tikzpicture}
+   \caption{Scan throughput in MiB/sec as a function of scan length. For small
+   scans, the start up cost dominates, but as the scans get longer, the
+   throughput approaches the device's advertised bandwidth
+   (2.6GiB/sec). The x-axis is on a log scale. Higher is
+   better.}\label{fig:scans}
+\end{figure}
+
+An inherent disadvantage of size-tiering is that short scans must search every
+branch along the root-to-leaf path to the starting key. Each of these searches
+is likely to incur an IO to the device. As a result, as seen in
+\cref{fig:ycsb-100B}, \sysname{} with 124B key-value pairs has scan throughput
+on small ranges that is about 85\% that of RocksDB. During that workload,
+\sysname performed 2.26 GiB/sec of IO, which is within 96\% of the devices
+advertised random read capability (short scans of small key-value pairs are
+essentially random reads).
+
+However, once the initial search for the successor to the starting key has
+completed, the root-to-leaf path within each relevant branch will be in memory.
+Together with prefetching, this allows subsequent keys to be fetched at near
+disk bandwidth. Therefore, we expect that scans have a relatively high startup
+cost for the search to the starting key, followed by a very low iteration cost
+of obtaining subsequent keys.
+
+Thus, when the amount of data requested grows to multiple pages, the
+disadvantage begins to dissipate. One way this happens is with larger key-value
+pairs: with 1kib values, \sysname is about 16\% faster than RocksDB.
+
+Another way this can happen is with scans of more key-value pairs.  We modify
+YCSB workload E to have only fixed-length scans of $N$ key-value pairs, where
+$N$ is 1, 10, 100, 1K, 10K or 100K.  We perform runs of 10M scans of length 1,
+10 and 100, 1M scans of length 1000, 100K scans of length 10000 and 10K scans
+of length 100000. Each run is performed on a dataset of 80GiB (with 24B keys and
+100B values) and 4GiB memory.
+
+The result is shown in \cref{fig:scans}. Short scans on \sysname have low
+effective bandwidth, and in fact the bandwidth scales close to linearly with
+the scan length for scans of up to 100 key-value pairs. This suggests that for
+scans of this length, the startup cost dominates the iteration cost, which is
+as expected.  As the scan length increases, the effective bandwidth of the
+scans approaches the device's advertised sequential read bandwidth, delivering
+91\% at scans of 1,000 key-value pairs.  At scans as small as 100 key-value
+pairs, \sysname{} returns data at nearly half the bandwidth of the device.
+
+%% \subsection{Insertion Latency}\label{sec:latency}
+
+%% \begin{figure}
+%%    \begin{tikzpicture}
+%%       \begin{axis} [
+%%             width = \columnwidth,
+%%             height = 0.8\columnwidth,
+%%             restrict y to domain=0.0:0.99,
+%%             major x tick style = transparent,
+%%             ymin = 0,
+%%             ymax = 1,
+%%             xlabel={Latency in $\mu$s},
+%%             ylabel={Cumulative Density},
+%%             ylabel near ticks,
+%%          ]
+%%       \addplot [
+%%          style={Plum},
+%%          %line width=1.5pt,
+%%       ]
+%%          table [
+%%             col sep=space,
+%%             x expr={\thisrowno{0}/1000.0}
+%%          ] {data/insert_latency/insert_latency_cdf.csv};
+%%       \end{axis}
+%%    \end{tikzpicture}
+%%    \caption{CDF of insertion latency for YCSB load workload.}
+%%    \label{fig:insert-latency-cdf}
+%% \end{figure}
+
+%% \Cref{fig:insert-latency-cdf} shows the CDF of insertion latencies in
+%% \sysname.  90\% of insertions complete in under 5 $\mu$secs, and 99\%
+%% complete in under 30 $\mu$secs.

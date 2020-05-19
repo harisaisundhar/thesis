@@ -1,0 +1,80 @@
+\section{Bundle of Trees Hash Tables in the Asymmetric Model}\label{sec:boa-asymmetric}
+
+In this section we describe the \defn{$\beta$-asymmetric Bundle of Arrays Hash
+table} (Asymmetric BOT), which adapts BOTs to the asymmetric external memory
+model~\cite{DBLP:conf/spaa/BlellochFGGS15}. This model is similar to the
+regular external memory model of Aggarwal and Vitter, except that the cost of
+reading a block is 1, but where the cost of writing a block is $\omega>1$.
+
+The underlying idea is to not write character on most levels and instead read
+the necessary information from the queues of descendant nodes. This only
+requires reads, provided no more than $M/B$ such queues are read at a time.
+Thus, every $\beta \leq \left\lfloor\log_\lambda\frac{M}{B\log_\lambda
+N}\right\rfloor$ levels, all the character queues must be merged and stored. We
+say level $i$ is a \defn{queue level} if $i$ is divisible by $\beta$.
+
+When the $i$th level root fills, where level $i$ is not a queue level, it is
+added to level $i+1$. For each key $K$ covered by the now-full orphan root, the
+high-order bits $\high{i+1}{K}$, check characters $C_{i+1}(K)$ and next
+characters $D_{i+2}(K)$ are obtained by merging the character queues on the
+highest queue level below $i$, which is $\ell=i - \left(i\bmod\beta\right)$.
+Thus $L_\ell^{\ell + 1},\ldots, L_\ell^{i + 1}$ are read;  for each key $K$ in
+sorted order this yields: $\high{\ell}{K}$ together with the characters
+$D_{\ell + 1}(K),\ldots,D_{i+2}(K)$, from which $\high{i+1}{K}$ and
+$D_{i+2}(K)$ can be computed, as well as the check character $C_{i+1}(K)$. This
+computation occurs sequentially, so that the intermediate results need not be
+written out.
+
+When the $i$th level root fills on a queue level, its character queues are
+created before it is added to level $i+1$. This involves computing
+$\high{i}{K}$ in sorted order as above and then merging all the character
+queues $L_{i-\beta}^{i+1},L_{i-\beta}^{i+2},\ldots$ into new character queues
+$L_i^{i+1},L_i^{i+2},\ldots$. These merges are performed with a single
+$\lambda^\beta$-way merge. Then the now-full level root can be added to the
+routing filter of the $(i+1)$st level root using the character queue
+$L_i^{i+1}$.
+
+We refer to this modified BOT as an \defn{$\beta$-asymmetric BOT}. 
+
+\asymbot*
+
+\begin{proof}
+	Each insertion will eventually be added to each level $i$. When the level
+	$i$ is not a queue level, $i\bmod \beta$ characters per item will be read from
+	the character queues on the queue level below $i$. Summed over all levels, this
+	yields
+	\[\sum_{i=0}^{\log_\lambda N} \frac{i\bmod \beta}{B\log_\lambda N} = O\left(\frac{\beta}{B}\right)\]
+	reads per insertion.
+
+	A $\lambda^\beta$-way merge is performed every $\beta$ levels. Since $\beta
+	\leq \left\lfloor\log_\lambda\frac{M}{B\log_\lambda N}\right\rfloor$, this
+	requires $O(1/B)$ reads and writes per element. This contributes
+	$O\left(\frac{\log_\grow{N}}{\beta B}\right)$ reads and writes per
+	insertion in total.
+
+	The per-insertion read and write cost of building the routing filters is
+	$\Theta(\lambda/B)$ as in the proof of \Cref{thm:bot-cost}.
+
+	The cost per query is the same as in \Cref{thm:bot-cost}.
+\end{proof}
+
+\Cref{thm:bot-asymmetric} can improve the write cost when $\grow =
+o(\log\log M)$ and $\log\log M = \Omega\left(\log_{\frac{M}{B}}{N}\right)$. In
+that case, $\beta$ can be tuned to optimize insertion performance relative to
+the $\omega$ of the AEMM by solving the quadratic equation $\beta = \omega
+\cdot \left(\lambda + \frac{1}{\beta}\log_{\grow}{N} \right)$. 
+
+In particular, an interesting consequence of \Cref{thm:bot-asymmetric} is
+in the case where $N$ is polynomial in $M$. Then insertions can be performed
+into a $(\log_\grow{M/B})$-asymmetric BOT with growth factor $\lambda = O(1)$
+with constant write amplification. This does come at the cost of more reads
+than when using a regular BOT:
+
+\begin{corollary}
+        If $N = O(M^c)$ for some constant $c$, then a
+        $(\log_\grow{M/B})$-asymmetric BOT with growth factor $\lambda=O(1)$
+        containing $N$ key-value values performs $\Theta(1/B)$ amortized writes
+        per insertion, $\Theta\left(\frac{1}{B}\left(\lambda +
+        \log{\frac{M}{B}}\right)\right)$ amortized reads per insertion and
+        $\Theta(\log N)$ reads per query.
+\end{corollary}

@@ -1,0 +1,109 @@
+\section{Refined Bundle of Arrays Hashing}\label{sec:boa-refined}
+
+In order to obtain high probability bounds for a BOA, we need a stronger
+guarantee on the number of false positives. This is achieved by including an
+additional character, the $\defn{check character}$ from each fingerprint in the
+routing filter, which is also checked during queries and thus eliminates most
+false positives.  To support this, we will need to refine the routing filter so
+it can maintain check characters even when there are collisions.
+
+The $i$th check character $C_i(K)$ of a fingerprint $K$ is the $i$th
+character from the end of the string representation of $K$. As
+described in \Cref{sec:hashing}, we assume that the fingerprints are
+taken from a universe of size at least $N^2$ so that the check
+characters do not overlap with the characters used in the prefixes of
+the routing filters, and by $\Theta(\log N)$-wise independence, the
+check characters of $O(1)$ fingerprints are independent. Now each
+fingerprint in the filter has a check character and a array pointer,
+and we refer to this data as the \defn{sketch} of the fingerprint.
+
+When level $i$ of the BOA is queried for a fingerprint $K$, the refined routing
+filter (described below) returns a list of sketches, one for each fingerprint
+in the level with prefix $P_i(K)$. The array indicated in the sketch is only
+checked if the check character matches $C_i(K)$, which reduces the number of
+false positives by a factor of $\lambda$.
+
+\paragraph{Refined Routing Filter}
+The routing filter described in \Cref{sec:boa-routing-filter} handles prefix
+collisions by returning only the last run containing the queried fingerprint
+and then chaining in the runs. Whereas, to support check characters, we need to
+return a list instead, while having the same performance guarantees.
+
+The idea behind the refined routing filter is to keep the prefix-sketch pairs
+in a sorted list and use a hash table on prefixes to point queries to the
+appropriate place. Each pointer may require as many as $\Omega(\log N)$ bits,
+and we require the routing filter to have $O(1)$ characters per fingerprint.
+Therefore the hash table must use shorter prefixes so as to reduce the number
+of buckets and thus reduce its footprint. In particular, it uses prefixes which
+are $\log_\lambda\log_\lambda N$ characters shorter, which we refer to as
+\defn{pivot prefixes}.
+
+The list delta encodes the prefix for each fingerprint $K$, together with its
+sketch. In addition, the first entry following each pivot prefix contains the
+full prefix, rather then just the difference. Otherwise, when the hash table
+routes a query to that place in the list, the full prefix wouldn't be
+immediately computable.
+
+\begin{lemma}\label[lemma]{lem:refined-routing-filter}
+	A refined routing filter can be updated using
+	$O\left(\frac{\grow\log\grow{}}{B\log N}\right)$ IOs per new entry, and
+	performs lookups in $O(D_K^*)$ IOs w.h.p., where $D_K^*$ is the number of
+	times $K$ appears in the level.
+\end{lemma}
+
+\begin{proof}
+	We prove first the update bound and then the query bound.
+	
+	Let $C$ be the capacity of the level. There are at most
+	$\frac{C}{\log_\lambda N}$ pivot prefixes. For each pivot prefix, the hash
+	table stores the bit position in a list with at most $C$ entries, where $C
+	\leq N$.  Each entry is at most $\log N$ bits, so this position can be
+	written using $O(\log N)$ bits.
+
+	For each fingerprint in the node, the list contains $O(1)$ characters by
+	\Cref{lem:delta-encoding}, or $O(\log \lambda)$ bits. Additionally, each
+	pivot prefix has to an initial entry of length $O(\log N)$ bits, so the
+	list all together uses $O(C\log\lambda + \frac{C}{\log_\lambda N} \cdot
+	\log N)= O(C\log\grow{})$ bits.
+
+	When the refined routing filter is updated, the old version is read
+	sequentially and the new version is written out sequentially. $C/\lambda$
+	fingerprints are added at a time, so this incurs
+	$O\left(\frac{\grow\log\grow{}}{B\log N}\right)$ IOs per entry.
+
+	During a query, the pivot bit string of a fingerprint and its successor are
+	accessed from the hash table in $O(1)$ IOs. This returns the beginning and
+	ending bit positions in the list. Because the fingerprints are distributed
+	uniformly and are pairwise independent to $K$, there are $O(\log_\lambda
+	N + D_K^*)$ fingerprints matching the pivot prefix in expectation.  From
+	\Cref{lem:chernoff} with $\delta=\log\lambda$, there are $O(\log N +
+	D_K^*)$ fingerprints matching the pivot prefix w.h.p. The encoding of each
+	fingerprint is less than a word, and $B=\Omega(\log N)$ by assumption, so
+	this is $O(D_K^*)$ IOs.
+\end{proof}
+
+\paragraph{BOA Performance}
+We now can show:
+
+\boacost*
+
+\begin{proof}
+	The insertion/deletion cost is given by \Cref{lem:refined-routing-filter}
+	and \Cref{thm:boa-cost-expectation}.
+
+	During a query for a fingerprint $K$, the expected number of false positives 
+	on level $i$ (fingerprints which match the prefix $P_i(K)$ and check
+	character $C_i(K)$ but are not $K$) is $O\left(\frac{1}{\lambda}\right)$.
+	Thus, the number of false positives across levels is
+	$O\left(\frac{\log_\lambda N}{\lambda}\right)$, so by \Cref{lem:chernoff},
+	the number of false positives is $O\left(\log_\lambda N\right)$ w.h.p.
+\end{proof}
+
+Thus, a BOA is optimal for large enough $\lambda$:
+
+\begin{corollary}
+	Let $\mathcal{B}$ be a \boa{} with growth factor $\grow$ containing $N$
+	entries. If $\grow = \Omega\left(\log_\frac{M}{B}{N} +
+	\frac{\log{N}}{\log\log{N}}\right),$ then $\mathcal{B}$ is an optimal
+	unsorted dictionary.
+\end{corollary}

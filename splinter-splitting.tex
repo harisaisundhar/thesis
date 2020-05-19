@@ -1,0 +1,69 @@
+\section{Preemptive Splitting for \datastructs}
+\label{sec:splitting}
+
+Splits and merges pose problems for hand-over-hand locking in B-trees
+(and \bets).  Hand-over-hand locking proceeds from root to leaf, but
+splits and merges proceed from the leaves up.
+
+An approach to solving this issue in B-trees is to use preemptive
+splitting and merging~\cite{Rodeh08}.  During a B-tree insert, if a
+child already has the maximum number of children, then it is split
+while the insertion thread still holds a lock on its parent.  Then the
+insertion can release the parent's lock and proceed down the tree,
+assured that the child will not need to split again as part of this
+insertion.  Analogously, deletions merge a child with one of its
+neighbors if the child has the minimum number of children.  This works
+because insertion and deletions can increase or decrease
+the number of children of a node by at most 1.
+
+This approach does not work in \bets, because a flush to a leaf could
+cause that leaf to split multiple times.  In \datastruct with
+flush-then-compact, we can move all pending messages along a
+root-to-leaf path to the leaf before performing any compaction,
+splits, or merges.  The total number of messages moved to the leaf is
+bounded by $O(B\log_F N)$, i.e. the height of the tree times the
+maximum amount of data that can be stored in branches at each trunk
+node.  The leaf can therefore split into as many as $O(\log_F
+N)$ new leaves of size $B$.  Similarly, a collection of flushes full
+of delete messages to several leaves of a single parent can reduce the
+parent's number of children by $O(\log_F N)$.
+
+In practice, the height of the tree is less than 10 for typical
+fanouts $F\approx 8$ and dataset size $N\leq 2^{80}$ key-value
+pairs.
+
+We extend preemptive splitting and merging to \datastructs as follows.
+We reserve space in each node to accommodate up to $F + H$
+children, where $H$ is an upper bound on the tree height, e.g. $H=10$.
+We then apply preemptive splitting, except we preemptively split a
+node during a flush if its fanout is above $F$.  For merges, we
+take a similar approach.  If, during a flush, we encounter a node with
+less than $F/2$ children, then we merge or rebalance it with one
+of its siblings.
+
+Thus all operations on the \datastruct---flushes, splits, and
+merges---proceed from root to leaf and can therefore use
+hand-over-hand locking.
+
+The mechanisms for flush-then-compact make it easy to handle branches
+during splits.  Recall that each branch can be marked dead or alive
+for each child, and branches are refcounted and hence can be shared by
+multiple trunk nodes. Thus we can split a trunk node by simply giving
+its new sibling references to all the same branches as the node had
+before the split.  In the new node, we copy the liveness information
+for each branch along with the children that are moved to the new
+sibling.
+
+%% Therefore, preemptive
+%% splitting is not enough to keep the number of pivots in the parent
+%% below the maximum.  Restricting the flush rate to prevent this would
+%% reduce update performance.
+
+%% We solve this problem in \sysname's \bet by using \defn{postemptive} splitting.
+%% Like preemptive splitting, this technique splits nodes as operations progress
+%% down the tree with hand-over-hand locking. However, postemptive splitting only
+%% splits nodes with \textit{more} pivots than the allowed maximum and is
+%% permitted to temporarily exceed the maximum number of pivots in trunk index
+%% nodes. Because fanout in a \bet is low, usually less than 20, there is more
+%% than enough physical room in the node and then the split can be performed by
+%% the next operation that touches the node.

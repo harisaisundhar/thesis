@@ -1,0 +1,99 @@
+\section{Introduction}\label{sec:boa-intro}
+
+Dictionaries are among the most heavily used data structures. A
+dictionary maintains a collection of key-value pairs
+$\mathcal{S}\subseteq mathcal{U}\times mathcal{V}$, under operations\footnote{We do
+  not consider dictionaries that also support the \Dsucc{x}{\mathcal{S}} and
+  \Dpred{x}{\mathcal{S}}.  \Dsucc{x}{mathcal{S}} return
+  $\min\{y| y>x \land y\in\mathcal{S}\}$ and \Dpred{x}{mathcal{S}} is defined
+  symmetrically.}  \Dinsert{x}{v}{\mathcal{S}}, \Ddelete{x}{mathcal{S}}, and
+\Dquery{x}{\mathcal{S}}, which returns the value corresponding to $x$ when
+$x\in S$.  When data fits in memory, there are many solutions to the
+dictionary problem.
+
+When data is too large to fit in memory, comparison-based dictionaries
+can be quite varied.  They include the
+\bet~\cite{DBLP:conf/soda/BrodalF03}, the write-optimized skip
+list~\cite{DBLP:conf/pods/BenderFJMMPX17}, and the cache-optimized
+look-ahead array
+(COLA)~\cite{DBLP:conf/spaa/BenderFFFKN07,DBLP:journals/pvldb/BenderFJKKMMSSZ12,DBLP:conf/esa/BenderCDF02}.
+These are optimal in the \defn{external-memory comparison model} in
+that they match the bound established by Brodal and
+Fagerberg~\cite{DBLP:conf/soda/BrodalF03} who showed that for any
+dictionary in this model, if insertions can be performed in
+$O\left(\frac{\grow\log_{\grow} N}{B}\right)$ amortized IOs, then
+there exists a query that requires at least $\Omega(\log_\grow N)$
+IOs, where $N$ is the number of items that can be stored in the data
+structure, $B$ is the size of a memory transfer, and $\lambda$ is a
+tuning parameter.  In the following $M$ will be the size of memory,
+and $B = \Omega(\log n)$.  This trade off has since been extended in
+several
+ways~\cite{DBLP:conf/esa/BenderFGMMT14,DBLP:conf/soda/AfshaniBFFGT17}.
+
+Iacono and P\v{a}tra\c{s}cu showed that in the DAM model, in which
+operations beyond comparisons are allowed on keys, that a better
+tradeoff exists:
+\begin{theorem}[DBLP:conf/soda/IaconoP12]\label{thm:ip-lower-bound}
+  If insertions into an external memory dictionary can be performed in
+  $O\left(\grow/B\right)$ amortized IOs, then queries require an
+  expected $\Omega(\log_\grow N)$ IOs.
+\end{theorem}
+
+They further describe an external-memory hashing algorithm, which we refer to
+here as the \defn{IP hash table}, that performs insertions in
+$O\left(\frac{1}{B}\left(\lambda + \log_{\frac{M}{B}} N + \log\log
+N\right)\right)$ IOs and queries in $O(\log_\lambda N)$ IOs w.h.p. Therefore,
+for $\lambda=\Omega\left(\log_{M/B}N + \log\log{N}\right)$, the IP hash table
+meets the tradeoff curve of \Cref{thm:ip-lower-bound} and is thus optimal.
+
+In dictionaries that do not support successors and predecessors, we
+can assume that keys are hashed, that is, that they are uniformly
+distributed and satisfy some independence properties. The IP hash
+table and the following results hash all keys before
+insertion and query in the dictionary by a
+$\Theta(\log N)$-independent hash function.
+
+The base result of this paper is a simple external-memory
+hashing scheme, the \defn{Bundle of Arrays Hash Table} (BOA),
+that meets the optimal \Cref{thm:ip-lower-bound} trade off curve for
+large enough $\grow$. Specifically, we show:
+
+\begin{restatable}{theorem}{boacost}\label{thm:boa-cost}
+	A \boa{} supports $N$ insertions and deletions with amortized
+	per entry cost of $O\left(\left(\grow + \log_{\frac{M}{B}} N +
+	\log_\grow{N} \right)/B\right)$ IOs, for any $\grow > 1$. A query for a key
+	$K$ costs $O(D_K\log_\grow{N})$ IOs w.h.p., where $D_K$ is the number of times
+	$K$ has been inserted or deleted.
+\end{restatable}
+
+Thus BOAs are optimal for $\grow = \Omega(\log_{\frac{M}{B}} N +
+\log_\grow{N})$.  They are readily modified to provide several variations,
+notably the \defn{Bundle of Trees Hash Table} (BOT). BOTs are optimal for the
+same range of $\grow$ as the IP hash table:
+
+\begin{restatable}{theorem}{botcost}\label{thm:bot-cost}
+	A BOT supports $N$ insertions and deletions with amortized per entry cost
+	of $O\left(\left(\grow + \log_{\frac{M}{B}} N + \log\log M\right)/B\right)$
+	IOs for any $\grow > 1$.  A query for a key $K$ costs $O(D_K\log_\grow{N})$
+	IOs w.h.p., where $D_K$ is the number of times $K$ has been inserted or
+	deleted.
+\end{restatable}
+
+We further introduce the first cache-oblivious hash table, the
+\defn{Cache-Oblivious Bundle of Trees Hash Table} (COBOT), which matches the IO
+performance of BOTs and IP hash tables.
+
+The BOT can also be adapted to models in which disk reads and writes incur
+different costs. The $\beta$-asymmetric BOT adjusts the merging schedule of a
+regular BOT to trade some writes for more reads.
+
+\begin{restatable}{theorem}{asymbot}\label{thm:bot-asymmetric}
+	A $\beta$-asymmetric BOT supports $N$ insertions and deletions with
+	amortized per entry cost of $O\left(\frac{1}{B}\left(\lambda +
+	\frac{1}{\beta}\log_{\grow}{N} \right)\right)$ writes and
+	$O\left(\frac{1}{B}\left(\lambda + \beta\right)\right)$ reads for any
+	$\lambda > 1$ and $\beta \leq
+	\left\lfloor\log_\lambda\frac{M}{B\log_\lambda N}\right\rfloor$. A query
+	for a key $K$ performs $O(D_K\log_\lambda N)$ reads, where $D_K$ is the
+	number of times $K$ has been inserted or deleted.
+\end{restatable}

@@ -1,0 +1,84 @@
+% Comments
+% Uncomment the line below to mute all comments
+%\def \shutupcomments{}
+
+\newcommand{\defn}[1]{\emph{\textbf{\boldmath #1}}}
+
+\ifx \shutupcomments \undefined
+\newcommand{\alex}[1]{\textcolor{blue}{[ Alex: #1 ]}}
+\newcommand{\mfc}[1]{\textcolor{red}{[ MFC: #1 ]}}
+\newcommand{\phil}[1]{\textcolor{green}{[ Phil: #1 ]}}
+\else
+\newcommand{\alex}[1]{{}}
+\newcommand{\mfc}[1]{{}}
+\newcommand{\phil}[1]{{}}
+\fi
+
+% Auto labelling / references
+\newcommand{\secput}[2]{\section{#2}\label{sec:#1}}
+\newcommand{\secref}[1]{~\Cref{sec:#1}}     
+\newcommand{\subsecput}[2]{\subsection{#2}\label{sec:#1}}
+\newcommand{\figput}[2]{%
+ \begin{figure}[t]%
+ \begin{center}%
+  \input{#1.pdf_tex}%
+ \end{center}%
+ \caption{#2}%
+ \label{fig:#1}%
+ \end{figure}%
+}
+\newcommand{\figlabel}[1]{\label{fig:#1}}
+\newcommand{\figref}[1]{~\Cref{fig:#1}}
+
+% Notation
+\newcommand{\E}[1]{\mathrm{E}\left[#1\right]}
+\newcommand{\Var}[1]{\mathrm{Var}\left[#1\right]}
+\newcommand{\Prob}[1]{\mathrm{P}\left(#1\right)}
+\newcommand{\opt}{\textrm{OPT}}
+
+%\newtheorem{lemma}{Lemma}
+%\newtheorem{theorem}{Theorem}
+%\newtheorem{corollary}{Corollary}
+
+\newcommand{\btree}{$B$-tree}
+\newcommand{\btrees}{$B$-trees}
+\newcommand{\betree}{$B^\epsilon$-tree}
+\newcommand{\betrees}{$B^\epsilon$-trees}
+\newcommand{\lsm}{LSM}
+\newcommand{\lsms}{LSMs}
+\newcommand{\lflsm}{LF-LSM}
+\newcommand{\boa}{BOA}
+\newcommand{\cola}{COLA}
+\newcommand{\colas}{COLAs}
+
+\newcommand{\Dinsert}[3]{\textsc{insert}$(#1,#2,#3)$}
+\newcommand{\Ddelete}[2]{\textsc{delete}$(#1,#2)$}
+\newcommand{\Dquery}[2]{\textsc{query}$(#1,#2)$}
+\newcommand{\Dsucc}[2]{\textsc{succ}$(#1,#2)$}
+\newcommand{\Dpred}[2]{\textsc{pred}$(#1,#2)$}
+
+\newcommand{\calS}{\mathcal{S}}
+\newcommand{\calU}{\mathcal{U}}
+\newcommand{\calV}{\mathcal{V}}
+
+\newcommand{\bet}{B$^{\varepsilon}$-tree}
+\newcommand{\bets}{B$^{\varepsilon}$-trees}
+\newcommand{\betrfs}{\BetrFS}
+
+\newcommand{\grow}{\lambda}
+\newcommand{\high}[2]{\mathcal{H}_{#1}(#2)}
+\newcommand{\pow}[1]{\textrm{pow}_2(#1)}
+
+\def\hyperspc{\kern -0.22em}
+\newcommand{\lhfloor}{\lfloor \hyperspc \lfloor}
+\newcommand{\rhfloor}{\rfloor \hyperspc \rfloor}
+\newcommand{\lhceil}{\lceil \hyperspc \lceil}
+\newcommand{\rhceil}{\rceil \hyperspc \rceil}
+\newcommand{\lhhfloor}{\lfloor \hyperspc \lfloor \hyperspc \lfloor}
+\newcommand{\rhhfloor}{\rfloor \hyperspc \rfloor \hyperspc \rfloor}
+\newcommand{\lhhceil}{\lceil \hyperspc \lceil \hyperspc \lceil}
+\newcommand{\rhhceil}{\rceil \hyperspc \rceil \hyperspc \rceil}
+
+\newcommand{\foo}[1]{\lhceil #1 \rhceil}
+
+\newcommand{\IInsist}[1]{\smallskip\noindent{\sffamily\normalsize\bfseries #1.}}

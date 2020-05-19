@@ -1,17 +1,29 @@
+\makeatletter\let\latex@xfloat\@xfloat\makeatother
+
 \documentclass{ruthesis}
 \special{papersize=8.5in,11in} % for A4-default configurations on servers
+
+\usepackage{etoolbox}
+\makeatletter
+\let\@xfloat\latex@xfloat
+\apptocmd{\@xfloat}{\linespread{1}\normalsize}{}{}
+\makeatother
+
+\input{packages}
+\input{defines}
+
 \begin{document}
 \phd
 
-\title{The title of my thesis}
-\author{The author of my thesis}
+\title{Understanding Dictionaries at the Intersection of Theory and Practice}
+\author{Alexander Conway}
 \program{Computer Science}
-\director{The principal advisor's name}
+\director{Mart\'in Farach-Colton}
 \approvals{4}
-\submissionyear{2017}
+\submissionyear{2020}
 \submissionmonth{May}
 
-\abstract{This is the abstract}
+\input{abstract}
 
 \beforepreface
 \acknowledgements{The body of the acknowledgements}
@@ -19,24 +31,17 @@
 \afterpreface
 
 \chapter{Introduction}
-Here is the introduction.
+\input{intro}
 
-\chapter{First chapter}
-\section{Another section}
-\subsection{A subsection}
+\chapter{Optimal Hashing in External Memory}
+\input{boa-intro}
+\input{boa-prelim}
+\input{boa-boa}
+\input{boa-refined}
+\input{boa-bot}
+\input{boa-cacheoblivious}
+\input{boa-asymmetric}
 
-\begin{vita}
-\heading{The author of my thesis} \vspace{15pt}
-% Colleges attended, with dates, subjects, degrees
-\begin{descriptionlist}{xxxxx-xxxxx} % reverse chronological order
-\item[200x] Ph. D. in Computer Science, Rutgers University
-\item[200x-0x] B. Sc. in Computer Science from some University
-\item[200x] Graduated from such and such high school.
-\end{descriptionlist}
-\medskip
-\begin{descriptionlist}{xxxxx-xxxxx} %positions held since BS degree
-\item[200x-200y] Teaching assistant, Department of Computer Science, Rutgers University
-\end{descriptionlist}
-\end{vita}
-
+\bibliographystyle{plainurl}
+\bibliography{./bibliography}
 \end{document}

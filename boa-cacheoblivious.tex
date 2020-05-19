@@ -1,0 +1,80 @@
+\section{Cache-Oblivious BOTs}\label{sec:boa-cacheoblivious}
+
+In this section, we show how to modify a BOT to be cache oblivious.  We call
+the resulting structure a cache-oblivious hash tree (COBOT). 
+
+Much of the structure of the BOT translates directly into the cache-oblivious
+model. However, some changes are necessary. In particular, when the series of
+character queues are merged, this merge must be performed cache-obliviously
+using funnels~\cite{DBLP:conf/focs/FrigoLPR99}, rather than with an (up to)
+$M/B$-way merge. Also, the log cannot be buffered into sections of size $O(B)$,
+and so instead they are buffered into sections of constant size, items are
+immediately added to routing filter, and the extra IOs are eliminated by
+optimal caching.
+
+When an insertion is made into a COBOT, its fingerprint-value pair is
+appended to the log, and it is immediately inserted into level 1. Thus, the
+leaves of the routing trees point to single entries in the log.
+
+The series of the character queues must be placed more carefully as well. In
+particular the runs of series $\sigma_j$ must be laid out back-to-back for all
+$j$ (rather than just small $j$ as in \Cref{sec:character-queue}), so that the
+caching algorithm can buffer them appropriately.
+
+The series are merged using a \defn{partial funnelsort}. Funnelsort is a
+cache-oblivious sorting algorithm that makes use of
+$K$-funnels~\cite{DBLP:conf/focs/FrigoLPR99}. A $K$-funnel is a CO data structure
+that merges $K$ sorted lists of total length $N$. We make use of the the
+following lemma.
+
+\begin{lemma}[\cite{DBLP:conf/focs/FrigoLPR99}]\label[lemma]{lem:funnel}
+	A $K$-funnel merges $K$ sorted lists of total length $N\geq K^3$ in
+	$O\left(\frac{N}{B}\log_{M/B} \frac{N}{B} + K + \frac{N}{B}\log_{K}
+	\frac{N}{B}\right)$ IOs, provided the tall cache assumption that
+	$M=\Omega(B^2)$ holds.
+\end{lemma}
+	
+The partial funnelsort used to merge $K$ runs of a series with total length $L$
+(in words) performs a single merge with a $K$-funnel if $L \geq K^3$ and
+recursively merges the run in groups of $K^{1/3}$ runs otherwise.
+
+\begin{corollary}\label[corollary]{cor:funnelsort}
+	A partial funnelsort merges $K$ runs of total word length $L$ in
+	$O\left(\frac{L}{B}\log_{M/B} \frac{L}{B} + \frac{L}{B}\log_{K}
+	\frac{L}{B}\right)$ IOs, provided the tall cache assumption that
+	$M=\Omega(B^2)$ holds.
+\end{corollary}
+
+\begin{proof}
+	The base case of the recursion occurs either when there is only 1 list
+	remaining or the remaining lists fit in memory. In any other case of the
+	recursion, since $L=\Omega(B^2)$ by the tall cache assumption, the $K$ term
+	in \Cref{lem:funnel} is dominated.
+
+	The recurrence is dominated by the cost of the funnel merges, which yields
+	the result.
+\end{proof}
+
+\begin{theorem}
+	If $M=\Omega(B^2)$, then a COBOT with $N$ entries and growth factor
+	$\lambda$ has amortized insertion/deletion cost
+	$\Theta\left(\frac{1}{B}\left(\lambda + \log\log M + \log_{M/B}
+	N/B\right)\right)$. A query for key $K$ has cost
+	$\Theta\left(D_K\log_\lambda N\right)$, w.h.p., where $D_K$ is the
+	duplication count of $K$.
+\end{theorem}
+
+\begin{proof}
+	We may assume that the caching algorithm sets aside enough memory that the
+	last $B$ items in the log, together with the subtree rooted at their least
+	common ancestor, are cached. Thus the log is updated at a per-item cost of
+	$O(1/B)$.
+
+        The proof of \Cref{thm:bot-cost} now carries over to the COBOT. The
+        routing filters are updated the same way, and the cost of updating the
+        character queues is unchanged, by \Cref{cor:funnelsort}.
+
+	Queries are performed as in \Cref{sec:routing-tree-query}, except that now
+	the level 1 nodes cover $O(1)$ fingerprints, but the depth of the tree is
+	unchanged, so the cost is the same.
+\end{proof}

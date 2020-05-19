@@ -1,0 +1,21 @@
+\section{Conclusion}
+\label{sec:conclusion}
+
+Our work shows that, by combining ideas from LSM trees and \bets, we can build
+a \kv store that outperforms current \kv stores by up to an order of magnitude
+on insertions, matches or outperforms on lookups, and is competitive on range
+queries.
+
+\Sysname targets the common case of small key-value pairs and
+non-uniformly random workloads.  Many real-world \kv workloads come
+from different clients, some of which might be performing very
+localized operations, while others are performing relatively random
+operations.  \Sysname exploits whatever locality is available.
+
+\Sysname makes contributions to both the data-structural and systems
+design of high-performance \kv stores.  We show how to get the low
+write amplification of size-tiered data structure while maintaining
+the high query throughput and workload-adaptivity of a \bet.  We also
+describe several systems issues, such as cache, lock, and memtable
+design, that one must address to extract the full performance of
+high-performance NVMe devices.

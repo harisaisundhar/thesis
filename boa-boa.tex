@@ -1,0 +1,174 @@
+\section{Bundle of Arrays Hashing}\label{sec:boa-boa}
+
+A \defn{Bundle of Arrays Hash Table} (\boa{}) is an external-memory dictionary
+based on ST-LSMs. In this section, we describe a simple version which is
+optimal in the sense of \Cref{thm:ip-lower-bound}, but where the query cost
+meets the bound only in expectation, not w.h.p. In \Cref{sec:boa-refined}, we
+give a version that satifies \Cref{thm:boa-cost}.
+
+As a first step, we show that runs with uniformly distributed, $\Theta(\log
+N)$-wise independent fingerprints can be searched more quickly than in an
+ST-LSMs. In this section 
+
+\begin{lemma}\label[lemma]{lem:interpolation-search}
+	Let $A$ be a sorted array of $N$ uniformly distributed $\Theta(\log
+	N)$-wise independent keys in the range $[0,K)$, and assume $B=\Omega(\log
+	N)$. Then $A$ can be written to external memory using $O(N)$ space and
+	$O(N/B)$ IOs so that membership in $A$ can be determined in $O(1)$ IOs with
+	high probability.
+\end{lemma}
+
+\begin{proof}
+  First note that, by \Cref{lem:chernoff} and Bonferroni's inequality,
+  if $N$ balls are thrown into $\Theta(N/\log{N})$ bins uniformly
+  and $\Theta(\log N)$-wise independently, then every bin has
+  $\Theta(\log{N})$ balls with high probability.
+
+	Divide the range of keys into $N/B$ uniformly sized buckets; that is,
+	bucket $i$ contains keys in the range $[(i-1)KB/N,iKB/N)$. Because the keys
+	in $A$ are distributed uniformly, and $B= \Omega(\log N)$, every bucket
+	contains $\Theta(B)$ keys with high probability.  Let $F$ be the number of
+	items in the fullest bucket, and write the keys in each bucket to disk in
+	order using $F$ space for each.  Because $F = \Theta(B)$, this takes the
+	desired space and IOs.
+
+	Now, to find a key, compute which bucket it belongs to. A constant number
+	of IOs will fetch that bucket, whose address is known because all buckets
+	have the same size.
+\end{proof}
+
+\begin{corollary}
+	If an ST-LSM contains uniformly distributed and $\Theta(\log N)$-wise
+	independent fingerprints and has growth factor $\grow$, then a query for
+	$K$ can be performed in $O(D_K\grow \log_{\grow} N)$ IOs by writing the
+	levels as in Lemma~\ref{lem:interpolation-search}. The insertion/deletion
+	cost is unchanged: $O\left(\frac{1}{B}\left(\log_{\grow}
+			N+\log_{\frac{M}{B}} N\right)\right)$ amortized IOs.
+\end{corollary} 
+
+While the query performance improves by a factor of $\log{N}$, the ST-LSM
+is still off the optimal tradeoff curve of \Cref{thm:ip-lower-bound}. In
+particular, queries can be at least exponentially slower than optimal. The
+\boa{} use additional structure in order to reduce this query cost.
+
+\subsection{Routing Filters}\label{sec:boa-routing-filter}
+The main result of this section is an auxiliary data structure, the
+\defn{routing filter}, that improves the query cost of an ST-LSM by a
+factor of $\grow$ by further exploiting the log-wise independence of
+fingerprints.  Combining these routing filters with fast interpolation
+search will yield the BOA, a hashing data structure that is optimal
+for large enough $\grow$. 
+
+The purpose of the routing filter is to indicate probabilistically, at each
+level, which run contains the fingerprint we are looking for. Each level will
+have its own routing filter, defined as follows. For each level $\ell$, let
+$h_\ell$ be some number, to be specified below. Let $P_\ell(K)$ be the prefix
+consisting of the first $h_\ell$ characters of $K$. The routing filter $F_\ell$
+for level $\ell$ is a $\lambda^{h_\ell}$-character array, where $F_\ell[i] = j$
+if the $j$th run $R_{\ell,j}$ contains a fingerprint $K$ such that the
+$P_\ell(K)=i$, and no later run $R_{\ell,j'}$ (i.e. with $j'>j$) contains such
+a fingerprint.
+
+We also modify each run $R_{\ell, j}$ during the merge so that each
+fingerprint-value pair contains a \defn{previous field} of 1 additional
+character used to specify the previous run containing a fingerprint with the
+same prefix, or $j$ to indicate no such run exists. Thus these fingerprint-value
+pairs now form a singly linked list whose fingerprint share the same prefix,
+and the routing filter points to the run containing the head.
+
+During a query for a fingerprint $K$, first $F_\ell[P_\ell(K)]$ is checked to
+find the latest run containing a fingerprint with a matching prefix. Once that
+fingerprint-value pair is found, its previous field indicates the next run
+which needs to be checked and so on until all fingerprints with matching prefix
+in the level are found. Each fingerprint $K'\neq K$ that matches $K$'s prefix
+is a false positive.
+
+Such routing filters induce a space/cost tradeoff. The greater $h_\ell$ is, the
+more space the table takes but the less likely it is that many runs will have
+false positives. The rest of this section shows that when $h_\ell=\log_\lambda
+B + \ell$, in other words, when prefixes grow by a character per level, the BOA
+lies on the optimal tradeoff curve of \Cref{thm:ip-lower-bound}.
+
+Define $\beta$, the \defn{routing table ratio}, to be the ratio of the number
+of buckets in the routing filter to the size of a run. The number of entries in
+a run on level $\ell$ is $B\lambda^{\ell-1}$, so $\beta =
+\lambda^{h_\ell}/B\lambda^{\ell-1}$. We first analyze the per-level
+insertion/deletion cost, and then we compute the expected number of false
+positives in order to analyze the overall query cost.
+
+\begin{lemma}\label[lemma]{lem:boa-insertion-cost}
+	For a \boa{} with growth factor $\grow$ and routing table ratio $\beta$,
+	merging a level incurs $\Theta\left(\frac{1}{B}\left(1 +
+	\log_{\frac{M}{B}}\grow + \beta\log_{N}{\grow}\right)\right)$ IOs per
+	fingerprint.
+\end{lemma}
+
+\begin{proof}
+	Merging a level requires merging its runs as well as updating the
+	next level's routing filter. Merging $\grow$ sorted arrays takes
+	$\Theta\left(\frac{1}{B}\left(1 + \log_{M/B}\grow\right)\right)$ IOs per
+	fingerprint.
+			
+	The routing filter is updated by iterating through it and the new run
+	sequentially. For each fingerprint $K$ appearing in the run,
+	$F_{\ell+1}[P_{h_{\ell+1}}(K)]$ is copied to the previous field in the run,
+	and $F_{\ell+1}[P_{h_{\ell+1}}(K)]$ is set to the number of the current
+	run. Each entry in the routing filter is a character, and the routing
+	filter has $\beta$ entries for each new fingerprint. Thus, it requires
+	$\Theta\left(\frac{\beta}{B}\log_{N}{\grow}\right)$ IOs per fingerprint to
+	update sequentially. 
+\end{proof}
+
+\begin{lemma}\label[lemma]{lem:boa-false-positive}
+	For a \boa{} with growth factor $\grow$ and routing table ratio $\beta$,
+	querying a fingerprint $K$ on a given level incurs at most
+	$\frac{\lambda}{\beta}$ false positives in expectation.
+\end{lemma}
+
+\begin{proof}
+	Given some enumeration of the fingerprints in level $\ell$, which are not
+	equal to $K$, denote the $i$th such fingerprint by $K_i$. Some of these may
+	be the duplicates. Let $X_i$ be the indicator random variable, which is 1
+	if $P_\ell(K)=P_\ell(K_i)$ and 0 otherwise. $K$ and $K_i$ are
+	uniformly distributed and their bits are pairwise independent.  Thus
+	$\E{X_i} \leq \frac{1}{\lambda^{h_\ell}}$. The expected number of
+	fingerprints (excluding $K$) in the level with prefix $P_\ell(K)$ is thus
+	at most $\sum_{i=1}^{B \lambda^\ell}\E{X_i} \leq \frac{B
+	\lambda^\ell}{\lambda^{h_\ell}} = \frac{\grow}{\beta}.$
+\end{proof}
+
+\begin{lemma}\label[lemma]{lem:boa-cost-beta}
+	A \boa{} with growth factor $\grow$ and routing table ratio $\beta$ has
+	insertion/deletion cost $O\left(\frac{1}{B}\left(\beta +
+	\log_{\frac{M}{B}} N + \log_\lambda N\right)\right)$. A query for
+	fingerprint $K$ has expected cost
+	$O\left(\frac{\lambda}{\beta}D_K\log_\lambda N\right)$, where $D_K$ is the
+	duplication count of $K$.
+\end{lemma}
+
+\begin{proof}
+	Because a \boa{} has $\log_\lambda N$ levels, the insertion cost follows from
+	\Cref{lem:boa-insertion-cost}.
+
+	To query for a fingerprint $K$, the routing filter on each level is
+	checked, which incurs $O(\log_\lambda N)$ IOs. These routing filters return
+	a collection of runs which contain up to $D_K$ true positives and an
+	expected $O\left(\frac{\lambda}{\beta}\log_\lambda N\right)$ false
+	positives, by \Cref{lem:boa-false-positive}. By
+	\Cref{lem:interpolation-search}, each run can be checked in $O(1)$ IOs.
+\end{proof}
+
+So for a fixed $\grow$, there is no advantage to choosing $\beta =
+\omega(\grow)$. On the other hand, $\beta = o(\grow)$ is suboptimal, because
+then choosing $\beta'=\grow'=\beta$ changes a linear factor in the query cost
+to a logarithmic one. Therefore, it is optimal to choose $\beta =
+\Theta(\grow)$, and in what follows we will fix $\beta = \grow$. Thus,
+
+\begin{lemma}\label{thm:boa-cost-expectation}
+	A \boa{} supports $N$ insertions and deletions with amortized
+	per entry cost of $O\left(\left(\grow + \log_{\frac{M}{B}} N +
+	\log_\grow{N} \right)/B\right)$ IOs, for any $\grow > 1$. A query for a key
+	$K$ costs $O(D_K\log_\grow{N})$ IOs in expectation, where $D_K$ is the
+	duplication count of $K$.
+\end{lemma}
+

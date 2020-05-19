@@ -1,0 +1,247 @@
+\section{From \datastructs to \sysname}\label{sec:details} 
+In this section, we discuss the details of \sysname's implementation. \sysname
+targets NVMe SSDs, and on NVMe SSDs, CPU is the primary bottleneck to
+write performance, and concurrency is the primary bottleneck to read
+performance. As a result, what would be minor design decisions for a key-value
+store which targets a slower storage medium become performance critical when
+targeting NVMe storage.
+
+\subsection{User-level Cache and Distributed Locks}\label{sec:cache}
+
+\sysname{} has a single user-level cache which keeps recently accessed pages in
+memory. Almost all the memory that \sysname uses comes from this cache, so
+pages from all parts of the data structure---trunk node pages, branch pages,
+filter pages and memtable pages---are all stored there. Only cache and
+file-system metadata, as well as small allocations used to enqueue compaction
+tasks are allocated from system memory.
+
+This design allows nearly all the free memory to be used for whichever
+operations are being performed, so that parts of the data structure which are
+not in use can be paged out.
+
+The cache at a high level is a clock cache, but with several features designed
+to improve concurrency.
+
+Each thread has a thread-local hand of the clock, which covers 64 pages. The
+thread draws free pages from the hand, and if it has exhausted them, it
+acquires a new hand from a global variable using a compare-and-swap. It then
+writes out dirty pages from the hand which is a quarter turn ahead, and
+evicts any evictable pages in its new hand. Thus threads clean and evict pages
+from distinct cache lines within the cache metadata, avoiding contention and
+cache-line ping-ponging.
+
+\sysname uses distributed reader-writer locks~\cite{HsiehWe92} to
+avoid cache-line thrashing between readers.  Briefly, a distributed
+reader-writer lock consists of a per-thread reader counter and a
+shared write bit.  Each reader counter is on a separate cache line to
+avoid cache-line ping-ponging when readers acquire the lock.  Writers
+set the write bit (using compare and swap) and then wait for all the
+read counters to become zero.  Readers acquire the lock by
+incrementing their read counter and then checking that the writer bit
+is 0.  If it is not, they decrement their reader counter and restart.
+
+Distributed reader-writer locks allow readers to scale essentially
+perfectly linearly, at the cost that acquiring a write lock is
+expensive.  However, the design of \sysname makes writing rare enough
+that this is a good trade-off.
+
+We make distributed reader-writer locks space efficent by storing each
+thread's reader counters in an array indexed by cache-entry index.
+Each reader counter is one byte, so the total space used by locks
+is $t\times c$ bytes, where $t$ is the number of threads and $c$ is the
+number of cache entries.
+
+\sysname supports three levels of lock: read locks, ``claims'', and
+write locks.  A claim is a read lock that can be upgraded to a write
+lock.  Only one thread can hold a claim at a time.  After obtaining a
+read lock, a thread may try to obtain a claim by trying to set a
+shared claim bit with a test-and-set. If this fails, they must drop
+the read lock and start over.  Otherwise, they can upgrade their claim
+to a write lock by setting a shared write bit and waiting for all the
+read counters to go to zero.
+
+\subsection{Branch Trees and Memtables}
+\sysname uses the same B-tree implementation for both its branches and its
+memtables, although there are some differences to optimize for their use cases.
+By using the same data structure, memtables can be incorporated into the 
+\datastruct directly as branch trees with no serialization. The only processing
+needed is the construction of a quotient filter.
+
+\paragraph{Branch trees.}
+When a branch is created from a compaction, its key-value pairs are packed into
+the leaves of the B-tree, and the leading edge of internal nodes are created to
+index them. The nodes in each level are allocated in extents of 32 pages, and
+the header of each node stores the address of the following node, but also of
+the next extent. In this way, the nodes of each level form a singly linked list.
+
+Iteration through a branch is performed by walking the linked list
+formed by its leaves.  Whenever the iterator reaches the beginning of
+a new extent, it issues an asynchronus prefetch request for the next
+extent.
+%The extent length is configurable to tune to the latency of
+%the storage device.
+
+\paragraph{Memtables.}
+The basic design of the memtables mirrors that of the branch B-trees, but
+includes some optimizations designed to increase their insertion performance
+and concurrency.
+
+As in the case of the static branch trees, the nodes on each level of the
+memtable form a singly-linked list, and nodes are allocated in extents.
+However, because nodes are created on
+demand as nodes split, we do not try to guarantee that successive nodes
+reside in the same extent.  Furthermore, since memtables are almost always
+in RAM, we do not perform prefetching during memtable traversals.
+
+%% and in particular not in key order, the prefetching design of the
+%% branch trees does not carry over. Therefore the memtables do not support
+%% prefetching. In practice they are rarely written to disk, and overhead of
+%% reading them without prefetching is only about 2--3$\times$.  \alex{probably
+%% include some sort of statistic here.}
+
+The memtable uses hand-over-hand locking, together with preemptive
+splitting. At each index node, first a read lock is obtained, which is
+upgraded only if a split is required. If an index node is full, the
+inserter tries to upgrade it to a claim; if this fails, that means
+another thread is already splitting the node, and the inserter
+attempts to continue down the tree.  If it cannot continue because of
+held locks, or if it finds that the leaf is full, then it aborts and
+tries again from the root.
+
+To ensure locks are held briefly, especially on nodes near the top of
+the tree, the tree uses a new technique called \defn{shadow
+  splitting}. To split a node $c$, a claim is obtained on $c$ and the
+parent $p$. We allocate a physical block number (PBN) $n$ for the new
+sibling, $c'$.  However, in the cache, we initially point $n$ to $c$.
+We also add a new pivot to the parent $p$, pointing to the new PBN
+$n$.  At this point, we can release all locks on $p$.  We then
+allocate space for $c'$ and fill in its contents.  We then update the
+PBN $n$ to point to $c'$ in the cache, and then release all locks on
+$c'$.  Finally we upgrade to a write lock on $c$, truncate its child
+list (via a metadata operation) and then release all locks on $c$.
+
+%\subsection{Memtables}
+%
+%\rob{Maybe this should be expanded to explain the design of your
+%  B-tree in general, including prefetching.}
+%
+%\sysname uses dynamic B-trees for its memtables. These B-trees use the same
+%structure as the branch B-trees, except that they do not fully pack nodes. When
+%a memtable fills, its quotient filter is constructed and it is added to the
+%trunk root via a pointer swing. Because it shares the same structure as the
+%branch B-trees, it needs no serialization or further processing.
+%
+%These memtables are designed to be kept in memory, but under cache pressure, it
+%is possible that some or all of their pages will be written out to disk. When
+%they are read back, they do not support the prefetching that the normal branch
+%B-trees use. When they are scanned (\textit{e.g.} for compactions or scans),
+%they are roughly 3--4$\times$ slower.
+%
+%In practice, this drawback doesn't significantly affect performance, because
+%memtables are usually relatively short-lived. Even though memtables are added
+%to the trunk root, once they are flushed from there, they will be compacted as
+%per the compact-after-flush policy. Once they are flushed to all pivots, they
+%will have no more references and be destroyed. The secondary flushing trigger
+%(see \cref{sec:flush-compact}) guarantees that only so much data can be added
+%to the trunk root before the memtable is flushed to all pivots, ensuring that
+%the memtable will not live for very long.
+
+\subsection{Quotient filters}
+
+Bloom filters~\cite{DBLP:journals/cacm/Bloom70} are the standard filter for
+most LSMs~\cite{leveldb,facebook-rocksdb2018,DBLP:conf/sosp/RajuKCA17}.
+However, the cost of Bloom filter insertions can dominate the cost of sorting
+the data in a compaction. Therefore modern key-value stores often use more
+efficient filters; for example, RocksDB uses blocked Bloom
+filters~\cite{DBLP:journals/jea/PutzeSS09};
+
+Similarly, \sysname uses quotient
+filters~\cite{DBLP:conf/hotstorage/BenderFJKMMSSZ11,DBLP:journals/pvldb/BenderFJKKMMSSZ12,DBLP:conf/sigmod/PandeyBJP17}
+instead of Bloom filters.  A full presentation of quotient filters is
+out of scope for this paper, but we review their salient features for
+\sysname.  See Pandey, et al.\ for a full presentation on quotient
+filters~\cite{DBLP:conf/sigmod/PandeyBJP17}.  The key feature of
+quotient filters is that, like blocked Bloom filters, each insert or
+query accesses $O(1)$ cache lines (and hence $O(1)$ page accesses).
+Quotient filters are roughly as space efficient as Bloom filters---for
+the range of parameters used in \sysname, quotient filters use between
+$0.8\times$ and $1.2\times$ the space of a blocked Bloom filter.  We view
+the space as essentially a wash.  Quotient filter inserts and lookups
+also require only one hash function computation.  In past work,
+quotient filter insertions and queries were shown to be 2-4$\times$
+faster than in a Bloom filter.
+
+
+
+%% A full presentation of quotient filters is out of
+%% scope for this paper, but we review their salient features for \sysname.  A
+%% quotient filter for set $S$ stores, without error, $h(S)=\{h(x) \mid x\in S\}$,
+%% where $h$ is a hash function.  Since the quotient filter stores $h(S)$ exactly,
+%% all false positives are the result of collisions under $h$.  Thus each
+%% insertion or lookup requires only one hash function computation.  Furthermore,
+%% a quotient filter stores the elements of $h(S)$ in sorted order in a hash table
+%% using a variant of linear probing.  Thus most inserts and lookups in a quotient
+%% filter access only 1 or 2 adjacent cache lines.  As a result, insertions and
+%% lookups in quotient filters are typically 2-4$\times$ faster than in a Bloom
+%% filter.  Finally, quotient filters are space efficient, using slightly less
+%% space than Bloom filters whenever the false positive rate $\epsilon$ is less
+%% than $1/64$, which is typical.  For example, a quotient filter with
+%% $\epsilon=0.1\%$ uses about 10\% less space than a Bloom
+%% filter~\cite{DBLP:conf/sigmod/PandeyBJP17}.
+
+\sysname further reduces the CPU costs of filter building during compaction by
+using a bulk build algorithm.  During the merging phase of compaction or when
+inserting into a memtable, \sysname builds an unsorted array of all the hashes
+of all the tuples compacted or inserted. The array is then sorted (by hash
+value) and the quotient filter is built.  Since the quotient filter also stores
+the hashes in sorted order, this means that the process of inserting all the
+hashes is a linear scan of the sorted array and of the quotient filter.  Hence
+it has good locality and can benefit from cache prefetching.  
+
+\subsection{Logging and Recovery}
+\label{sec:recovery}
+
+\sysname uses per-thread write-ahead logical logging for recovery.  By
+using per-thread logs, we avoid contention on the head of a single,
+shared log.
+
+The challenge is to resolve the order of operations across logs after
+a crash.  For this, we use a technique similar to ``cross-referenced
+logs''~\cite{!huang:cross:referencing:logs}.  Our scheme works as
+follows.  Each leaf of the memtable has a generation number.  Whenever
+a thread inserts a new message into the memtable, it records and
+increments the generation number of the memtable leaf for the inserted
+key.  It then appends the inserted message to its per-thread log,
+tagged with the leaf's generation number.  During recovery, the
+generation numbers in the logs give a total order on the operations
+performed on each leaf (and hence on all the keys for that leaf), so
+that the recovery procedure can replay the operations on each key in
+the proper order.  When a leaf of the memtable splits, the new leaf
+gets the same generation number as the old leaf.
+
+%% Checkpoints proceed as follows.  A checkpoint begins by incorporating
+%% the current memtable into the \datastruct and copying the entire trunk
+%% of the \datastruct, creating a new trunk that shares all its branches
+%% with the running trunk.  Since branches are all immutable and
+%% reference-counted, they can safely be shared between the live tree and
+%% the tree that is in the process of being checkpointed.  The copy is
+%% created in a breadth-first manner with hand-over-hand locking,
+%% ensuring that the copy is a consistent view of the \datastruct's
+%% logical state at the moment when the copy began.  Since each trunk
+%% node covers, on average, hundreds of megabytes of messages, the number
+%% of trunk nodes is extremely small---typically only a few thousand---so
+%% the copy operation takes very little time.  The checkpointing process
+%% also records the positions of the heads of all the per-thread logs.
+
+%% Once \sysname has created a copy of the trunk, it makes a single pass
+%% over the cache, writing out all dirty pages.  This ensures that all
+%% pages referenced by the in-progress checkpoint tree are on disk.
+
+%% Finally, \sysname has two superblocks, each of which points to the
+%% root of a \datastruct and its associated logs.  The two superblocks
+%% are timestamped and, on boot, \sysname chooses the more recent of the
+%% two.  Thus, to complete a checkpoint, \sysname overwrites the older of
+%% the two superblocks with a new block containing pointers to the new
+%% trunk and to the heads of the logs that were recorded earlier.  After
+%% writing out this new superblock, all log pages prior to the log heads
+%% can be garbage collected.

@@ -1,0 +1,95 @@
+\section{Preliminaries}\label{sec:boa-prelim}
+
+\paragraph{Fingerprints and Hashing}\label{sec:hashing}
+In order to achieve our bounds, we need $\Theta(\log N)$-wise independent hash
+functions, which, once again matches IP hash tables.  We note that a $k$-wise
+independent hash function is also $k$-wise independent on individual bits.
+Furthermore, the following Chernoff-type bound holds:
+
+\begin{lemma}[\cite{DBLP:journals/siamdm/SchmidtSS95}]\label[lemma]{lem:chernoff}
+	Let $X_1,X_2,\ldots,X_N$ be $\lceil\mu\delta\rceil$-wise independent binary
+	random variables, $X=\sum_{i=1}^N X_i$ and $\mu = \E{X}$. Then $\Prob{X >
+	\mu\delta} = O\left(1/\delta^{\mu\delta}\right)$, for sufficiently
+	large $\delta$.
+\end{lemma}
+
+In the following, we use \defn{fingerprint} to refer to any
+key that has been hashed using a $\Theta(\log N)$-wise independent hash
+function. Such hash functions have a compact representation and can be specified
+using $\Theta(\log N)$ words. The universe that is hashed into is assumed to
+have size $\Theta(N^k)$ for $k\geq2$. We ignore collisions, but these can be
+handled as in~\cite{DBLP:conf/soda/IaconoP12}.
+
+For a fingerprint $K$, it will be convenient to interpret the bits of $K$ as a
+string of $\log \lambda$ (where lambda is a given parameter) bit characters,
+$K=K_0K_1K_2\cdots$.
+
+\paragraph{Delta Encoding}\label{sec:delta-encoding}
+We will frequently encounter sorted lists of fingerprint prefixes (possibly
+with duplicates), together with some data about each. When the size of the list
+is dense in the space of prefixes, we can compress it using \defn{delta
+encoding}, where the difference between prefixes is stored rather than the
+prefixes themselves.
+
+\begin{lemma}\label[lemma]{lem:delta-encoding}
+	A list of delta-encoded prefixes with density $D$, that is there are $D$
+	prefixes in the list for every possible prefix, requires
+	$O(-\log_\lambda{D})$ characters per prefix.
+\end{lemma}
+
+\begin{proof}
+	The average difference between consecutive prefixes is $1/D$. Because
+	logarithms are convex, the average number of characters required to
+	represent this difference is therefore $O(-\log_\lambda{D})$.
+\end{proof}
+
+\paragraph{Log-structured Merge Trees}\label{sec:lsm}
+Log-structured merge trees (LSMs) are (a family of) external-memory dictionary
+data structures.  They come in two varieties: \defn{level-tiered LSMs}
+(LT-LSMs) and \defn{size-tiered LSMs} (ST-LSMs).  Both kinds are suboptimal in
+that they do not meet the optimal insertion-query
+tradeoff~\cite{DBLP:conf/soda/BrodalF03}, although the
+COLA~\cite{DBLP:conf/spaa/BenderFFFKN07} is an optimal variant of the LT-LSMs.
+
+An LSM consists of sets of either B-trees or sorted arrays called \defn{runs}.
+In this paper, we describe them in terms of runs, since we use runs below.
+
+An LT-LSM consists of a cascade of levels, where each level consists
+of at most one run.  Each level has a \defn{capacity} that is $\grow$
+times greater than the level below it, where $\grow$ is called the
+\defn{growth factor}.\footnote{Sometimes this and related structures
+  are analyzed with a growth factor of $B^\epsilon$. The two are
+  equivalent. We use $\grow$ rather than $\epsilon$ as the tuning
+  parameter for consistency with the external-memory hashing
+  literature.}  When a level reaches capacity, it is merged into the
+next level (perhaps causing a merge cascade).  The amortized IO cost
+for insertions is small because sequential merging is fast, although
+each item will participate in $\grow/2$ merges on average.  The IO
+cost for a query is high because a query must be performed independently
+on each of $O(\log_\grow N)$ levels (although Bloom
+filters~\cite{DBLP:journals/cacm/Bloom70,DBLP:journals/pvldb/BenderFJKKMMSSZ12}
+are sometimes used to mitigate this cost).
+
+An ST-LSM further improves insertion IOs at the expense of queries.
+Each level contains fewer than $\grow$ runs.  Every run on a given
+level has the same size, which is $\grow$ times larger than the runs
+on the level beneath it.  When $\grow$ runs are present at a level,
+they are merged into one run and placed at the next level.  There are
+therefore $O(\log_{\grow} N)$ levels.  Insertions are faster than in
+LT-LSMs because each item is only merged once on each level.  Queries
+are slower because each query must be perform $O(\grow)$ times at each
+level.
+
+In LSMs, deletions can be implemented by the use of \defn{upsert
+messages}~\cite{DBLP:conf/hotstorage/EsmetBFK12,DBLP:conf/hotstorage/JannenBFJKP16},
+which are a type of insertion with a message that indicates that the key has
+been deleted. A query for a key $K$ then fetches all the matching key-value
+pairs and if the last one (temporally) is a deletion upsert, it returns false.
+To this end, the merges must maintain the temporal order of key-value pairs
+with the same key. Because a query for a key $K$ must fetch every instance of
+$K$, the cost of a query is proportional to the number of times the key has
+been inserted and deleted, which we refer to as the \defn{duplication count},
+$D_K$ of $K$. When $N/2$ deletions have been made, the structure is rebuilt to
+reclaim space. In what follows, deletions will be implemented using the same
+mechanism.
+
