@@ -1,0 +1,7 @@
+Length  ThroughputBytes  Throughput  Alignment
+1       18.7             49          225
+10       171             58          315
+100      972             54          340
+1000    2063             28          150
+10000   2158             4.1         345
+100000  1872             0           90

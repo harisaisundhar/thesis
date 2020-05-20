@@ -1,0 +1,4 @@
+Type        Amplification  Min   Max
+load-write  8.15           8.23  8.23
+load-total  8.34            9.8   9.8
+c-read      4.41           24.9  24.9

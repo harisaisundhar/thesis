@@ -1,0 +1,6 @@
+Percent_Sequential  Write  Total  WriteAlignment  WriteOpacity  TotalAlignment
+0                   2.87   4.21   150             100           205
+50                  2.56   3.18   90              100           270
+90                  1.91   2.06   45              0             270
+99                  1.27   1.27   45              0             25
+100                 1.24   1.24   135             0             215

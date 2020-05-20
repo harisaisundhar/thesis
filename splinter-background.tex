@@ -27,9 +27,9 @@ analyses of the data structures.
 
 
 \paragraph{The DAM model.}
-We use the Disk Access Machine (DAM) model~\cite{!aggarwal:vitter:input:output:complexity:sorting} 
-in our performance analyses.  In the DAM model, data is transferred between disk and
-RAM of size $M$ in blocks of size $B$ words.  The I/O cost of a data
+We use the Disk Access Machine (DAM) model~\cite{DBLP:conf/icalp/AggarwalV87}
+in our performance analyses.  In the DAM model, data is transferred between
+disk and RAM of size $M$ in blocks of size $B$ words.  The I/O cost of a data
 structure is the number of block transfers.
 %When RAM becomes full, blocks may
 %need to be written back to disk to make room for new blocks.
@@ -184,7 +184,7 @@ insertion workloads that have high locality can be asymptotically slower.  Queri
 asymptotically slower than in a B-tree, but this can largely be
 mitigated with filters.
 
-\paragraph{\Bets.} The generic \bet~\cite{!brodal:fagerberg:dictionaries:lower:bounds}
+\paragraph{\Bets.} The generic \bet~\cite{DBLP:conf/soda/BrodalF03}
 is
 a B-tree that uses part of the space in each node to buffer items
 recently inserted into the subtree rooted at that node.  Queries must
@@ -256,12 +256,11 @@ emptiness queries.
 %no IOs for negative queries.
 
 In our work we use a variant of quotient
-filters~\cite{DBLP:conf/hotstorage/BenderFJKMMSSZ11}, because inserts
-and lookups access only a constant number of distinct
-locations~\cite{DBLP:conf/hotstorage/BenderFJKMMSSZ11}, making them
-generally faster than Bloom filters.  Furthermore, quotient filters
-are, for the false-positive rate used in \sysname, roughly the same
-size as Bloom filters.
+filters~\cite{DBLP:journals/pvldb/BenderFJKKMMSSZ12}, because inserts and
+lookups access only a constant number of distinct
+locations~\cite{DBLP:journals/pvldb/BenderFJKKMMSSZ12}, making them generally
+faster than Bloom filters.  Furthermore, quotient filters are, for the
+false-positive rate used in \sysname, roughly the same size as Bloom filters.
 
 
 % Besides size, the other main performance metric of a filter is cache

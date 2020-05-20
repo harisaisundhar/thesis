@@ -3,37 +3,32 @@
 % should move this to paper.tex, using this locally to avoid conflict.
 \newcommand{\sref}[1]{\S\ref{#1}}
 
-Key-value stores form an integral part of system infrastructure.
-Google's LevelDB and Facebook's RocksDB are widely used both
-within their companies and outside. Their importance has spurred
-research into several aspects of key-value store design, such as
-increasing write throughput, reducing write amplification, and
-increasing
-concurrency~\cite{PapagiannisSaGo16,cassandra,scylla,!pebblesdb:raju,facebook-rocksdb2018,!dostoevsky:dayan:idreos,!log:structured:merge:bush,!monkey:optimal:navigable,!bender:streaming:oblivious,DBLP:conf/soda/BrodalF03,!bender:persistence,!bender:skip,lu2016wisckey,hashkv,!conway:icalp:hashing,!iacono:patrascu:hashing:dictionary:external:memory,lsm-trie,marmol2015nvmkv,vasudevan2012using,shetty2013building,golan2015scaling,!hashing:index:persistent,!geardb,KourtisIoKo19,KaiyrakhmetLeNa19,leveldb,bradleywhitepaper,!triad:synergies:memory:disk:log:usenix}.
+Key-value stores form an integral part of system infrastructure.  Google's
+LevelDB and Facebook's RocksDB are widely used both within their companies and
+outside. Their importance has spurred research into several aspects of
+key-value store design, such as increasing write throughput, reducing write
+amplification, and increasing
+concurrency~\cite{DBLP:conf/usenix/PapagiannisSGB16,cassandra,scylla,DBLP:conf/sosp/RajuKCA17,facebook-rocksdb2018,DBLP:conf/sigmod/DayanI18,DBLP:conf/sigmod/DayanI19,DBLP:conf/sigmod/DayanAI17,DBLP:conf/spaa/BenderFFFKN07,DBLP:conf/soda/BrodalF03,DBLP:conf/pods/BenderBJKMPSSZ16:set,DBLP:conf/pods/BenderFJMMPX17,DBLP:journals/tos/LuPGAA17,DBLP:conf/usenix/ChanLLX18,DBLP:conf/icalp/ConwayFS18,DBLP:conf/soda/IaconoP12,DBLP:conf/usenix/WuXSJ15,DBLP:conf/usenix/MarmolSTR15,DBLP:conf/cloud/VasudevanKA12,DBLP:conf/fast/ShettySMASZ13,DBLP:conf/eurosys/Golan-GuetaBHK15,DBLP:journals/tos/ZuoHW19,DBLP:conf/fast/YaoWHZLXH19,DBLP:conf/fast/KourtisIK19,DBLP:conf/fast/KaiyrakhmetLNNC19,leveldb,bradleywhitepaper,DBLP:conf/usenix/BalmauDGZYAGK17}.
 
-Existing key-value stores face new challenges with the increasing use
-of high-performance NVMe solid state drives (SSDs) in industry. NVMe
-SSDs offer substantially higher bandwidth (500K-600K IOPS) and lower
-latency (10-20 micro-seconds) than other SSDs.
+Existing key-value stores face new challenges with the increasing use of
+high-performance NVMe solid state drives (SSDs) in industry. NVMe SSDs offer
+substantially higher bandwidth (500K-600K IOPS) and lower latency (10-20
+micro-seconds) than other SSDs.
 
 These key-value stores struggle to utilize all the available bandwidth in
 modern SSDs.  For example, we find that for the common case of small key-value
 pairs, RocksDB is able to use only 30\% of the bandwidth supplied by an
 Optane-based Intel 905p NVMe SSD (even when using 20 or more cores).
 
-\alex{I think there's a decent argument that it's write concurrency
-  that's the main culprit. Check out the plot in eval.} 
-  We find that the bottleneck has shifted from the storage
-device to the CPU: reading data multiple times during compaction, cache misses, and
-thread contention cause RocksDB to be CPU-bound when running atop NVMe
-SSDs.
-Thus, there is a need to redesign
-key-value stores to avoid these CPU
-inefficiencies.
-While KVell~\cite{!kvell}, a new research key-value store, also tries to reduce CPU overhead,
-it presents a design optimized for large key-value pairs. In particular, we show that
-KVell experiences an extreme performance cliff when it does not have enough memory to hold
-its in-memory index, a limitation also acknowledged by its authors.
+We find that the bottleneck has shifted from the storage device to the CPU:
+reading data multiple times during compaction, cache misses, and thread
+contention cause RocksDB to be CPU-bound when running atop NVMe SSDs.  Thus,
+there is a need to redesign key-value stores to avoid these CPU inefficiencies.
+While KVell~\cite{DBLP:conf/sosp/LepersBGZ19}, a new research key-value store,
+also tries to reduce CPU overhead, it presents a design optimized for large
+key-value pairs. In particular, we show that KVell experiences an extreme
+performance cliff when it does not have enough memory to hold its in-memory
+index, a limitation also acknowledged by its authors.
 
 \begin{figure}
       \centering
@@ -60,9 +55,9 @@ its in-memory index, a limitation also acknowledged by its authors.
                   ylabel={Ops/Sec \\ (Thousands)},
                   xlabel={},
                   label style={align=center, font=\small},
-                  legend columns=5,
+                  %legend columns=5,
                   %legend style={at={(0.98, 0.98)}, anchor=north east}
-                  legend to name={highlights-legend},
+                  %legend to name={highlights-legend},
                   skip coords between index={1}{7}
                ]
                \addplot[style={Plum,fill=Plum,mark=none} ]
@@ -71,7 +66,7 @@ its in-memory index, a limitation also acknowledged by its authors.
                table [col sep=space] {data/ycsb-100b/rocksdb.csv};
                \addplot[style={ForestGreen,fill=ForestGreen,mark=none}]
                table [col sep=space] {data/ycsb-100b/pebblesdb.csv};
-               \legend{\sysname, RocksDB, PebblesDB};
+               %\legend{\sysname, RocksDB, PebblesDB};
             \end{axis}
          \end{tikzpicture}
          %% \caption{Throughput on YCSB workloads. Load consists of 673M
@@ -122,50 +117,46 @@ its in-memory index, a limitation also acknowledged by its authors.
       \label{fig:eval-highlights}
 \end{figure}
 
-We present \sysname, a key-value store designed for high performance
-on NVMe SSDs. For example, on small key-value pairs, \sysname is
-able to fully utilize the device bandwidth and achieves almost
-$2\times$ lower write amplification than RocksDB (see Figure~\ref{fig:eval-highlights}).  We show that
-compared to state-of-the-art key-value stores such as RocksDB and
-PebblesDB, \sysname is able to ingest new data 6 to 28$\times$ faster
-(see \Cref{fig:eval-highlights}) while using the same or less memory.
-For queries, \sysname is 1.5-3$\times$ faster than RocksDB and PebblesDB.
+We present \sysname, a key-value store designed for high performance on NVMe
+SSDs. For example, on small key-value pairs, \sysname is able to fully utilize
+the device bandwidth and achieves almost $2\times$ lower write amplification
+than RocksDB (see \cref{fig:eval-highlights}).  We show that compared to
+state-of-the-art key-value stores such as RocksDB and PebblesDB, \sysname is
+able to ingest new data 6 to 28$\times$ faster (see \cref{fig:eval-highlights})
+while using the same or less memory.  For queries, \sysname is 1.5-3$\times$
+faster than RocksDB and PebblesDB.
 
 Three novel ideas contribute to the high performance of \sysname: the
-\emph{\datastruct}, a concurrent memtable that removes the insertion scalability bottleneck,
-and a concurrent user-level cache that reduces cache-interference in highly-concurrent settings.
-All three components are designed to enable the CPU to drive high IOPS without wasting cycles.
+\emph{\datastruct}, a concurrent memtable that removes the insertion
+scalability bottleneck, and a concurrent user-level cache that reduces
+cache-interference in highly-concurrent settings.  All three components are
+designed to enable the CPU to drive high IOPS without wasting cycles.
 
-At the heart of \sysname is the \datastruct, a novel data structure
-that combines ideas from log-structured merge trees and \bets.  The
-\datastruct adapts the idea of size-tiering (also known as
-fragmentation) from key-value stores such as Cassandra and PebblesDB
-and applies them to \bets to reduce write amplification by reducing
-the number of times a data item is re-written during compaction.  The
-\datastruct also enables localized, fine-grained compactions that
-increase compaction concurrency across the entire tree.  By enabling
-fine-grained, localized compactions, \datastructs push ideas from
+At the heart of \sysname is the \datastruct, a novel data structure that
+combines ideas from log-structured merge trees and \bets.  The \datastruct
+adapts the idea of size-tiering (also known as fragmentation) from key-value
+stores such as Cassandra and PebblesDB and applies them to \bets to reduce
+write amplification by reducing the number of times a data item is re-written
+during compaction.  The \datastruct also enables localized, fine-grained
+compactions that increase compaction concurrency across the entire tree.  By
+enabling fine-grained, localized compactions, \datastructs push ideas from
 PebblesDB to their logical cocnclusion.
 
-In key-value stores like RocksDB, all
-inserted data is first stored in an in-memory component called the
-memtable. We find that the
-memtable in RocksDB provides low concurrency and becomes the
-bottleneck when used on top of the highly-concurrent \datastruct on
-NVMe devices. We redesigned the memtable for high concurrency: similar to the
-\datastruct, the \sysname memtable is based on a B-tree designed using
-a 4KB disk block size and the L3 cache-line size; as a result, when data
-needs to be moved between the memtable and \datastruct, it can be done
-using simple pointer manipulations, reducing the CPU cost.
+In key-value stores like RocksDB, all inserted data is first stored in an
+in-memory component called the memtable. We find that the memtable in RocksDB
+provides low concurrency and becomes the bottleneck when used on top of the
+highly-concurrent \datastruct on NVMe devices. We redesigned the memtable for
+high concurrency: similar to the \datastruct, the \sysname memtable is based on
+a B-tree designed using a 4KB disk block size and the L3 cache-line size; as a
+result, when data needs to be moved between the memtable and \datastruct, it
+can be done using simple pointer manipulations, reducing the CPU cost.
 
 Finally, key-value stores such as RocksDB and PebblesDB use the Linux page
-cache, but we found the page cache ill-suited for high concurrency. 
-We designed a new user-level concurrent
-cache for \sysname that uses fine-grained, distributed reader-writer locks to avoid contention and
-ping-ponging of cache lines, as well as a direct map
-to enable lock-free cache operations. All the data read and written by \sysname
-flows through this concurrent cache.
-
+cache, but we found the page cache ill-suited for high concurrency.  We
+designed a new user-level concurrent cache for \sysname that uses fine-grained,
+distributed reader-writer locks to avoid contention and ping-ponging of cache
+lines, as well as a direct map to enable lock-free cache operations. All the
+data read and written by \sysname flows through this concurrent cache.
 
 %At the heart of \sysname is the \emph{\datastruct}, a novel data structure that
 %combines ideas from log-structured merge trees and \bets. \datastruct
