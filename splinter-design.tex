@@ -7,7 +7,7 @@ concurrency, without sacrificing lookup performance.
 
 \begin{figure}[t]
   \begin{center}
-    \includegraphics[width=3.25in]{stbetree-diagram.pdf}
+    \includegraphics[width=3.25in]{figures/stbetree-diagram.pdf}
     \caption{Overall design of \datastructs and \sysname.  Trunk
       nodes contain pivots and child pointers and pointers to a
       collection of branches and their associated filters.  Each branch
@@ -66,15 +66,15 @@ nodes to prefetch leaves
 in advance, enabling our \datastruct to take advantage of the I/O
 parallelism of NVMe devices.
 
-Each branch also has an associated \defn{quotient filter}. Quotient
-filters serve the same role as a Bloom filters in many LSM
-implementations.  However, we choose quotient filters because they
-have substantially greater insert and query performance than Bloom
-filters~\cite{!thrash:hash:cache:flash:pvldb}, reducing the CPU costs
-of both queries and compactions, while using roughly the same or
-slightly less space than Bloom filters for the false-positive rate
-used in \sysname (1/256).  Quotient filters are also efficient if they
-get paged out to disk, since each lookup accesses only one page.
+Each branch also has an associated \defn{quotient filter}. Quotient filters
+serve the same role as a Bloom filters in many LSM implementations.  However,
+we choose quotient filters because they have substantially greater insert and
+query performance than Bloom
+filters~\cite{DBLP:journals/pvldb/BenderFJKKMMSSZ12}, reducing the CPU costs of
+both queries and compactions, while using roughly the same or slightly less
+space than Bloom filters for the false-positive rate used in \sysname (1/256).
+Quotient filters are also efficient if they get paged out to disk, since each
+lookup accesses only one page.
 
 \sysname uses \defn{memtables} to collect new insertions.
 Our memtable is a dynamic B-tree.  In fact, it is the same structure

@@ -1,7 +1,8 @@
 $pdf_mode = 1;
 $postscript_mode = 0;
 #dvi_mode = 0;
-$pdflatex = "pdflatex --shell-escape %O %S";
+$pdflatex = "pdflatex --halt-on-error --shell-escape %O %S";
+$max_repeat = 10;
 
 $bibtex_use = 2;
 

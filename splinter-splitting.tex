@@ -5,15 +5,14 @@ Splits and merges pose problems for hand-over-hand locking in B-trees
 (and \bets).  Hand-over-hand locking proceeds from root to leaf, but
 splits and merges proceed from the leaves up.
 
-An approach to solving this issue in B-trees is to use preemptive
-splitting and merging~\cite{Rodeh08}.  During a B-tree insert, if a
-child already has the maximum number of children, then it is split
-while the insertion thread still holds a lock on its parent.  Then the
-insertion can release the parent's lock and proceed down the tree,
-assured that the child will not need to split again as part of this
-insertion.  Analogously, deletions merge a child with one of its
-neighbors if the child has the minimum number of children.  This works
-because insertion and deletions can increase or decrease
+An approach to solving this issue in B-trees is to use preemptive splitting and
+merging~\cite{DBLP:journals/tos/Rodeh08}.  During a B-tree insert, if a child
+already has the maximum number of children, then it is split while the
+insertion thread still holds a lock on its parent.  Then the insertion can
+release the parent's lock and proceed down the tree, assured that the child
+will not need to split again as part of this insertion.  Analogously, deletions
+merge a child with one of its neighbors if the child has the minimum number of
+children.  This works because insertion and deletions can increase or decrease
 the number of children of a node by at most 1.
 
 This approach does not work in \bets, because a flush to a leaf could

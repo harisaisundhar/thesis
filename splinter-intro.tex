@@ -55,9 +55,9 @@ index, a limitation also acknowledged by its authors.
                   ylabel={Ops/Sec \\ (Thousands)},
                   xlabel={},
                   label style={align=center, font=\small},
-                  %legend columns=5,
-                  %legend style={at={(0.98, 0.98)}, anchor=north east}
-                  %legend to name={highlights-legend},
+                  legend columns=5,
+                  legend style={at={(0.98, 0.98)}, anchor=north east},
+                  legend to name={highlights-legend},
                   skip coords between index={1}{7}
                ]
                \addplot[style={Plum,fill=Plum,mark=none} ]
@@ -66,7 +66,7 @@ index, a limitation also acknowledged by its authors.
                table [col sep=space] {data/ycsb-100b/rocksdb.csv};
                \addplot[style={ForestGreen,fill=ForestGreen,mark=none}]
                table [col sep=space] {data/ycsb-100b/pebblesdb.csv};
-               %\legend{\sysname, RocksDB, PebblesDB};
+               \legend{\sysname, RocksDB, PebblesDB};
             \end{axis}
          \end{tikzpicture}
          %% \caption{Throughput on YCSB workloads. Load consists of 673M
@@ -238,10 +238,6 @@ In summary, the contributions of \sysname are as follows:
 \item We introduce the \datastruct, which reduces write amplification and
 enables fine-grained concurrency in compaction operations (\S\ref{sec:design}-\ref{sec:splitting}).
 
-\ifsupplemental
-  \item We provide an in-depth analysis of the properties of \datastruct (\S\ref{sec:analysis}).
-    \fi
-  
 \item We design and build a highly-concurrent memtable that is able to
 drive enough operations to the underlying \datastruct (\S\ref{sec:details}).
 

@@ -30,15 +30,15 @@ evicts any evictable pages in its new hand. Thus threads clean and evict pages
 from distinct cache lines within the cache metadata, avoiding contention and
 cache-line ping-ponging.
 
-\sysname uses distributed reader-writer locks~\cite{HsiehWe92} to
+\sysname uses distributed reader-writer locks~\cite{DBLP:conf/ipps/HsiehW92} to
 avoid cache-line thrashing between readers.  Briefly, a distributed
-reader-writer lock consists of a per-thread reader counter and a
-shared write bit.  Each reader counter is on a separate cache line to
-avoid cache-line ping-ponging when readers acquire the lock.  Writers
-set the write bit (using compare and swap) and then wait for all the
-read counters to become zero.  Readers acquire the lock by
-incrementing their read counter and then checking that the writer bit
-is 0.  If it is not, they decrement their reader counter and restart.
+reader-writer lock consists of a per-thread reader counter and a shared write
+bit.  Each reader counter is on a separate cache line to avoid cache-line
+ping-ponging when readers acquire the lock.  Writers set the write bit (using
+compare and swap) and then wait for all the read counters to become zero.
+Readers acquire the lock by incrementing their read counter and then checking
+that the writer bit is 0.  If it is not, they decrement their reader counter
+and restart.
 
 Distributed reader-writer locks allow readers to scale essentially
 perfectly linearly, at the cost that acquiring a write lock is
@@ -207,7 +207,7 @@ shared log.
 
 The challenge is to resolve the order of operations across logs after
 a crash.  For this, we use a technique similar to ``cross-referenced
-logs''~\cite{!huang:cross:referencing:logs}.  Our scheme works as
+logs''~\cite{DBLP:conf/usenix/HuangPMS0B18}.  Our scheme works as
 follows.  Each leaf of the memtable has a generation number.  Whenever
 a thread inserts a new message into the memtable, it records and
 increments the generation number of the memtable leaf for the inserted

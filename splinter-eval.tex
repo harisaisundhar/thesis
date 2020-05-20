@@ -1,10 +1,9 @@
 \section{Evaluation}\label{sec:eval}
 
-We evaluate the performance of \sysname{} on several microbenchmarks and 
-on the standard YCSB application benchmark\cite{ycsb}. We compare this
-performance against that of two state-of-the-art key-value stores,
-RocksDB and PebblesDB.
-The following questions drive our evaluation:
+We evaluate the performance of \sysname{} on several microbenchmarks and on the
+standard YCSB application benchmark\cite{DBLP:conf/cloud/CooperSTRS10}. We
+compare this performance against that of two state-of-the-art key-value stores,
+RocksDB and PebblesDB.  The following questions drive our evaluation:
 %In our evaluation, we first wish to demonstrate \sysname's macro performance.
 %Then, we would like to understand the performance impacts of several specific
 %design decisions in \sysname, and to quantify both the advantages and drawbacks
@@ -210,15 +209,17 @@ RocksDB.
 
 \subsection{KVell}\label{sec:kvell}
 
-KVell~\cite{!kvell} is a key-value store also designed to utilize full NVMe bandwidth.
-It has an in-memory B-tree index that maps all keys to disk page offsets.
-It does well on large (4KiB) key-value pairs, but on small key-value pairs, the overhead
-of the in-memory index becomes a significant fraction of the dataset size.
-In particular, it was impossible to run KVell in a memory \texttt{cgroup} of 4GiB.
-Figure~\ref{fig:kvell} shows KVell's performance on the YCSB workload with 100B values,
-for different memory sizes. At 22GiB, which is around the size of the in-memory index,
-KVell's performance starts to drop. At 20GiB, KVell becomes unusable. Therefore in realistic
-memory settings, KVell is not a viable option for the small key-value sizes that \sysname targets.
+KVell~\cite{DBLP:conf/sosp/LepersBGZ19} is a key-value store also designed to
+utilize full NVMe bandwidth.  It has an in-memory B-tree index that maps all
+keys to disk page offsets.  It does well on large (4KiB) key-value pairs, but
+on small key-value pairs, the overhead of the in-memory index becomes a
+significant fraction of the dataset size.  In particular, it was impossible to
+run KVell in a memory \texttt{cgroup} of 4GiB.  Figure~\ref{fig:kvell} shows
+KVell's performance on the YCSB workload with 100B values, for different memory
+sizes. At 22GiB, which is around the size of the in-memory index, KVell's
+performance starts to drop. At 20GiB, KVell becomes unusable. Therefore in
+realistic memory settings, KVell is not a viable option for the small key-value
+sizes that \sysname targets.
 
 \begin{figure}
    \begin{tikzpicture}

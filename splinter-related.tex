@@ -1,109 +1,105 @@
 \section{Related Work}
 \label{sec:related}
 
-The closest work to ours is Tucana~\cite{PapagiannisSaGo16}, a \bet
-optimized for SSDs.  They also focus on CPU cost, concurrency, and
-write amplification.  Our work pushes this to the even more demanding
-case of NVMe devices.  
+The closest work to ours is Tucana~\cite{DBLP:conf/usenix/PapagiannisSGB16}, a
+\bet optimized for SSDs.  They also focus on CPU cost, concurrency, and write
+amplification.  Our work pushes this to the even more demanding case of NVMe
+devices.  
 
 \textbf{Size-Tiering.}  Cassandra~\cite{cassandra}, Scylla~\cite{scylla}
-PebblesDB~\cite{!pebblesdb:raju}, and RocksDB~\cite{facebook-rocksdb2018} (in
-``universal compaction'' mode) use size-tiering to reduce write amplification.
-Size tiering delays compaction of sorted runs in order to reduce
-write amplification.  This can harm query performance because queries must
-search in more runs to find the queried item.  Fluid
-LSMs~\cite{!dostoevsky:dayan:idreos},
-Dostoevsky~\cite{!dostoevsky:dayan:idreos}, LSM
-bushes~\cite{!log:structured:merge:bush}, and
-Wacky~\cite{!log:structured:merge:bush} use hybrids between size-tiering and
+PebblesDB~\cite{DBLP:conf/sosp/RajuKCA17}, and
+RocksDB~\cite{facebook-rocksdb2018} (in ``universal compaction'' mode) use
+size-tiering to reduce write amplification.  Size tiering delays compaction of
+sorted runs in order to reduce write amplification.  This can harm query
+performance because queries must search in more runs to find the queried item.
+Fluid LSMs~\cite{DBLP:conf/sigmod/DayanI18},
+Dostoevsky~\cite{DBLP:conf/sigmod/DayanI18}, LSM
+bushes~\cite{DBLP:conf/sigmod/DayanI19}, and
+Wacky~\cite{DBLP:conf/sigmod/DayanI19} use hybrids between size-tiering and
 level-tiering to tune the trade-off between write amplification and query
-performance.  See~\cite{!pebblesdb:raju} for a survey of LSM-compaction
-schemes.
+performance.  See~\cite{DBLP:conf/sosp/RajuKCA17} for a survey of
+LSM-compaction schemes.
 
 \textbf{Bloom filters in LSM trees.}  Almost all LSM trees use Bloom
-filters~\cite{DBLP:journals/cacm/Bloom70} to improve point-query
-performance, and specifically to mitigate the impact of size-tiering.
-Monkey~\cite{!monkey:optimal:navigable} and ElasticBF~\cite{elasticbf}
-investigated how to allocate RAM to Bloom filters to improve query
-performance.  Bloom filters do not affect range query performance,
-however, since they support only point queries.
+filters~\cite{DBLP:journals/cacm/Bloom70} to improve point-query performance,
+and specifically to mitigate the impact of size-tiering.
+Monkey~\cite{DBLP:conf/sigmod/DayanAI17} and
+ElasticBF~\cite{DBLP:conf/usenix/LiTGLX19} investigated how to allocate RAM to
+Bloom filters to improve query performance.  Bloom filters do not affect range
+query performance, however, since they support only point queries.
 
-\textbf{Additional indexing.}  Numerous \kv stores use additional
-indexing to improve query performance.  For example,
-COLAs~\cite{!bender:streaming:oblivious} use fractional cascading,
-\bets~\cite{DBLP:conf/soda/BrodalF03} follow a B-tree-like structure,
-and PebblesDB uses randomized skip-list-based fractional cascading
-(referred to as guards in~\cite{!pebblesdb:raju}).
-External-memory skip lists
-were analyzed in~\cite{!bender:persistence} and write optimized
-in~\cite{!bender:skip}.  The main technical challenge in such skip
-lists is the high variance of the size of runs, which in PebblesDB was
+\textbf{Additional indexing.}  Numerous \kv stores use additional indexing to
+improve query performance.  For example,
+COLAs~\cite{DBLP:conf/spaa/BenderFFFKN07} use fractional cascading,
+\bets~\cite{DBLP:conf/soda/BrodalF03} follow a B-tree-like structure, and
+PebblesDB uses randomized skip-list-based fractional cascading (referred to as
+guards in~\cite{DBLP:conf/sosp/RajuKCA17}).  External-memory skip lists were
+analyzed in~\cite{DBLP:conf/pods/BenderBJKMPSSZ16:set} and write optimized
+in~\cite{DBLP:conf/pods/BenderFJMMPX17}.  The main technical challenge in such
+skip lists is the high variance of the size of runs, which in PebblesDB was
 addressed by turning long runs into mini-B-trees.
 %% Since our data structure is a based on a \bet, many of these schemes
 %% are not as relevant here.
 
-\textbf{Write amplification vs. range queries.}  Several systems
-sacrifice range-query performance in order to reduce write
-amplification in other ways.  Wisckey~\cite{lu2016wisckey} reduces
-write amplification by declustering their \kv store: they log values
-and only store keys in the LSM-Tree.  Since values are stored on disk
-in arrival order, a range query must gather values from the log.  On
-NVMe, this is not a problem once the values are 4KB or larger.
-However, for smaller values, this can induce huge read amplification,
-limiting range query performance to a tiny fraction of device
-bandwidth.  HashKV~\cite{hashkv} builds on Wisckey by introducing
-hash-based data-grouping to further reduce write amplification, but
+\textbf{Write amplification vs. range queries.}  Several systems sacrifice
+range-query performance in order to reduce write amplification in other ways.
+Wisckey~\cite{DBLP:journals/tos/LuPGAA17} reduces write amplification by
+declustering their \kv store: they log values and only store keys in the
+LSM-Tree.  Since values are stored on disk in arrival order, a range query must
+gather values from the log.  On NVMe, this is not a problem once the values are
+4KB or larger.  However, for smaller values, this can induce huge read
+amplification, limiting range query performance to a tiny fraction of device
+bandwidth.  HashKV~\cite{DBLP:conf/usenix/ChanLLX18} builds on Wisckey by
+introducing hash-based data-grouping to further reduce write amplification, but
 inherits Wisckey's range query performance limitations.
 
-Other systems improve write amplification by sacrificing range queries
-altogether.  Conway et al.~\cite{!conway:icalp:hashing} describe a
-write-optimized hash table, called the BOA, that also uses size-tiering
-with an LSM.  In a BOA, SSTables of sorted runs are replaced
-with hash tables.  They also introduce the concept of a routing
-filter, which extends the functionality of Bloom filters, in order to
+\alex{Going to have to fix this.} Other systems improve write amplification by
+sacrificing range queries altogether.  Conway et
+al.~\cite{DBLP:conf/icalp/ConwayFS18} describe a write-optimized hash table,
+called the BOA, that also uses size-tiering with an LSM.  In a BOA, SSTables of
+sorted runs are replaced with hash tables.  They also introduce the concept of
+a routing filter, which extends the functionality of Bloom filters, in order to
 speed up queries.  The principle advantage of routing filters is that
-performance does not degrade as much when they don't fit in RAM.  The
-BOA meets a provable lower bound on the I/O costs of insertions and
-queries~\cite{!iacono:patrascu:hashing:dictionary:external:memory}.
-Thus the BOA is essentially the best possible on-disk data structure
-for random insertions and point queries.  The downside is that the BOA
-does not support range queries, which are crucial to many \kv-store
-applications.  LSM-tries~\cite{lsm-trie} organize the LSM tree using
-tries, resulting in reduced write amplification. However, LSM-tries do
-not support range queries.
+performance does not degrade as much when they don't fit in RAM.  The BOA meets
+a provable lower bound on the I/O costs of insertions and
+queries~\cite{DBLP:conf/soda/IaconoP12}.  Thus the BOA is essentially the best
+possible on-disk data structure for random insertions and point queries.  The
+downside is that the BOA does not support range queries, which are crucial to
+many \kv-store applications.  LSM-tries~\cite{DBLP:conf/usenix/WuXSJ15}
+organize the LSM tree using tries, resulting in reduced write amplification.
+However, LSM-tries do not support range queries.
 
-\textbf{Other approaches.}  Researchers have also attempted to reduce
-write amplification by exploiting special hardware features such as
-flash translation layers~\cite{marmol2015nvmkv} and vector
-interfaces~\cite{vasudevan2012using}. VT-Tree~\cite{shetty2013building}
-uses indirection to avoid copy data that is already sorted.  ``Trivial
-moves'' are a similar idea is in RocksDB and PebblesDB.
-TRIAD~\cite{!triad:synergies:memory:disk:log:usenix} reduces write
+\textbf{Other approaches.}  Researchers have also attempted to reduce write
+amplification by exploiting special hardware features such as flash translation
+layers~\cite{DBLP:conf/usenix/MarmolSTR15} and vector
+interfaces~\cite{DBLP:conf/cloud/VasudevanKA12}.
+VT-Tree~\cite{DBLP:conf/fast/ShettySMASZ13} uses indirection to avoid copy data
+that is already sorted.  ``Trivial moves'' are a similar idea is in RocksDB and
+PebblesDB.  TRIAD~\cite{DBLP:conf/usenix/BalmauDGZYAGK17} reduces write
 amplification by holding hot keys in memory, delaying compaction until
-different runs have significant key overlap, and by reducing
-redundancy between log and LSM tree writes.  All these techniques are
-orthogonal to our work and can be used in conjunction with our
-techniques.
+different runs have significant key overlap, and by reducing redundancy between
+log and LSM tree writes.  All these techniques are orthogonal to our work and
+can be used in conjunction with our techniques.
 
-Concurrency is also an important aspect of key-value store
-performance. One of the first works in increasing concurrency in
-LSM-based stores was cLSM~\cite{golan2015scaling} which introduces a
-new compaction algorithm.  Zuo et al.~\cite{!hashing:index:persistent}
-show how to tune a cuckoo hash for NVM.  Such a scheme suffers from
-high write amplification, since each insertion must re-write all keys
-in a data block.  Zuo et al.~do not report write amplification numbers
-but instead focus on concurrency.
+Concurrency is also an important aspect of key-value store performance. One of
+the first works in increasing concurrency in LSM-based stores was
+cLSM~\cite{DBLP:conf/eurosys/Golan-GuetaBHK15} which introduces a new
+compaction algorithm.  Zuo et al.~\cite{DBLP:journals/tos/ZuoHW19} show how to
+tune a cuckoo hash for NVM.  Such a scheme suffers from high write
+amplification, since each insertion must re-write all keys in a data block.
+Zuo et al.~do not report write amplification numbers but instead focus on
+concurrency.
 
-Recent work on fast \kv stores includes GearDB~\cite{!geardb}, a \kv
-store that avoids garbage collection on HM-SMR.  Eisenman et
-al.~\cite{!nvm:facebook} address the issue of large DRAM requirements
-of \kv stores for NVM via several techniques, including in-memory
-compression and NVM-specific caching schemes.  Kourtis, et
-al.~describe several systems-level optimizations for improving
-key-value-store throughput on NVMe, such as efficient use of
-user-level asynchronous I/O and low-latency
-scheduling~\cite{KourtisIoKo19}.  Their techniques are largely
+Recent work on fast \kv stores includes
+GearDB~\cite{DBLP:conf/fast/YaoWHZLXH19}, a \kv store that avoids garbage
+collection on HM-SMR.  Eisenman et
+al.~\cite{DBLP:conf/eurosys/EisenmanGAADHPC18} address the issue of large DRAM
+requirements of \kv stores for NVM via several techniques, including in-memory
+compression and NVM-specific caching schemes.  Kourtis, et al.~describe several
+systems-level optimizations for improving key-value-store throughput on NVMe,
+such as efficient use of user-level asynchronous I/O and low-latency
+scheduling~\cite{DBLP:conf/fast/KourtisIK19}.  Their techniques are largely
 orthogonal to the work in this paper.  Kaiyrakhmet, et al.~use
 persistent memory to simplify and improve performance relative to
-LevelDB~\cite{KaiyrakhmetLeNa19}.
+LevelDB~\cite{DBLP:conf/fast/KaiyrakhmetLNNC19}.
 
