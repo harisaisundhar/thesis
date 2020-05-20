@@ -1,1 +1,137 @@
+Dictionaries are fundamental data structures that map a set of keys to values.
+A dictionary generally must support insertion and lookup, but also optionally
+delete, update, successor and scan. A systems that implements a dictionary is
+called a key-value store. Dictionaries lie at the heart of most storage systems
+and also play an essential role in many algorithms.
 
+The work presented here examines problems related to the theory and
+implementation of high-performance external memory dictionaries.
+
+Since the invention of the B-tree 50 years ago, the theory of external memory
+dictionaries and the implementation of key-value stores has progressed to some
+extent independently and in parallel. Currently, most external memory key-value
+stores used in practice are based on log-structured merge trees (LSMs), which
+are suboptimal from a theoretical standpoint.
+
+From a theoretical perspective, there are many dictionary data structures which
+are optimal under different models. In the comparison DAM model, where the only
+operations permitted on key are key comparisons, the \bet was the first known
+optimal dictionary, and it was followed by an LSM derivative, the COLA, and
+several other data structures. In the broader DAM model, more general
+operations---in particular hashing---are permitted, which improves the
+performance of optimal data structures. In this model, the only previously
+known optimal dictionary is the external memory hash table of Iacono and
+P\v{a}tra\c{s}cu. Of these optimal data structures, only the \bet has been used
+successfully in a handful of systems.
+
+\section{Key Differences between Theory and Practice}
+
+Although a proper exposition of this schism between the data structures used in
+practice and those which are optimal in theory is beyond the scope of this
+work, it is helpful to examine some of the reasons here in order to motivate
+and contextualize the results.
+
+\paragraph{Models}
+One of the difficulties in translating theoretical results into systems is
+understanding the strengths and limitations of the models used. The disk access
+model (DAM) has long been the standard model for external memory algorithms,
+but while it offers a reasonable approximation of the perforamnce of hard
+drives, it can distort performance by a factor of 2 compared to more realistic
+models, such as the affine model. These sorts of constant factors are
+irrelevant in theory, but meaningful in practice.
+
+The assumptions used also matter. For example, it is often the case that a
+system may have a cache which is 25--50\% the size of the dataset, whereas many
+theoretical results, such as the lower bounds alluded to above, assume that the
+cache is much smaller, typically $M = o(N/\log{N})$. Thus, at first glance,
+these results may not directly apply.
+
+\paragraph{Hardware}
+As technology changes and new storage hardware is developed, new models and
+design principles are required to understand and leverage their performance. As
+the premium storage technology has evolved from hard drive to solid state
+device to block-addressable non-volatile memory, much of the external memory
+literature has remained relatively constant. Interestingly enough, the
+performance of SSDs and NVMe devices is perhaps best captured by a classical
+model: the parallel disk access model (PDAM). As a result, in many settings,
+variations of classical external memory data structures perform well on these
+devices.
+
+\paragraph{Filters}
+A filter is a probabilistic set-membership data structure with one-sided error.
+The first and most well-known example is the Bloom filter, but many other
+variants have been proposed and implemented, such as the cuckoo filter and the
+quotient filter. Filters are commonly used to optimize the lookup performance
+of LSMs and under some conditions can reduce the number of IOs per point lookup
+to 1.
+
+Filters are commonly only used in memory (although cuckoo and quotient filters
+have good performance characteristics in external memory as well), and across
+the dataset consume at least $\Omega{N/\log{N}}$ space---implying that $M =
+\Omega{N/\log{N}}$. This part of the parameter space is less theoretically
+interesting, because reasons \alex{fix}. However, as a result, the application
+of filters to common data structures which asymptotically dominate LSMs, such
+as COLAs and \bets, has been overlooked, and these data structures have
+received much less exposure to the systems community.
+
+Thus filters have sterred systems both towards LSMs, by ``fixing'' their
+lookups, and towards hardware configurations with a relatively large amount of
+cache, to enable their use.
+
+\section{This Work}
+
+This work studies a collection of dictionary problems each of which lies
+somewhere in between theory and practice. The themes above---models and their
+limitations, changing hardware and the use of filters---frequently recur.
+However, rather than dividing the theoretic and practical study of
+dictionaries, these themes reflect the flow of ideas back and forth between
+them. This yields interesting and surprising results, both where innovations
+and ideas in systems have influenced theoretical data structures, and also
+where those data structures form the foundation for new highly performant
+systems.
+
+\paragraph{Chapter 2: Optimal Hashing in External Memory}
+
+This is evident in \textit{Optimal Hashing in External Memory}, in which
+LSMs---commonly used in practice, but theoretically suboptimal---are modified
+using a new type of filter, the routing filter, to create a simple optimal
+external memory dictionary, the BOA. Pusing these ideas further yields the BOT,
+which is optimal over a larger parameter ranges, and the COBOT, which is the
+first optimal cache-oblivious dictionary.
+
+\paragraph{Chapter 3: SplinterDB}
+
+This chapter introduces SplinterDB: a highly concurrent key-value store
+designed to perform on NVMe. SplinterDB takes the ideas underlying BOAs and
+BOTs, including routing filters, and implements them within a \bet. SplinterDB
+outperforms RocksDB, a state-of-the-art key-value store, by 2--8$\times$ on
+insertions and 1.2--2$\times$ on point lookups.
+
+\paragraph{Chapter 4: File System Aging}
+
+File system aging is thought to be a solved problem: while older file systems
+are known to age, modern file systems (and devices) are believed to only age
+under adversarial workloads. However, models for block allocation suggest that
+the approaches taken by most file systems should lead to aging under a broad
+range of workloads.
+
+In this work, we present an aging tool based on the version control system,
+git, which replays development histories spanning years of use.  Using this
+tool, we show that 5 popular file systems suffered catastrophic aging on hard
+drives and substantially aging on SSDs.
+
+On the other hand, BetrFS, a file system which uses \bets to manage its on-disk
+data, should not age because it algorithmically moves stored data to maintain
+locality. This is borne out using the git aging tool: BetrFS does not age at
+all under the same workload.
+
+\paragraph{Chapter 5: Optimal Ball Recycling}
+
+A popular optimization technique for B-tree-based databases is the use of an
+insertion buffer. This is an in-memory buffer, which stores insertions as they
+arrive with the hope of batching them together before they are written to the
+leaves of the B-tree. This chapter models and analyzes insertion buffers (as
+well as the related update buffers) and provides a tight upper bound of the
+performance improvement that can be obtained. This result undermines the common
+assumption that large caches can be used to fix performance problems in storage
+systems.
