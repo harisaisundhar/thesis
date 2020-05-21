@@ -32,22 +32,22 @@
         ]
         \addplot[color=\pgfkeysvalueof{/fs-colors/ext4}, style=\pgfkeysvalueof{/agedness-styles/clean}, line width=0.0pt, mark=\pgfkeysvalueof{/fs-marks/ext4}] 
         table[x expr=\thisrow{filesystem_size} / \thisrow{file_count} * 1024, y expr=\thisrow{clean_time} / \thisrow{filesystem_size} * 1049600] 
-        {../data/ext4_git_filesize.csv};
+        {fsa-data/ext4_git_filesize.csv};
         \addlegendentry{\ext git}
 
         \addplot[color=LimeGreen, line width=0.75pt, mark=*]
         table[x=file_size, y expr=\thisrow{clean_time} / \thisrow{fs_size} * 1049600]
-        {../data/ext4_filesize.csv};
+        {fsa-data/ext4_filesize.csv};
         \addlegendentry{\ext interfile}
 
         \addplot[color=\pgfkeysvalueof{/fs-colors/zfs}, style=\pgfkeysvalueof{/agedness-styles/clean}, line width=0.0pt, mark=\pgfkeysvalueof{/fs-marks/zfs}] 
         table[x expr=\thisrow{filesystem_size} / \thisrow{file_count} * 1024, y expr=\thisrow{clean_time} / \thisrow{filesystem_size} * 1049600] 
-        {../data/zfs_git_filesize.csv};
+        {fsa-data/zfs_git_filesize.csv};
         \addlegendentry{\zfs git}
 
         \addplot[color=Red, line width=0.75pt, mark=x]
         table[x=file_size, y expr=\thisrow{clean_time} / \thisrow{fs_size} * 1049600]
-        {../data/zfs_filesize.csv};
+        {fsa-data/zfs_filesize.csv};
         \addlegendentry{\zfs interfile}
 
       \end{axis}

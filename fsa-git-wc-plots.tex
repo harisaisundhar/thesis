@@ -1,45 +1,9 @@
 \newcommand{\addwcplot}[2] %\addwcplot{ram-size}{fs}
 {
-  \pgfplotstableread{../data/camera_ready_warm_cache/#2_warm_cache.csv}\thistable
+  \pgfplotstableread{fsa-data/camera_ready_warm_cache/#2_warm_cache.csv}\thistable
   \addplot[color=\pgfkeysvalueof{/rs-colors/#1}, line width=0.75pt, mark=\pgfkeysvalueof{/rs-marks/#1}, mark repeat=5] table[x=pulls, y=#1_time] \thistable;
   \addlegendentry{\pgfkeysvalueof{/ram-sizes/#1}}
 }
-
-% args are: hardware partition-size git-gc-mode
-%\newcommandx{\startwcplot}[3]
-%{
-%  \begin{tikzpicture}[yscale=0.825, xscale=0.825]
-%	  \begin{axis}[
-%      width=1.21\columnwidth,
-%      % scale only axis,
-%      % title=Insertion per second against Load Factor, 
-%      %xlabel={Pulls Accrued}, 
-%      ylabel={Grep cost (sec/GB)}, 
-%      xmin=0,
-%      xmax=10000, 
-%      ymin=0, 
-%      % ymax=50, 
-%      % xtick={0,20,40,60,80,100},
-%      % ytick={0,5,10,15,20,25,30,35,40,45,50},
-%      grid=major, 
-%      scaled x ticks=false,
-%      scaled y ticks=false,
-%      legend columns=4,
-%      legend cell align=left,
-%      legend pos=north west,
-%      legend to name=wcplotslegend_#1_#2_#3,
-%      transpose legend,
-%      ]
-%    }
-%
-%\NewEnviron{wcplot}{\expandafter\startwcplot\BODY
-%\end{axis}
-%\end{tikzpicture}
-%}
-%
-%
-%\newcommand{\wcplotsubcaption}[1] %\wcplotsubcaption{fs}
-%{\label{fig:wc:#1} \pgfkeysvalueof{/fs-names/#1}}
 
 \begin{figure}
   {\centering
@@ -83,46 +47,6 @@
 	\end{tikzpicture}
 	%\caption{\wcplotsubcaption{ext4}}
 	\end{subfigure}\\
-%	\vfill
-%	\begin{subfigure}{\columnwidth}
-%	\centering
-%		\tikzsetnextfilename{warmcache-btrfs_hdd}
-%	\hspace*{1em}
-%	 \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
-%	  \begin{axis}[
-%      width=1.21\columnwidth,
-%      % scale only axis,
-%      % title=Insertion per second against Load Factor, 
-%      xlabel={Pulls Accrued}, 
-%	  ylabel style={align=center},
-%	  ylabel={\vspace*{4em}(b) \btrfs\quad Grep cost (sec/GB)}, 
-%      xmin=0,
-%      xmax=10000, 
-%      ymin=0, 
-%      % ymax=50, 
-%      % xtick={0,20,40,60,80,100},
-%      % ytick={0,5,10,15,20,25,30,35,40,45,50},
-%      grid=major, 
-%      scaled x ticks=false,
-%      scaled y ticks=false,
-%      legend columns=4,
-%      legend cell align=left,
-%      legend pos=north west,
-%      legend to name=wcplotslegend,
-%      transpose legend,
-%      ]
-%	  \addwcplot{768mb}{btrfs}
-%	  \addwcplot{1024mb}{btrfs}
-%	  \addwcplot{1280mb}{btrfs}
-%	  \addwcplot{1536mb}{btrfs}
-%	  \addwcplot{2048mb}{btrfs}
-%	  \addwcplot{cold}{btrfs}
-%	  \addwcplot{cold_clean}{btrfs}
-%	  \addwcplot{betrfs}{btrfs}
-%	\end{axis}
-%	\end{tikzpicture}
-%	%\caption{\wcplotsubcaption{btrfs}}
-%	\end{subfigure}\\
 	\vfill
 	\begin{subfigure}{\columnwidth}
 	\centering
@@ -145,11 +69,6 @@
       grid=major, 
       scaled x ticks=false,
       scaled y ticks=false,
-      legend columns=4,
-      legend cell align=left,
-      legend pos=north west,
-      legend to name=wcplotslegend,
-      transpose legend,
       ]
 	  \addwcplot{768mb}{f2fs}
 	  \addwcplot{1024mb}{f2fs}
@@ -164,7 +83,6 @@
 		%\caption{\label{fig:wc:git}\wcplotsubcaption{f2fs}}
 	\end{subfigure}
 	\caption{\label{fig:git:warmcache} Grep costs as a function of git pulls with warm cache and varying system RAM on \ext(top) and \ftwofs(bottom). Lower is better.}
-%	\caption{\label{fig:git:warmcache} Git workload with a warm cache: read performance declines catastrophically as soon as the data won't fit in memory. In general, a good layout with cache (cold cache unaged and \betrfs cold cache aged) outperforms a bad layout with warm cache.}
 
   }
 \end{figure}

@@ -1,66 +1,35 @@
-\section{Application Level Aging: Mail Server}\label{sec:fsa-mailserver}
-In addition to the git workload, we evaluate aging with the Dovecot email server.
-Dovecot is configured with the Maildir backend, which stores each message in a file,
-and each inbox in a directory.
-%Dovecot is
-%an open source IMAP and POP3 email server for LINUX/UNIX, and Maildir
-%stores each mail as a file.
-We simulate 2 users, each having 80 mailboxes
-receiving new email, deleting old emails, and searching through
-their mailboxes. 
-%We simulate this behavior for 2 users, each having 80
-%mailboxes.
+\section{Application Level Aging: Mail Server}\label{sec:fsa-mailserver} In
+addition to the git workload, we evaluate aging with the Dovecot email server.
+Dovecot is configured with the Maildir backend, which stores each message in a
+file, and each inbox in a directory.  We simulate 2 users, each having 80
+mailboxes receiving new email, deleting old emails, and searching through their
+mailboxes. 
 
 A cycle or ``day'' for the mailserver comprises of 8,000 operations, where each
 operation is equally likely to be a insert or a delete, corresponding to
 receiving a new email or deleting an old one. Each email is a string of random
 characters, the length of which is uniformly distributed over the range [1,
 32K]. Each mailbox is initialized with 1,000 messages, and, because inserts and
-deletes are balanced, mailbox size tends to stay around 1,000.  \fixmedp{Is
-this right?} We simulate the mailserver for 100 cycles and after each cycle we
-perform a recursive grep for a random string. As in our git benchmarks, we then
-copy the partition to a freshly formatted file system, and run a recursive
-grep.
+deletes are balanced, mailbox size tends to stay around 1,000.  We simulate the
+mailserver for 100 cycles and after each cycle we perform a recursive grep for
+a random string. As in our git benchmarks, we then copy the partition to a
+freshly formatted file system, and run a recursive grep.
 
-\figref{mailserver} shows the read costs in seconds per GiB of the grep test on
-hard disk.  Although the unaged versions of all file systems show consistent
-performance over the life of the benchmark,
-%though some are faster than others,
-the aged versions of \ext, \btrfs, \xfs and \zfs all show significant
-degradation over time. In particular, aged \ext performance degrades by
-4.4$\times$, and is 28$\times$ slower than aged \betrfs.
-%and by a factor of 15 compared to the fastest file systems \fixmeac{ get real
-%factor here },
-\xfs slows down by a factor of 7 and \btrfs by a factor of 30. \zfs slows down
-drastically, taking about 20 minutes per GiB by cycle 20.
-%and after running the test for 3 weeks, we were only able to get as far as
-%4,300 iterations.
-However, the aged version of \betrfs does not slow down. As with the other HDD
+\cref{fig:mailserver} shows the read costs in seconds per GiB of the grep test
+on hard disk.  Although the unaged versions of all file systems show consistent
+performance over the life of the benchmark, the aged versions of \ext, \btrfs,
+\xfs and \zfs all show significant degradation over time. In particular, aged
+\ext performance degrades by 4.4$\times$, and is 28$\times$ slower than aged
+\betrfs.  \xfs slows down by a factor of 7 and \btrfs by a factor of 30. \zfs
+slows down drastically, taking about 20 minutes per GiB by cycle 20.  However,
+the aged version of \betrfs does not slow down. As with the other HDD
 experiments, dynamic layout score is moderately correlated ($-0.63$) with grep
 cost.
 
 %
-% space constraints we have not included a figure with the dynamic layout
-%scores, however, these are similarly correlated with the read performance
-%shown in \figref{mailserver}.
-
-%At the time of submission, we were not able to complete the \zfs clean
-%test, as it regularly crashed.  The \betrfs{} clean results were also not complete
-%at the time of submission, but were consistent with the aged version.
-%This experiment was also conducted on a slightly different machine setup, using the first
-%partition of the hard drive to store the root file system image, and 
-%We spot checked these results against the default setup (booting from a USB device)
-%but were not able to get a complete dataset at the time of submission.
-
-%Due to unforeseen circumstances, we do not currently show the \betrfs
-%clean version, although preliminary testing showed it to be almost identical
-%to the aged one.
-
-
-%
 % File parsing definitions
 %
-\newcommand{\mailserverDataDir}{../data/mailserver_aging}
+\newcommand{\mailserverDataDir}{fsa-data/mailserver_aging}
 % Args: hardware, partition-size, file-system
 \newcommand{\mailserverDataFileName}[3]{\mailserverDataDir/mailserver_#3_#1_#2.csv}
 \newcommand{\mailserverOperationCountColumn}{pulls_performed}
