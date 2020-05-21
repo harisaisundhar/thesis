@@ -6,11 +6,9 @@ future locality.  These microbenchmarks isolate and highlight the effects of
 both intra-file fragmentation and inter-file fragmentation and show the
 performance impact aging can have on read performance in the worst cases.
 
-\tightpara{Intrafile Fragmentation.} When a file grows, there may not
-be room to store the new blocks with the old blocks on disk, and a
-single file's data may become scattered.  %Modern file systems apply
-                                %several heuristics to avoid intrafile
-                                %fragmentation (\secref{mitigate}). 
+\paragraph{Intrafile Fragmentation.} When a file grows, there may not be room
+to store the new blocks with the old blocks on disk, and a single file's data
+may become scattered.  
 
 Our benchmark creates 10 files by first creating each file of an initial size,
 and then appending between 0 and 100 4KiB chunks of random data in a
@@ -23,8 +21,6 @@ the disk cache is flushed by remounting, and we wait for 90 seconds before
 measuring read performance.  Some file systems appear to perform background
 work immediately after mounting that introduced experimental noise; 90 seconds
 ensures the file system has quiesced.
-%\fixmeac{This 90 seconds business probably needs more explaining, but I'm not
-%100\% sure how to do it.} 
 
 The aging process this microbenchmark emulates is multiple files growing in
 length. The file system must allocate space for these files somewhere, but
@@ -34,49 +30,24 @@ Given that the data set size is small and the test is designed to run in a
 short time, an fsync is performed after each file is written in order to defeat
 deferred allocation. Similar results are obtained if the test waits for 5
 seconds between each append operation. If fewer fsyncs are performed or less
-waiting time is used, then the performance differences are 
-smaller, as the file systems are
-able to delay allocation, rendering a more contiguous layout.
+waiting time is used, then the performance differences are smaller, as the file
+systems are able to delay allocation, rendering a more contiguous layout.
 
-\input{microbenchmarks-intra-plots}
+\input{fsa-microbenchmarks-intra-plots}
 
 The performance of these file systems on an HDD and SSD are summarized in
 Figures~\ref{fig:micro:intra}. On HDD, the layout scores generally correlate
-($-0.93$) with the performance of the file systems.
-%\betrfs, \ext, \xfs and \zfs have relatively stable dynamic layout scores
-%throughout the test, and their performance is similarly stable, however \ext
-%and \xfs decline in both measure towards the end. \betrfs performs at roughly
-%2/3 of drive bandwidth (roughly 8.5 seconds per Gib according to {\tt
-%hdparm})\fixmeac{double check on the official machine when it's free}, \ext is
-%near to that until round 85 or so, \xfs is similar, but with some oscillation,
-%and \zfs \btrfs and \ftwofs roughly decline linearly in both measures
-%throughout the whole test, with both ending up around 10 times drive bandwidth
-%by the end.\mfc{I find this recitation of the content of the graph not very
-%useful.  What seems like we need here is analysis.  The things that are
-%mentioned here are avialble for anyone to see.}
-On SSD, the file systems all perform similarly (note the scale of the y-axis).
-In some cases, such as \xfs, \ext, and \zfs, there is a correlation, albeit at
-a small scale.  For \btrfs, \ext, \xfs, and \ftwofs, the performance is hidden
-by read-ahead in the OS or in the case of \btrfs also in the file system
-itself. If we disable read-ahead, shown in Figure~\ref{subfig:rr:ssd_raoff}, the
-performance is more clearly correlated ($-.67$) with layout score.  We do
-note that this relationship on an SSD is still not precise; SSDs are
-sufficiently fast that factors such as CPU time can also have a significant
-effect on performance.
+($-0.93$) with the performance of the file systems.  On SSD, the file systems
+all perform similarly (note the scale of the y-axis).  In some cases, such as
+\xfs, \ext, and \zfs, there is a correlation, albeit at a small scale.  For
+\btrfs, \ext, \xfs, and \ftwofs, the performance is hidden by read-ahead in the
+OS or in the case of \btrfs also in the file system itself. If we disable
+read-ahead, shown in Figure~\ref{subfig:rr:ssd_raoff}, the performance is more
+clearly correlated ($-.67$) with layout score.  We do note that this
+relationship on an SSD is still not precise; SSDs are sufficiently fast that
+factors such as CPU time can also have a significant effect on performance.
 
-%%% the file systems all perform similarly, despite that fact
-%%% that Figure~\ref{fig:alpha-plot} suggests that dynamic layout scores should
-%%% still correlate with performance. What is happening is that the inherently
-%%% parallel nature of SSDs allows them to make up performance on non-sequential
-%%% reads, provided the blocks are being requested asynchronoously. Because grep is
-%%% synchronous, this is being achieved by having a readahead buffer, either in the
-%%% OS or the file system itself.  However, if we disable these buffers, then the
-%%% performance is more in line with the layout scores as shown in
-%%% Figure~\ref{fig:mb-ssd_raoff}. This relationship is not precise, as SSDs are
-%%% fast enough that other factors such as CPU time start to affect performance
-%%% significantly as well.
-
-\input{microbenchmarks-intralayout-plots}
+\input{fsa-microbenchmarks-intralayout-plots}
 
 Because of the small amount of data and number of files involved in this
 microbenchmark, we can visualize the layout of the various file systems, shown
@@ -100,49 +71,27 @@ this small amount of data fits entirely in a leaf.  Thus, \betrfs will read all
 this data into memory in one sequential read. This results is some read
 amplification, but, on an HDD, only one seek.
 
-%If we plot the seek performance of the hardware employed \fixmeac{FIX: need to
-%plot this}, we can infer the performance these layouts will generate. In
-%general, on the hard drive, this means that shorter seeks have performance
-%roughly linear in the size of the seek, and longer ones are slow on average,
-%but this will depend on the drive geometry. For the solid state drive, a
-%sequential read is about 3-4 times faster than a seek of any size, even a
-%single 4KiB block. Thus for the SSD, the main performance consideration of a
-%given layout is simply the number of seeks. \fixmeac{Not quite sure how this
-%paragraph can be fit into the flow of the preceding ones}
+\input{fsa-microbenchmarks-inter-plots}
 
-\input{microbenchmarks-inter-plots}
-
-\tightpara{Interfile Fragmentation.}\label{sec:interfile} Many workloads read
+\paragraph{Interfile Fragmentation.}\label{sec:interfile} Many workloads read
 multiple files with some logical relationship, and frequently those files are
 placed in the same directory. Interfile fragmentation occurs when files which
 are related---in this case being close together in the directory tree---are not
-collocated in the LBA space. %Many file systems make some attempt to
-                            %group related files and directories in
-                            %close physical proximity
-                            %(\secref{mitigate}). 
-
-%Although many file systems attempt to group related objects (i.e., files in the
-%same directory or directory subtree) in close physical proximity, these
-%heuristics do not always succeed, and thematically it can be extremely
-%difficult to maintain.  For example, FFS-style file systems place files within
-%the same directory in the same cylinder group.  However, once space in a
-%cylinder group is exhausted, the file system is forced to store new files
-%elsewhere.  Similarly, if a file is created in one directory and moved to
-%another, the file is not physically moved into a different cylinder group.
+collocated in the LBA space.
 
 We present a microbenchmark to measure the impact of namespace creation order
 on interfile locality. It takes a given ``real-life'' file structure, in this
 case the Tensorflow repository obtained from \texttt{github.com}, and replaces
 each of the files by 4KiB of random data. This gives us a ``natural'' directory
 structure, but isolates the effect of file ordering without the influence of
-intrafile layout. The benchmark creates a sorted list of the files as well as two
-random permutations of that list. On each round of the test, the benchmark
- copies all of
-the files, creating directories as needed with {\tt cp --parents}.  However, on
-the $n$th round, it swaps the order in which the first $n\%$ of files appearing
-in the random permutations are copied. Thus, the first round will be an in-order
-copy, and subsequent rounds will be copied in a progressively more random
-order until the last round is a fully random-order copy.
+intrafile layout. The benchmark creates a sorted list of the files as well as
+two random permutations of that list. On each round of the test, the benchmark
+copies all of the files, creating directories as needed with {\tt cp
+--parents}.  However, on the $n$th round, it swaps the order in which the first
+$n\%$ of files appearing in the random permutations are copied. Thus, the first
+round will be an in-order copy, and subsequent rounds will be copied in a
+progressively more random order until the last round is a fully random-order
+copy.
 
 The results of this test are shown in Figure~\ref{fig:micro:inter}.  On hard
 drive, all the file systems except \betrfs and \xfs show a precipitous
@@ -161,439 +110,7 @@ degrees of performance. The other half have a very sharp slowdown between the
 in-order state and the 10\% out-of-order state. These two modes are reflected
 in their dynamic layout scores as well. While \ext and \zfs are stable, their
 performance is worse than the best cases of several other file systems.
-%poor; they just perform poorly on the in-order copy as well.
 \betrfs is the only file system with stable fast performance; it is faster in
 every round than any other file system even in their best case: the in-order
 copy. In this cases the performance strongly correlates with the dynamic layout
 score ($-0.83$).
-
-
-%\input{microbenchmarks-interlayout-plots.tex}
-%
-%Figure \fixmeac{Fix: need labels and stuff} shows layout snapshots for the
-%interfile microbenchmark. Here the horizontal axis shows the order in which the
-%blocks are requested by the {\tt grep}, and the vertical axis shows which LBA
-%these blocks have. Due to space considerations, only the first 2000 blocks
-%requested are shown, as well as only a 2000 LBA segment of the LBA space. This
-%still allows a local view of the allocation decisions made by the file systems.
-%In general as the order in which  the files are written becomes more random,
-%the files become more scattered on disk, even within this small window.
-%\fixmeac{if there's time (lol), I might put together a shading map of the
-%global picture to complement this, but since there are already serious space
-%considerations, perhaps that's simply not worthwhile.}
-
-%The rate of aging varies by file system, which we believe is due to differences
-%in the allocation strategies employed by each file system.  \ext{} ages
-%precipitously at first, and then levels off; this is commensurate with the
-%heuristic of spreading small directories across disparate cylinder groups to
-%accommodate future growth.  As more data is added to these directories, the
-%costs of shifting cylinder groups is amortized.  In fact, the layout score of
-%\ext{} aged {\em improves} slightly until the performance levels off, albeit at
-%a very poor level.  More generally, there is a dramatic difference in the
-%layout scores of all file systems, except \betrfs, between the aged and unaged
-%versions, and in particular, all have aged scores well below 0.1. The most
-%likely explanation for the difference is whether the file system employs
-%delayed allocation for data, and the degree to which this choice is factored
-%into placement decisions of directories.  We note that delayed allocation here
-%does not represent a solution to the problem, as the ``clean'' lines have
-%unrealistically good visibility into future write patterns; rather, the
-%``aged'' lines illustrate the degree to which locality can be lost when
-%placement decisions have to be made with incomplete information.
-%As on our other microbenchmarks, \betrfs shows essentially no signs of aging,
-%sustaining consistently high performance and dynamic layout scores.
-%
-%As in the intra-file fragmentation experiment, performance on SSD improves as
-%the experiment progresses, as directory search costs are amortized on larger
-%files.  In this experiment, reading small files is roughly $10\times$ slower
-%than reading fewer, large files, as the underlying I/O requests are smaller and
-%less efficient at the device level. %in the SSD large-file experiment.
-%\fixmedp{why?} Performance improves because, as the number of files increases,
-%the overhead of traversing the directory hierarchy can be amortized over more
-%data.  We note that no aged file system other that \betrfs achieves a lower cost
-%than 25sec/GB. Some of the unaged file systems perform poorly here as well.
-%
-%%\fixmedp{measurement or guess?} Overall performance is lower than the
-%%large-file experiment because there is less opportunity for parallelism at the
-%%SSD level, since the grep is serialized on each file and each file is only
-%%\unit{4}\kibi\byte.  \fixme{check this with our understanding}\fixmeac{none of
-%%this stuff makes any sense to me}
-%
-%%\fixmedp{Sure this isn't read-ahead?  Why doesn't BetrFS drop?}
-%
-%%\fixmedp{Figure 2 is very hard to read in black and white and printed.  Please embiggen or separate aged/clean. I could only interpret these graphs zoomed way in on my computer.  For every sub-figure, please say whether lower or higher is better.   For e and f, please state whether measured on a HDD or SSD.  The overall legend shoudl explain how to interpret the graphs}\fixmeac{These are good points, but there are serious space considerations to contend with}
-%
-%%\fixmedp{I am not sure I buy only showing layout scores for an HDD.  Shouldn't we also show SSD?  It seems dodgy to assume these will be identical on different-sized disks.}\fixmeac{We measure them on both and they are essentially identical. I don't mind including them, but it's more graphs, which already is a bit of a squeeze spacewise.}
-%
-%% \xfs and \btrfs maintain a reasonable throughput unaged, 20-30 MB/sec,
-%% however \ext and \zfs already post low throughputs in the 10MB/sec
-%% range. With the exception of \betrfs, no file system breaks 10MB/sec on
-%% the aged version of this test, and they all end up below 2MB/sec (and
-%% all but \xfs below 1MB/sec). \betrfs actually shows a speedup as the
-%% test progressed both in the aged and unaged version. \fixme{anyone
-%%   wanna offer a explanation?} No file system other than \betrfs is able
-%% to maintain reasonable sequentiality, with all but \xfs dropping
-%% quickly below $.01$, and \xfs falling below $.05$.
-%
-%
-%%\subsection{HDD}
-%% Another challenge for a file system is that as files are created in a directory tree, a static layout will struggle to maintain sequentiality between the current files and directories and the new ones being created. 
-%
-%\tightpara{Effect of File Creation Order.}
-%The final read-based microbenchmark we ran involves copying the Linux
-%source code to the target file system, one file at a time in random
-%order, generating directories as necessary (using \texttt{cp --parents}).
-%We measure the \texttt{grep} time of the
-%resulting file system, and compare it to one that creates
-%identical contents in search order  (using \texttt{cp -a}). The results are
-%presented in \figref{randlinux}.
-%
-%
-%%is then measured, as well as one in which the copy was performed
-%%in the standard order
-%
-%On the hard disk, this microbenchmark highlights the sensitivity of file
-%system performance to file creation order, as every file system except
-%\betrfs shows a 3-15x slowdown when the files are copied in a random
-%order. \fixmedp{why?}
-%
-%The effect largely disappears on SSD, except for \btrfs and \xfs.  The fastest
-%file system for this benchmark is \btrfs in the standard order.  The rest of
-%the file systems exhibit much worse performance than unaged \btrfs or \xfs, regardless of
-%how the files are created.
-%%even when presented the files
-%%in the standard order.  Thus this experiment shows that \ext and \zfs are not
-%%able to take advantage of the standard ordering to lay out files contiguously,
-%%\xfs is able to gain some performance, \btrfs is able to gain a lot. \betrfs
-%%performs poorly under both versions.
-%This experiment indicates that, under the best circumstances, \xfs and \btrfs
-%can efficiently organize directories and smaller files on an SSD,
-%but most file systems have room for improvement.
-%% random linux
-%
-%%\pgfplotstableread{../data/random_linux_hdd.csv}\randomLinuxHDD
-%%\pgfplotstableread{../data/random_linux_ssd.csv}\randomLinuxSSD
-%%\pgfplotstableread{../data/random_linux_discont_chart.csv}\randomLinuxDiscontChart
-%%
-%%\begin{figure*}[p]
-%%  {\centering
-%%    ~\ref{rlplotsHDD}~\\
-%%    \begin{subfigure}{0.49\linewidth}
-%%      \begin{tikzpicture}[yscale=0.825, xscale=0.825]
-%%        \begin{axis}[
-%%          ybar,
-%%          %% legend style={at={(0.5,-0.1)},anchor=north},
-%%          legend to name=rlplotsHDD,
-%%          legend columns=2,
-%%          % width=\linewidth,
-%%          % scale only axis,
-%%          % title=Insertion per second against Load Factor, 
-%%          xlabel={File system}, 
-%%          ylabel={Time (sec)}, 
-%%          symbolic x coords={betrfs,btrfs,ext4,xfs,zfs},
-%%          ymin=0,
-%%          ymajorgrids=true, 
-%%          scaled y ticks=false,
-%%          major x tick style={draw=none},
-%%          bar width=14pt,
-%%          ]
-%%          \addplot[draw=black, fill=blue, mark=none] 
-%%          table[x=fs, y=ordered_time] \randomLinuxHDD;
-%%          \addlegendentry{Files copied in standard order}
-%%          \addplot[draw=black, fill=gray, mark=none] 
-%%          table[x=fs, y=random_time] \randomLinuxHDD;
-%%          \addlegendentry{Files copied in random order}
-%%        \end{axis}
-%%      \end{tikzpicture}
-%%      \caption{HDD.}
-%%    \end{subfigure}
-%%    \begin{subfigure}{0.49\linewidth}
-%%      \begin{tikzpicture}[yscale=0.825, xscale=0.825]
-%%        \begin{axis}[
-%%          ybar,
-%%          %%legend style={at={(0.5,-0.1)},anchor=north},
-%%          % width=\linewidth,
-%%          % scale only axis,
-%%          % title=Insertion per second against Load Factor, 
-%%          xlabel={File system}, 
-%%          ylabel={Time (sec)}, 
-%%          symbolic x coords={betrfs,btrfs,ext4,xfs,zfs},
-%%          ymin=0,
-%%          ymajorgrids=true, 
-%%          scaled y ticks=false,
-%%          major x tick style={draw=none},
-%%          bar width=14pt,
-%%          ]
-%%          \addplot[draw=black, fill=blue, mark=none] 
-%%          table[x=fs, y=ordered_time] \randomLinuxSSD;
-%%          \addplot[draw=black, fill=gray, mark=none] 
-%%          table[x=fs, y=random_time] \randomLinuxSSD;
-%%          %\legend{Files copied in random order,Files copied in order}
-%%        \end{axis}
-%%      \end{tikzpicture}
-%%      \caption{SSD.}
-%%    \end{subfigure}\\
-%%    \begin{subfigure}{0.49\linewidth}
-%%      \begin{tikzpicture}[yscale=0.825, xscale=0.825]
-%%        \begin{axis}[
-%%          ybar,
-%%          % width=\linewidth,
-%%          % scale only axis,
-%%          % title=Insertion per second against Load Factor, 
-%%          xlabel={Discontinuity Length in blocks}, 
-%%          ylabel={Count},
-%%          ymin=0,
-%%          ymax=15000,
-%%          xmin=0,
-%%  	      xmode=log,
-%%  	      log basis x=2,
-%%          ymajorgrids=true, 
-%%          scaled y ticks=false,
-%%          bar width=6pt,
-%%          ]
-%%          \addplot[draw=black, fill=blue, mark=none] 
-%%          table[x=discontiguitylength, y=btrfsordered] \randomLinuxDiscontChart;
-%%        \end{axis}
-%%      \end{tikzpicture}
-%%      \caption{Discontinuity lengths: In-order copy on \btrfs}
-%%    \end{subfigure}
-%%    \begin{subfigure}{0.49\linewidth}
-%%      \begin{tikzpicture}[yscale=0.825, xscale=0.825]
-%%        \begin{axis}[
-%%          ybar,
-%%          % width=\linewidth,
-%%          % scale only axis,
-%%          % title=Insertion per second against Load Factor, 
-%%          xlabel={Discontinuity Length in blocks}, 
-%%          ylabel={Count},
-%%          ymin=0,
-%%          ymax=15000,
-%%          xmin=0,
-%%          xmode=log,
-%%          log basis x=2,
-%%          ymajorgrids=true, 
-%%          scaled y ticks=false,
-%%          bar width=6pt,
-%%          ]
-%%          \addplot[draw=black, fill=gray, mark=none] 
-%%          table[x=discontiguitylength, y=btrfsrandom] \randomLinuxDiscontChart;
-%%        \end{axis}
-%%      \end{tikzpicture}
-%%      \caption{Discontinuity lengths: Random-order copy on \btrfs}
-%%    \end{subfigure}\\
-%%    \begin{subfigure}{0.49\linewidth}
-%%      \begin{tikzpicture}[yscale=0.825, xscale=0.825]
-%%        \begin{axis}[
-%%          ybar,
-%%          % width=\linewidth,
-%%          % scale only axis,
-%%          % title=Insertion per second against Load Factor, 
-%%          xlabel={Discontinuity Length in blocks}, 
-%%          ylabel={Count},
-%%          ymin=0,
-%%          ymax=15000,
-%%          xmin=0,
-%%  	      xmode=log,
-%%  	      log basis x=2,
-%%          ymajorgrids=true, 
-%%          scaled y ticks=false,
-%%          bar width=6pt,
-%%          ]
-%%          \addplot[draw=black, fill=blue, mark=none] 
-%%          table[x=discontiguitylength, y=ext4ordered] \randomLinuxDiscontChart;
-%%        \end{axis}
-%%      \end{tikzpicture}
-%%      \caption{Discontinuity lengths: In-order copy on \ext}
-%%    \end{subfigure}
-%%    \begin{subfigure}{0.49\linewidth}
-%%      \begin{tikzpicture}[yscale=0.825, xscale=0.825]
-%%        \begin{axis}[
-%%          ybar,
-%%          % width=\linewidth,
-%%          % scale only axis,
-%%          % title=Insertion per second against Load Factor, 
-%%          xlabel={Discontinuity Length in blocks}, 
-%%          ylabel={Count},
-%%          ymin=0,
-%%          ymax=15000,
-%%          xmin=0,
-%%          xmode=log,
-%%  	      log basis x=2,
-%%          ymajorgrids=true, 
-%%          scaled y ticks=false,
-%%          bar width=6pt,
-%%          ]
-%%          \addplot[draw=black, fill=gray, mark=none] 
-%%          table[x=discontiguitylength, y=ext4random] \randomLinuxDiscontChart;
-%%        \end{axis}
-%%      \end{tikzpicture}
-%%      \caption{Discontinuity lengths: Random-order copy on \ext}
-%%    \end{subfigure}
-%%  }
-%%  \caption{\label{fig:randlinux} Time to perform a grep through the
-%%    linux source code copied onto the target file system in the
-%%    standard and a random order, and histograms of the discontinuity
-%%    sizes for \ext and \btrfs.}
-%%\end{figure*}
-%
-%To further explain the performance difference between hard disk and
-%SSD, we plot the histograms of discontinuity sizes for \btrfs and \ext
-%in \figref{randlinux}.
-%%Our model \fixmedp{model promise again, but good to connect them} predicts that, to get good
-%%performance on disk, a file system needs to limit the number or size
-%%of discontinuities, whereas on SSD, only the number of discontinuities
-%%matters. %\fixmedp{Reflect number of discontinuities in Figure 1}.
-%As the graphs show, \btrfs in standard order has a very
-%small number of discontinuities, and hence gets good performance on
-%both hard disk and SSD.  \ext in the standard order has more
-%discontinuities, but they are all small, so it performs well on hard disk, although not as well as \btrfs.  In the
-%random order, \ext has substantially larger discontinuities than
-%\btrfs, but only about 50\% more.
-%These results indicate that 
-%only the number of discontinuities matter on SSDs,
-%whereas HDD performance is more sensitive to the magnitude of discontinuities.
-%
-%%\ext's performance
-%%in this setting is only a small amount worse than \btrfs's.
-%
-%
-%%\fixmedp{This section should probably have a little conclusion or summary explicitly reminding the reader what has been demonstrated.}
-%
-%%\subsection{SSD}
-%% In order to highlight one of the curiousities of the interaction
-%% between solid state drives and file systems principally designed for
-%% hard disk drives, we first consider the random-vs-in-order linux
-%% source code test. The results of this microbenchmark performed on
-%% the solid state drive are shown in \figref{rltssd}.
-%
-%% While \btrfs and \xfs have similar, though faster results compared
-%% to their results on hard drives, \ext and \zfs perform relatively
-%% poorly in both the aged and unaged version of this test. Their
-%% layout scores aren't much different either, so how come they perform
-%% equally poorly on ssds, whereas there is an 8x difference between
-%% the aged and unaged versions on hard drive with the same layout
-%% scores? To understand what is happening, we look at the
-%% discontiguity length charts for these file systems, shown in
-%% \figref{rltdiscont}; for both file systems the unaged chart shows
-%% that there are a lot of discontiguities, but they are all reasonably
-%% short, whereas the aged chart has roughly the same number of
-%% discontiguities, but they tend to be much longer (note the maps are
-%% log-scale). We believe that on a solid state drive, any reasonably
-%% sized discontiguity causes a random access, which incurs a fixed
-%% cost, but on a hard drive, the cost of the discontiguity is heavily
-%% dependent on its size. If the head stays on the same track for
-%% example, the cost is much less than if it has to (mechanically) move
-%% to a different track. Thus the effect of the small discontiguities
-%% in the unaged versions is second-order on hard drives, but
-%% first-order on solid state drives. It is worth noting that we are
-%% assuming in this hypothesis that the logical layout is indeed
-%% transferring as least partially through the FTL on a physical layout
-%% on the drive. While we are not sure exactly what design decision
-%% caused this behavior in \ext and \zfs, likely what happened is that
-%% a heuristic that was acceptible for (and perhaps even designed to
-%% optimize) hard drive performance is hurting solid state
-%% performance. \fixme{Alex: would love to have time to figure this
-%% out}
-%
-%% On the other microbenchmarks, shown in \figref{sfssd} and
-%% \figref{rrssd}, we see a similar performance pattern: \zfs and \ext
-%% underperform on both the aged and unaged variants, wheres \xfs and
-%% \btrfs perform well only on the unaged version. \betrfs remains fast
-%% under both conditions.
-%
-%
-%%% Local Variables:
-%%% mode: latex
-%%% End:
-%
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%% old plot
-%%
-%%% round robin
-%%
-%%% setup
-%%\newcommand{\NumChunksColumn}{16kbchunks}
-%%
-%%% args are: FS agedness hardware
-%%\newcommand{\addrrplot}[3]
-%%{
-%%  \pgfplotstableread{../data/round_robin_#3.csv}\thistable
-%%  \addplot[color=\pgfkeysvalueof{/fs-colors/#1}, style=\pgfkeysvalueof{/agedness-styles/#2}, line width=0.75pt, mark=\pgfkeysvalueof{/fs-marks/#1}, mark repeat=5]
-%%  table[x=\NumChunksColumn, y expr=\thisrow{#1#2}] \thistable;
-%%  \addlegendentry{\pgfkeysvalueof{/fs-names/#1} \pgfkeysvalueof{/agedness-names/#2}}
-%%}
-%%
-%%\newcommand{\addrrlayoutplot}[3]
-%%{
-%%  \pgfplotstableread{../data/round_robin_#3.csv}\thistable
-%%  \addplot[color=\pgfkeysvalueof{/fs-colors/#1}, style=\pgfkeysvalueof{/agedness-styles/#2}, line width=0.75pt, mark=\pgfkeysvalueof{/fs-marks/#1}, mark repeat=5]
-%%  table[x=\NumChunksColumn, y expr=\thisrow{#1#2layout}] \thistable;
-%%  \addlegendentry{\pgfkeysvalueof{/fs-names/#1} \pgfkeysvalueof{/agedness-names/#2}}
-%%}
-%%
-%
-%%  \begin{tikzpicture}[yscale=0.825, xscale=0.825]
-%%    \begin{axis}[
-%%      % width=\linewidth,
-%%      % scale only axis,
-%%      % title=Insertion per second against Load Factor, 
-%%      xlabel={\unit{4}\kibi\byte{} chunks appended }, 
-%%      ylabel={Grep cost (sec/GB)}, 
-%%      xmin=1,
-%%      xmax=100, 
-%%      ymin=0,  
-%%      ymax=#2,
-%%      % xtick={0,20,40,60,80,100},
-%%      % ytick={0,5,10,15,20,25,30,35,40,45,50},
-%%      grid=major, 
-%%      scaled x ticks=false,
-%%      scaled y ticks=false,
-%%      legend columns=2,
-%%      legend cell align=left,
-%%      legend pos=north west,
-%%      legend to name=rrplotslegend_#1,
-%%      transpose legend,
-%%      ]
-%%    }
-%%
-%%\NewEnviron{rrplot}{\expandafter\startrrplot\BODY
-%%\end{axis}
-%%\end{tikzpicture}
-%%}
-%%
-%%% args are: hardware
-%%\newcommandx{\startrrlayoutplot}[1]
-%%{
-%%  \begin{tikzpicture}[yscale=0.825, xscale=0.825]
-%%    \begin{axis}[
-%%      % width=\linewidth,
-%%      % scale only axis,
-%%      % title=Insertion per second against Load Factor, 
-%%      xlabel={\unit{16}\kibi\byte{} chunks appended}, 
-%%      ylabel={Dynamic layout score}, 
-%%      xmin=1,
-%%      xmax=99, 
-%%      ymin=0, 
-%%      ymax=1, 
-%%      % xtick={0,20,40,60,80,100},
-%%      % ytick={0,5,10,15,20,25,30,35,40,45,50},
-%%      grid=major, 
-%%      scaled x ticks=false,
-%%      scaled y ticks=false,
-%%      legend columns=2,
-%%      legend cell align=left,
-%%      legend pos=north west,
-%%      legend to name=rrplotslegend_#1,
-%%      transpose legend,
-%%      ]
-%%    }
-%%
-%%
-%%\NewEnviron{rrlayoutplot}{\expandafter\startrrlayoutplot\BODY
-%%\end{axis}
-%%\end{tikzpicture}
-%%}
-%%
-%%\newcommand{\rrplotsubcaption}[1]{\label{subfig:rr:#1} Intrafile benchmark results on \pgfkeysvalueof{/hardware-names/#1}.}
-%%\newcommand{\rrlayoutplotsubcaption}[1]{\label{subfig:rrl:#1} Intrafile benchmark layout.}
-%%
-%%

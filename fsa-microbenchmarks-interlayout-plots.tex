@@ -29,9 +29,9 @@
 					transpose legend,
 					%height=5in,
 					]
-					\addplot[color=blue, mark=*, only marks, mark size=1.5] table [x=request, y=block] {../data/camera_ready_layout/ext4/aged_rlt0.csv};
+					\addplot[color=blue, mark=*, only marks, mark size=1.5] table [x=request, y=block] {fsa-data/camera_ready_layout/ext4/aged_rlt0.csv};
 					\addlegendentry{~In-order copy (round 0)}
-					\addplot[color=red, mark=*, only marks, mark size=1.5] table [x=request, y=block] {../data/camera_ready_layout/ext4/aged_rlt100.csv};
+					\addplot[color=red, mark=*, only marks, mark size=1.5] table [x=request, y=block] {fsa-data/camera_ready_layout/ext4/aged_rlt100.csv};
 					\addlegendentry{~Random-order copy (round 100)}
 				\end{axis}
 			\end{tikzpicture}
@@ -55,8 +55,8 @@
 					xtick={0,400,800,1200,1600,2000},
 					%height=5in,
 					]
-					\addplot[color=blue, mark=*, only marks, mark size=1.5] table [x=request, y=block] {../data/camera_ready_layout/btrfs/aged_rlt0.csv};
-					\addplot[color=red, mark=*, only marks, mark size=1.5] table [x=request, y=block] {../data/camera_ready_layout/btrfs/aged_rlt100.csv};
+					\addplot[color=blue, mark=*, only marks, mark size=1.5] table [x=request, y=block] {fsa-data/camera_ready_layout/btrfs/aged_rlt0.csv};
+					\addplot[color=red, mark=*, only marks, mark size=1.5] table [x=request, y=block] {fsa-data/camera_ready_layout/btrfs/aged_rlt100.csv};
 				\end{axis}
 			\end{tikzpicture}
 			%\caption{btrfs}

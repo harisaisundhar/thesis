@@ -1,14 +1,14 @@
 % intrafile microbenchmark (round robin)
-\newcommand{\addrrplot}[2] %\addrrplot{fs}{hdd/ssd/ssd_raoff}
+\newcommand{\addrrplot}[2]
 {
-	\pgfplotstableread{../data/camera_ready_microbenchmarks/intra_#2.csv}\thistable
+	\pgfplotstableread{fsa-data/camera_ready_microbenchmarks/intra_#2.csv}\thistable
 	\addplot[color=\pgfkeysvalueof{/fs-colors/#1}, style=\pgfkeysvalueof{/agedness-styles/aged}, line width=0.75pt, mark=\pgfkeysvalueof{/fs-marks/#1}, mark repeat=5] table[x=round, y=#1_time] \thistable;
 	\addlegendentry{\pgfkeysvalueof{/fs-names/#1}}
 }
 
 \newcommand{\addrrlayoutplot}[2] %\addrrlayoutplot{fs}{hdd/ssd/ssd_raoff}
 {
-	\pgfplotstableread{../data/camera_ready_microbenchmarks/intra_#2.csv}\thistable
+	\pgfplotstableread{fsa-data/camera_ready_microbenchmarks/intra_#2.csv}\thistable
 	\addplot[color=\pgfkeysvalueof{/fs-colors/#1}, style=\pgfkeysvalueof{/agedness-styles/aged}, line width=0.75pt, mark=\pgfkeysvalueof{/fs-marks/#1}, mark repeat=5] table[x=round, y=#1_layout] \thistable;
 	\addlegendentry{\pgfkeysvalueof{/fs-names/#1}}}
 
@@ -21,7 +21,7 @@
       % scale only axis,
       % title=Insertion per second against Load Factor, 
       ylabel style={at={(axis description cs:0.085,0.5)},anchor=south},
-      xlabel={Rounds of \unit{4}\kibi\byte{} chunks appended}, 
+      xlabel={Rounds of \SI{4}{\kibi\byte} chunks appended}, 
       ylabel={Grep cost (sec/GiB)}, 
       xmin=0,
       xmax=100, 
@@ -55,7 +55,7 @@
       % scale only axis,
       % title=Insertion per second against Load Factor,
       ylabel style={at={(axis description cs:0.085,0.5)},anchor=south},
-      xlabel={Rounds of \unit{4}\kibi\byte{} chunks appended}, 
+      xlabel={Rounds of \SI{4}{\kibi\byte} chunks appended}, 
       ylabel={Dynamic layout score}, 
       xmin=0,
       xmax=100, 
@@ -69,7 +69,7 @@
       legend columns=6,
       legend cell align=left,
       legend pos=north west,
-      legend to name=rrplotslegend_#1,
+      legend to name=rrlayoutplotslegend_#1,
       %transpose legend,
       ]
     }
@@ -143,42 +143,3 @@
 	\caption{\label{fig:micro:intra} Intrafile benchmark: 4KiB chunks are appended round-robin to sequential data to create 10 400KiB files. Dynamic layout scores generally correlate with read performance as measured by the recursive grep test; on an SSD, this effect is hidden by the readahead buffer. }
 	}
 \end{figure*}
-
-
-%\begin{figure}
-%{
-%	\centering
-%	~\ref{rr_ssd_raofflegend}~\\
-%	\tikzsetnextfilename{micro-intra_ssd_raoff}
-%	\begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
-%    \begin{axis}[
-%      width=1.21\columnwidth,
-%      % scale only axis,
-%      % title=Insertion per second against Load Factor, 
-%      xlabel={Rounds of \unit{4}\kibi\byte{} chunks appended}, 
-%      ylabel={Grep cost (sec/GiB)}, 
-%      xmin=0,
-%      xmax=100, 
-%      ymin=0,  
-%      ymax=50,
-%      % xtick={0,20,40,60,80,100},
-%      % ytick={0,5,10,15,20,25,30,35,40,45,50},
-%      grid=major, 
-%      scaled x ticks=false,
-%      scaled y ticks=false,
-%      legend columns=3,
-%      legend cell align=left,
-%      legend pos=north west,
-%      legend to name=rr_ssd_raofflegend,
-%      %transpose legend,
-%      ]
-%        \addrrplot{betrfs}{ssd_raoff}
-%        \addrrplot{btrfs}{ssd_raoff}
-%        \addrrplot{ext4}{ssd_raoff}
-%        \addrrplot{f2fs}{ssd_raoff}
-%        \addrrplot{xfs}{ssd_raoff}
-%        \addrrplot{zfs}{ssd_raoff}
-%	\end{axis}
-%	\end{tikzpicture}
-%	\caption{\label{fig:mb-ssd_raoff}\rrplotsubcaption{ssd_raoff} With read-ahead turned off, the SSD can no longer serve block requests in parallel, and read performance is more sensitive to layout.}}
-%\end{figure}

@@ -1,15 +1,15 @@
 % interfile microbenchmark (degrees of random order copy)
 
-\newcommand{\addsfplot}[2] %\addrrplot{fs}{hdd/ssd/ssd_raoff}
+\newcommand{\addsfplot}[2]
 {
-	\pgfplotstableread{../data/camera_ready_microbenchmarks/inter_#2.csv}\thistable
+	\pgfplotstableread{fsa-data/camera_ready_microbenchmarks/inter_#2.csv}\thistable
 	\addplot[color=\pgfkeysvalueof{/fs-colors/#1}, style=\pgfkeysvalueof{/agedness-styles/aged}, line width=0.75pt, mark=\pgfkeysvalueof{/fs-marks/#1}, mark repeat=5] table[x=round, y=#1_time] \thistable;
 	\addlegendentry{\pgfkeysvalueof{/fs-names/#1}}
 }
 
 \newcommand{\addsflayoutplot}[2] % \addsfplot{fs}{hdd/ssd/ssd_raoff}
 {
-  \pgfplotstableread{../data/camera_ready_microbenchmarks/inter_#2.csv}\thistable
+  \pgfplotstableread{fsa-data/camera_ready_microbenchmarks/inter_#2.csv}\thistable
   \addplot[color=\pgfkeysvalueof{/fs-colors/#1}, style=\pgfkeysvalueof{/agedness-styles/aged}, line width=0.75pt, mark=\pgfkeysvalueof{/fs-marks/#1}, mark repeat=5]
   table[x=round, y=#1_layout] \thistable;
   \addlegendentry{\pgfkeysvalueof{/fs-names/#1}}
@@ -72,7 +72,7 @@
       legend columns=3,
       legend cell align=center,
       legend pos=north west,
-      legend to name=sfplotslegend_#1,
+      legend to name=sflayoutplotslegend_#1,
       %transpose legend,
       ]
     }
