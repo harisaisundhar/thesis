@@ -4,7 +4,7 @@
 
 Ball recycling models insertion and update buffers, which are widely used in
 modern databases~\cite{Azure16, IBM17, Xiang12, Informix, Callaghan11, NuDB16,
-Oracle17, SAP17, Vertica17,CanimLaMi10,BenderFaJo12}. These implementations are
+Oracle17, SAP17, Vertica17,DBLP:conf/vldb/CanimMBLR10,DBLP:journals/pvldb/BenderFJKKMMSSZ12}. These implementations are
 discussed in more detail in \Cref{sec:experiments}.
 
 For a key-value store, such as a database, an \defn{insertion buffer} is a
@@ -95,7 +95,7 @@ which are known to be asymptotically optimal for insertions, in the worst case.
 some update distributions, flushing according to \RB can achieve an update rate
 that is $B^\varepsilon$ faster than \FB.  We expect to try \RB flushing in our
 \betree{}-based file system,
-B$\varepsilon$trFS~\cite{JannenYuZh15a,YuanZhJa16,YuanZhJa17,ConwayBa17,JannenYuZh15,esmet2012tokufs}.
+B$\varepsilon$trFS~\cite{DBLP:journals/tos/JannenYZAEJMPRW15,DBLP:conf/fast/YuanZJPACDKWBFJ16,DBLP:conf/fast/ConwayBJJZYBJKP17,DBLP:conf/fast/JannenYZAEJMPRW15,DBLP:conf/hotstorage/EsmetBFK12}.
 
 
 %%% Local Variables:

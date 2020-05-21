@@ -1,25 +1,23 @@
-% !TEX root =  paper.tex
-
-\secput{nonuniform}{Random Ball is Optimal}
+\section{Random Ball is Optimal}\label{sec:br-nonuniform}
 
 In this section we prove \Cref{thm:random-opt}, showing that \RB{} is
 $\Theta(1)$-optimal. 
 
-\subsecput{nonuni-outline}{Outline of Proof}
+\subsection{Outline of Proof}\label{sec:br-nonuni-outline}
 We prove \Cref{thm:random-opt} in the following steps:
 \begin{enumerate}
 	\item No recycling strategy has a recycling rate exceeding
-		$(2m+n-1)/\halfnorm{\p}$. (\secref{upper-statement})
+		$(2m+n-1)/\halfnorm{\p}$. (\cref{sec:br-upper-statement})
 	\item \RB{} matches that bound when $m \geq n$, leading to case (1) of
-		\Cref{thm:random-opt}. (\secref{randomballwithmanyballs})
+		\Cref{thm:random-opt}. (\cref{sec:br-randomballwithmanyballs})
 	\item There is an $\Theta(1)$-optimal strategy, \AE{}, when $m < n$. The
 		recycling rate of \AE matches case (2) of \Cref{thm:random-opt}.
-		(\secref{randomballaggroempty})
+		(\cref{sec:br-randomballaggroempty})
 	\item By comparison to \AE{}, \RB{} is $\Theta(1)$-optimal when $m < n$.
-		(\secref{rboptproof})
+		(\cref{sec:br-rboptproof})
 \end{enumerate}
 
-\subsecput{upper-statement}{The Upper Bound}
+\subsection{The Upper Bound}\label{sec:br-upper-statement}
 We begin by proving an important lemma that will be used throughout, which we
 refer to as the \defn{flow equation}. Then we proceed to prove the upper bound.
 
@@ -210,7 +208,7 @@ rate of any recycling strategy.
 	This follows immediately from the Cauchy-Schwartz Inequality.
 \end{proof}
 
-\subsecput{randomballwithmanyballs}{\RB with \texorpdfstring{$m \geq n$}{m >= n}}
+\subsection{\RB with \texorpdfstring{$m \geq n$}{m >= n}}\label{sec:br-randomballwithmanyballs}
 
 We show the following lower bound, which with \Cref{lem:upperbound}, shows
 optimality when $m = \Omega(n)$.
@@ -253,7 +251,7 @@ optimality when $m = \Omega(n)$.
 	\Omega(n)$, then \RB is asymptotically optimal among recycling strategies. 
 \end{corollary}
 
-\subsecput{randomballaggroempty}{\AE is Optimal}
+\subsection{\AE is Optimal}\label{sec:br-randomballaggroempty}
 
 In this section, we investigate \AE strategies, which aggressively recycle
 balls outside a given subset of bins.  An \AE strategy runs one strategy on a
@@ -358,7 +356,7 @@ of $S$ on the induced ball-recycling game on $L$.
 	\end{align*}
 \end{proof}
 
-\subsecput{rboptproof}{\RB is Optimal}
+\subsection{\RB is Optimal}\label{sec:br-rboptproof}
 
 In this section we will further examine the performance of \RB and show that it
 is asymptotically optimal. We first describe a sufficient condition for
