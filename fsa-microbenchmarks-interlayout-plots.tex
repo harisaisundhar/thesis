@@ -1,0 +1,67 @@
+\newcommand{\addinterlayoutplot}[2]
+%{
+%	\addplot[color=blue, mark=*, only marks, mark size=0.25] table [x=request, y=block] {../data/camera_ready_layout/#1/aged_rlt#2.csv};
+%}
+
+\begin{figure}[t]
+{ \centering
+	~\ref{layout-inter-legend}~\\
+	\begin{subfigure}{\columnwidth}
+		\centering
+		\tikzsetnextfilename{layout-inter_ext4}
+			\begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+				\begin{axis}[
+					width=1.21\columnwidth,
+					%xlabel={block requested},
+					ylabel style={align=center},
+					ylabel={(a) \ext\quad relative lba},
+					xmin=0,
+					xmax=2000,
+					ymin=8000,
+					ymax=9000,
+					restrict x to domain=0:2000,
+					restrict y to domain=8000:9000,
+					xtick={0,400,800,1200,1600,2000},
+					legend columns=2,
+					legend cell align=left,
+					legend pos=north west,
+					legend to name=layout-inter-legend,
+					transpose legend,
+					%height=5in,
+					]
+					\addplot[color=blue, mark=*, only marks, mark size=1.5] table [x=request, y=block] {../data/camera_ready_layout/ext4/aged_rlt0.csv};
+					\addlegendentry{~In-order copy (round 0)}
+					\addplot[color=red, mark=*, only marks, mark size=1.5] table [x=request, y=block] {../data/camera_ready_layout/ext4/aged_rlt100.csv};
+					\addlegendentry{~Random-order copy (round 100)}
+				\end{axis}
+			\end{tikzpicture}
+			%\caption{ext4}
+		\end{subfigure}\\
+		\begin{subfigure}{\columnwidth}
+		\centering
+		\tikzsetnextfilename{layout-inter_btrfs}
+			\begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+				\begin{axis}[
+					width=1.21\columnwidth,
+					xlabel={block requested},
+					ylabel style={align=center},
+					ylabel={(b) \btrfs\quad relative lba},
+					xmin=0,
+					xmax=2000,
+					ymin=2000,
+					ymax=4000,
+					restrict x to domain=0:2000,
+					restrict y to domain=2000:4000,
+					xtick={0,400,800,1200,1600,2000},
+					%height=5in,
+					]
+					\addplot[color=blue, mark=*, only marks, mark size=1.5] table [x=request, y=block] {../data/camera_ready_layout/btrfs/aged_rlt0.csv};
+					\addplot[color=red, mark=*, only marks, mark size=1.5] table [x=request, y=block] {../data/camera_ready_layout/btrfs/aged_rlt100.csv};
+				\end{axis}
+			\end{tikzpicture}
+			%\caption{btrfs}
+		\end{subfigure}
+	}
+	\caption{\label{mb:inter-layout}Interfile Layout Snapshots}
+\end{figure}
+

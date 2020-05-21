@@ -1,0 +1,93 @@
+\section{Measuring File System Fragmentation}\label{sec:fsa-metrics}
+
+This section explains the two measures for file system fragmentation used in
+our evaluation: recursive scan latency and dynamic layout score, a modified
+form of Smith and Seltzer's layout score~\cite{SmithSe97}.  These measures are
+designed to capture both intra-file fragmentation and inter-file fragmentation. 
+
+\tightpara{Recursive grep test.} One measure we present in the following
+sections is the wall-clock time required to perform a recursive grep
+in the root directory of the file system.  This captures the effects of both
+inter- and intra-file locality, as it searches both large files and large
+directories containing many small files.  We report search time per unit of
+data, normalizing by using \ext's du output.  We will refer to
+this as the grep test. 
+
+%% The precise command is \texttt{grep -r --binary-files=text
+%%   \$short\_random\_string \$root\_of\_file system}.  Issuing this
+%% command will recurse through the directory structure and read through
+%% each file in order (attempting---unsuccessfully---to match the random
+%% string). This type of command, as well as other unix commands, such as
+%% \texttt{find} are frequently used by linux programmers and other
+%% users, and the underlying patterns, such as reading all files in a
+%% directory tree, occur quite commonly in standard applications such as
+%% email clients and various servers \fixme{right?}, not to mention that
+%% at a finer-grained level, \texttt{read} and \texttt{readdir} are
+%% ubiquitous. Having collected the wall-clock time, 
+
+%We use two measures of fragmentation: recursive scan speed and a
+%modified form of Smith, et al.'s ``layout
+%score''~\cite{SmithSe97}.
+
+%\subsection{A Performance-Based Metric\fixme{Ainesh: Are we using Metric?}}
+
+\tightpara{Dynamic layout score}.  Smith and Seltzer's layout
+score~\cite{SmithSe97} measures the fraction of blocks in a file or (in
+aggregate) a file system that are allocated in a contiguous sequence in the
+logical block space.  We extend this score to
+the dynamic I/O patterns of a file system.  During a given workload, we capture
+the logical block requests made by the file system, using blktrace, and
+measure the fraction that are contiguous.
+%Our dynamic layout score measures the fraction of logical block requests that
+%are conti  made by the file system during a given workload.  Rather than
+%measure the allocation itself, the dynamic layout score measures the
+%efficiency of a file system's access patterns.  
+This approach captures the impact of placement decisions on a file system's
+access patterns, including the impact of metadata accesses or accesses that
+span files.  A high dynamic layout score indicates good data and metadata
+locality, and an efficient on-disk organization for a given workload.
+%system with a high dynamic layout score will have good data and metadata
+%locality and an efficient organization of objects within the directory
+%hierarchy.  \fixme{A file system with a high dynamic layout score will have a
+%high layout score, but the reverse is not always true.}
+
+One potential shortcoming of this measure is that it does not distinguish
+between small and large discontiguities. Small discontiguities on a hard drive
+should induce fewer expensive mechanical seeks than large discontiguities in
+general, however factors such as track length, difference in angular placement
+and other geometric considerations can complicate this relationship. A more
+sophisticated measure of layout might be more predictive.  We leave this
+for further research. On SSD, we have found that the length of discontiguities
+has a smaller effect.
+%, which require longer seeks. 
+Thus we will show that dynamic layout score strongly correlates with grep test
+performance on SSD and moderately correlates on hard drive.
+
+%Throughout this paper, we calculate dynamic layout scores
+%using \texttt{blktrace}, although other instrumentation of the block
+%I/O scheduler would work as well.
+%% or other instrumentation of the block I/O scheduler.  This gives some
+%% rough measure of the degree of locality present in a particular
+%% file system state.
+
+%% We compute the dynamic layout score of a
+%% file system by analyzing the \texttt{blktrace} of the above recursive
+%% grep through the directory tree. We specifically look at the reads
+%% issued to the driver and we compute the fraction of the requested
+%% blocks which are in sequence, and therefore ``optimally allocated.''
+
+
+%Thus, we also sometimes present a histogram
+%of the sizes of the measured discontiguities. For example, small
+%discontiguities on a hard drive should induce less expensive mechanical seeks
+%than large discontiguities, which require longer seeks.
+
+%; for example, small discontiguities on a hard drive should have a small
+%effect, especially when the subsequent request is in the same track, whereas
+%large discontiguities would require a longer, more expensive seek.  For the
+%tests and benchmarks where we observed this effect, we present a histogram of
+%discontiguity sizes.  \fixmedp{Would be nice to comment on SSDs, if possible}
+
+%% Local Variables:
+%% mode: latex
+%% End:

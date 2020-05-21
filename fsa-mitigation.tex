@@ -1,0 +1,813 @@
+\def\checkmark{\tikzsetnextfilename{checkmark}\tikz\fill[scale=0.4](0,.35) -- (.25,0) -- (1,.7) -- (.25,.15) -- cycle;} 
+
+\setlength\tabcolsep{3pt}
+\begin{table}
+\footnotesize
+\centering
+	\begin{tabular}{p{1in}*{6}{c}}
+{\bf Feature} & {\bf \btrfs} & {\bf \ext} & {\bf \ftwofs} & {\bf \xfs} & {\bf \zfs} & {\bf \betrfs}\\
+\hline
+\raggedright Grouped allocation within directories & \checkmark & \checkmark & & \checkmark & \checkmark & \checkmark \\
+Extents & \checkmark & \checkmark & & \checkmark & \checkmark &    \\
+Delayed allocation & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark & \checkmark \\
+Packing small files & \checkmark & & & &  & \checkmark \\
+ and metadata & (by OID) & & & & & \\
+\hline
+Default Node Size & 16 K & 4 K  & 4 K &  4 K &   8 K & 2--4 M\\
+Maximum Node Size & 64 K & 64 K & 4 K & 64 K & 128 K & 2--4 M \\
+Rewriting for locality & & & & & & \checkmark\\
+Batching writes to reduce amplification & & & \checkmark & & & \checkmark \\
+\end{tabular}
+\caption{\label{tab:heuristics} \small
+Principal anti-aging features of the file systems measured in this paper.
+The top portion of the table are commonly-deployed features, and the bottom portion
+indicates features our model (\S\ref{sec:seq}) indicates are essential;
+an ideal node size should match the natural transfer size, which is roughly 4 MiB for 
+modern HDDs and SSDs. OID in \btrfs is an object identifier, roughly corresponding to an inode number, which is assigned at creation time.}
+\end{table}
+
+\subsection{Existing Strategies to Mitigate Aging}\label{sec:fsa-filesystem}
+
+When files are created or extended, blocks must be allocated to store the new
+data.  Especially when data is rarely or never relocated, as in an
+update-in-place file system like \ext{},
+%Especially for update-in-place file systems, such as \ext{}, where data is
+%rarely relocated,
+initial block allocation decisions determine
+% \mfc{``essential to'' has a positive note.  What I think we really mean is
+% ``determine''}
+performance over the life of the file system. Here we outline a few of the
+strategies use in modern file systems to address aging, primarily at
+allocation-time (also in the top of Table~\ref{tab:heuristics}).
+
+\tightpara{Cylinder or Block Groups.}
+FFS~\cite{McKusickJoLe84} introduced the idea of \defn{cylinder groups},
+which later evolved into block groups or allocation groups (\xfs).
+Each
+group maintains information about its inodes and a bitmap of blocks. A
+new directory is placed in the cylinder group that contains more than the
+average number of free inodes, while inodes and data blocks of files in one
+directory are placed in the same cylinder group when possible.
+
+\zfs~\cite{BonwickMo08} is designed to pool
+storage across multiple devies~\cite{BonwickMo08}.
+%%% When allocating space for a file, there are three decisions:
+%%% device selection, metaslab selection, and block selection
+%%% Device selection tries to spread the data across
+%%% all devices in the pool so that maximum bandwidth can be obtained;
+%%% note that this is not just space, but also factors that 
+%%% impact throughput, like bit density and angular velocity.
+\zfs selects from one of a few hundred \defn{metaslabs} on a 
+device, based on a weighted calculation of several factors
+including minimizing seek distances.
+%such as reusing the same metaslabs to minimize seek distance.
+The metaslab with the highest weight is chosen.
+%%% Within a metaslab, space is managed by a \defn{space map},
+%%% which tracks available extents using an AVL tree.
+%%% zfs chooses a block within the meta-slab with a
+%%% variant of first-fit policy.  
+
+In the case of \ftwofs~\cite{lee15f2fs}, a log-structured file system, 
+the disk is divided into segments---the granularity at which the log is garbage collected, or cleaned.
+The primary locality-related optimization in \ftwofs is that writes
+are grouped to improve locality, and dirty segments are filled before
+finding another segment to write to. In other words, writes with temporal
+locality are more likely to be placed with physical locality.
+
+Groups are a best-effort approach to directory locality:
+space is reserved for co-locating files in the same directory,
+but when space is exhausted, files in the same directory can be scattered
+across the disk.  Similarly, if a file is renamed, it is not physically moved
+to a new group.
+
+\tightpara{Extents.} All of the file systems we measure, except \ftwofs and
+\betrfs,
+%\mfc{the table says we do}, 
+allocate space using \defn{extents}, or runs of physically contiguous blocks.
+In \ext~\cite{CardTsTw94,Tweedie00, MathurCaBh07}, for example, an extent can be up to 128 MiB.  Extents reduce
+bookkeeping overheads (storing a range versus an exhaustive list of blocks).
+Heuristics to select larger extents can improve locality of large files.  For
+instance, \zfs selects from available extents in a metaslab using a first-fit
+policy.
+%tracks available extents in a metaslab using an AVL tree, and selects an
+%extent using first-fit policy.
+
+\tightpara{Delayed Allocation.} Most modern file systems, including \ext, \xfs,
+\btrfs, and \zfs, implement delayed allocation, where 
+logical blocks are not allocated until buffers are written to disk. 
+By delaying allocation when a file is growing,
+the file system can allocate a larger extent for data appended to the same file.
+%This offers the opportunity to allocate larger extents 
+%unneccessary temporary file allocations, and it aggregates related allocation requests.
+However, allocations can only be delayed so long without
+violating durability and/or consistency requirements; a typical
+file system ensures data is dirty no longer than a few seconds.
+Thus, delaying an allocation only improves locality inasmuch
+as adjacent data is also written on the same timescale;
+delayed allocation alone cannot prevent fragmentation when 
+data is added or removed  over larger timescales.
+%in order to maintain file system consistency and to
+%prevent data loss, most file systems ensure that all data (including unallocated
+%data) is written to disk every few seconds; it is unclear how
+%the extent to which
+%this heuristic improves allocations for operations that span
+%larger timescales.
+
+Application developers may also request a persistent preallocation
+of contiguous blocks using fallocate.
+%\mfc{I thought we weren't
+%  using this font.  And we don't just two sentences on.}
+%which is a useful interface to tell the file system to
+%allocate contiguous blocks for a given file at its best.
+To take full advantage of this interface, 
+developers must know each file's size in advance. % in order to take advantage of it.
+Furthermore, fallocate can only help intrafile fragmentation; there is currently 
+not an
+analogous interface to ensure directory locality.
+
+\tightpara{Packing small files and metadata.}
+For directories with many small files, an important optimization 
+can be to pack the file contents, and potentially metadata,
+into a small number of blocks or extents.
+\btrfs~\cite{RodehBaMa13} stores metadata of files and directories in
+copy-on-write B-trees. Small files are broken into 
+one or more fragments, which are packed inside the B-trees.
+For small files, the fragments are indexed by object identifier (comparable to inode number);
+the locality of a directory with multiple small files
+depends upon the proximity of the object identifiers.
+
+\betrfs stores metadata and data as key-value
+pairs in two \bets.  Nodes in a \bet are large (2--4 MiB),
+amortizing seek costs.  Key/value pairs are packed
+within a node by sort-order, and nodes are periodically rewritten,
+copy-on-write, as changes are applied in batches.
+
+\betrfs also divides the namespace of the file system into \defn{zones} of a
+desired size (512 KiB by default), in order to maintain locality within a
+directory as well as implement efficient renames.  Each zone root is either a
+single, large file, or a subdirectory of small files.
+%; each zone is a file or subdirectory.
+The key for a file or directory is its relative path to its zone root. The
+key/value pairs in a zone are contiguous, thereby maintaining locality.
+
+%%% \tightpara{FFS.} FFS~\cite{McKusickJoLe84} introduced the idea of
+%%% \defn{cylinder groups}: one or more consecutive cylinders on a disk. 
+
+%%% \tightpara{ext family.} Following FFS, ext2 makes use of
+%%% block groups---a similar idea to cylinder groups, but
+%%% using logical blocks instead of physical cylinders.
+%%% %that don't necessarily comprise the actually physical cylinders of
+%%% %the disk.
+%%% Moreover, when allocating a new block, up to 8 blocks are
+%%% preallocated for the file.
+%%% %ext3 introduced journaling.
+%%% \ext allows file data to be placed in {\em extents} as large
+%%% as 128MiB, in addition to allocating individual blocks to files.
+%%% %rather than track individual blocks,
+%%% %file data is organized into extents as large as 128 MiB.
+%%% %store
+%%% %extent trees in inodes, with extents as large as 128MiB.
+%%% Preallocation of
+%%% extents is possible using an ``uninitialized'' flag, and \ext tracks
+%%% information about free extents in each block group, 
+%%% so that multiple contiguous file blocks can be placed in a larger extent.
+%%% % to allow
+%%% %nallocation of larger extents  multi block
+%%% %allocation. \fixmedp{Huh?}
+
+%%% \tightpara{\xfs} %\xfs is mainly designed for scalability.
+%%% Similar to FFS's
+%%% cylinder groups, \xfs has allocation groups (AG), which are several GiB in size.
+%%% The inode of a new directory is placed at a different AG than its parent, and
+%%% newly allocated blocks of a file are placed close to the inode or existing
+%%% blocks of the file. As with \ext, extents are used for block allocation;
+%%% \xfs indexes free extents in  B+ trees to efficiently find 
+%%% extents of a given size near a given block.
+%%% %\fixmedp{Or to make search for adjacent free blocks more efficient?}
+%%% %\fixme{Yang: they aim for both finding an extent of a given size and finding
+%%% %  an extent near a given block}
+
+%\fixmeac{Need an expert on ZFS still, but here goes, please work on this:}
+
+
+%\tightpara{\zfs.} \zfs is designed to pool storage on multiple devices, 
+%and divides each device into a few hundred \defn{metaslabs}.
+%Space maps have some good properties.
+%%First, a space map with no entries means that there have been no
+%allocations and no frees, indicating that all space is free. Second,
+%space maps scale well because they are append-only. Space maps are
+%efficient to update regardless of the pattern of allocations and
+%frees. Space maps are equally efficient at finding free space whether
+%the pool is empty or full. This is different to bitmaps which takes
+%longer time to scan as they fill up.
+
+
+%%% and when allocating space for a file, it attempts to choose an optimal metaslab
+%%% by weighting these metaslabs by their free space, proximity to the outer
+%%% regions of the disk and previous use. A record of the free space in a metaslab
+%%% is maintained by a \defn{space map},  and blocks are allocated by one of several
+%%% procedures, depending on the specific context. \fixmedp{Another sentence or two of intuition wouldn't be amiss here}
+
+%%% \tightpara{\zfs.} \zfs is a pooled storage file system
+%%% which is intended to manage a large number of storage devices.
+%%% It uses a copy-on-write transactional object model, for which
+%%% blocks containing active data are never overwritten in place
+%%% and transaction groups are used to batch up chunks of data to
+%%% be written to disk. The write performance of zfs relies on
+%%% effective allocation of contiguous disk blocks.
+%%% At the high level, zfs storage pools are made up of a
+%%% collection of virtual devices which can be a set of disks.
+%%% The space on the virtual devices are divided into
+%%% \defn{metaslabs} and each metaslab is managed separately.
+%%% There are three levels of decisions to make when allocating
+%%% new blocks which are device selection, metaslab selection
+%%% and block selection~\cite{BonwickMo08}.
+%%% Device selection tries to spread the data across
+%%% all devices in the pool so that maximum bandwidth can be obtained.
+%%% To keep load balanced, zfs block allocation algorithm is in
+%%% favor of underutilized devices.
+%%% For special data, such as zfs intent log, the round-robin mechanism
+%%% is used each time the file system writes a log block since they are
+%%% very short-lived and not expected to ever be read.
+%%% With a selected device, zfs next decides which metaslab should
+%%% be used. 
+%%% zfs selects the meta-slab with the most free
+%%% bandwidth rather than simply the one with the most free space
+%%% by considering bit density and angular velocity.
+%%% zfs also assigns a higher weight to
+%%% metaslabs that have been used before to minimize seek distance
+%%% when a pool is relatively empty.
+%%% Multiple factors need to be considered and a final weight is
+%%% calculated. With the weight calculated, the selection algorithm is
+%%% simply to choose the meta-slab with the highest weight. In the
+%%% selected metaslab,
+%%% zfs use the data structure called \defn{space map} for
+%%% its allocation algorithm which is a series of logs of
+%%% allocations and frees ordered by time.
+%%% When space is deallocated, the
+%%% extent are appended to the space map, and each allocation is recorded
+%%% as an extent in the space map as well.  The space map and its
+%%% associated allocations and frees are maintained in memory in the form
+%%% of an AVL tree. When zfs needs to allocate blocks from a particular
+%%% meta-slab, it first reads that metaslab's space map from disk and
+%%% replays the allocations and frees in the in-memory AVL tree and new blocks
+%%% are allocated based on the information of the space map.
+%\zfs divides each device into a few hundred \defn{metaslabs},
+%and when allocating space for a file, it attempts to choose an optimal metaslab
+%by weighting these metaslabs by their free space, proximity to the outer
+%regions of the disk and previous use. A record of the free space in a metaslab
+%is maintained by a \defn{space map},  and blocks are allocated by one of several
+%procedures, depending on the specific context. \fixmedp{Another sentence or two of intuition wouldn't be amiss here}
+
+%%% \tightpara{\zfs.} \zfs is a pooled storage file system
+%%% which is intended to manage a large number of storage devices.
+%%% At the high level, zfs storage pools are made up of a
+%%% collection of virtual devices which can be a set of disks.
+%%% The space on the virtual devices are divided into
+%%% \defn{metaslabs} and each metaslab is managed separately.
+%%% There are three levels of decisions to make when allocating
+%%% new blocks which are device selection, metaslab selection
+%%% and block selection~\cite{BonwickMo08}.
+%%% Device selection tries to spread the data across
+%%% all devices in the pool so that maximum bandwidth can be obtained.
+%%% To keep load balanced, zfs block allocation algorithm is in
+%%% favor of underutilized devices.
+%%% For special data, such as zfs intent log, the round-robin mechanism
+%%% is used each time the file system writes a log block since they are
+%%% very short-lived and not expected to ever be read.
+%%% With a selected device, zfs next decides which metaslab should
+%%% be used. zfs selects the meta-slab with the most free
+%%% bandwidth rather than simply the one with the most free space
+%%% by considering bit density and angular velocity.
+%%% zfs also assigns a higher weight to
+%%% metaslabs that have been used before to minimize seek distance
+%%% when a pool is relatively empty.
+%%% Multiple factors need to be considered and a final weight is
+%%% calculated to select the best metaslab.
+%%% For a metaslab, zfs use the data structure called \defn{space map}
+%%% for space management which is a series of logs of
+%%% allocations and frees ordered by time.
+%%% When space is deallocated, the
+%%% information of the free space are appended to the
+%%% space map, and each allocation is recorded
+%%% in the space map as well. The space map and
+%%% the allocation and deallocation logs are maintained
+%%% in memory in the form of an AVL tree. When zfs needs to
+%%% allocate blocks from a particular
+%%% metaslab, it first reads that metaslab's space map
+%%% from disk and replays logs in memory and new blocks
+%%% are can be allocated.
+
+
+%%% \tightpara{\ftwofs.} \ftwofs is a log-structured file system designed for SSDs.
+%%% \ftwofs divides a disk into zones; each zone has multiple sections and each
+%%% section consists of multiple segments.
+%%% \ftwofs uses up to 6 logs (cold, warm and
+%%% hot logs of data and metadata), each of which  writes to segments
+%%% in a different zone. \ftwofs employs both on-demand and background garbage
+%%% collection  at the granularity of sections, and a \defn{node
+%%%   address table} is used to avoid updating block addresses in inodes.
+%%% %\fixmedp{This is a fine overview, but it really doesn't give me any intuition about
+%%% %  if/how locality is preserved}
+%%% %\fixme{Yang: I think they don't really consider locality, as they feel SSDs are
+%%% %  good enough for such thing. Their main goal is less write amplification and
+%%% %  smarter GC. The only thing that might be locality is that F2FS groups writes
+%%% %  for better write locality (filling dirty segments before seeking another)}
+
+%%% \tightpara{\btrfs.} \btrfs stores metadata of files and directories in
+%%% copy-on-write B-trees. Extents are used for large files, which 
+%%% should have comparable locality to the file systems above.
+%%% Small files are broken into 
+%%% one or more fragments, which are packed inside the B-trees.
+%%% For small files, the fragments are indexed by object identifier (comparable to inode number);
+%%% the locality of a directory with multiple small files
+%%% depends upon the proximity of the object identifiers numbers.
+%\fixmedp{What about when there is a write?  Do small writes erode locality, or is the whole
+%  file recopied?}
+%\fixme{Yang: 'item's in btrfs are indexed by objectid (inode num). If one file
+%  has many such fragments, they are always close, but if you want locality for
+%  small files in the same directory, you should hope they are given consecutive
+%  inode nums. If you rewrite a fragment and btrfs decides to keep it as a
+%  fragment, the fragment is COWed to the new node. But for large files, btrfs
+%  probably just update-in-place the extents (btrfs divides the disk into two
+%  parts, one storing the COW B-tree of metadata and framgents, the other for
+%  those extents of large files. I don't think btrfs would do COW for extents
+%  because of write-amplification).}
+
+%, not interfile
+%fragmentation.
+
+%Since \ext cannot predict future operations, it uses two techniques to
+%maximize its available information.
+%% using two techniques: delayed allocaion and persistent preallocation.
+%First, \ext delays the physical allocation of data until dirty buffers
+%are written to disk.  Second, with persistent preallocation, an
+%application can declare its intent to write a certain number of blocks
+%to a file, and \ext uses this information to make an informed
+%allocation decision.
+
+%\tightpara{Efficient metadata.}  Extents are often a compact way to index file
+%data.  Compared to file systems that use direct and indirect pointers,
+%extent-based file systems~\cite{SweeneyDoHu96, MathurCaBh07} can often locate
+%data by reading fewer metadata blocks, reducing the number of disk seeks
+%required to read a file.
+%%
+%\fixme{MAB: It's not clear what this has to do with fragmentation. I know that
+%all file-system people know what an extent is. But I really don't. Shouldn't we
+%define it?}
+%%
+%\fixme{Martin recemmends that we kill this paragraph because at the very least,
+%it's not obviously related to fragmentation.} \fixmeac{I think that the
+%relation is that the more fragments, the more metadata is required to index
+%them, so that using extents should mitigate this impact. However, I think that
+%the difference between a few redirect blocks and the equivalent data in extents
+%has got to be pretty minor. I think that this should be airlifted into our
+%file system descriptions, whenever they fully come into existence.}
+%\mfc{or punted.  I vote for punting.}
+
+
+\begin{comment}
+\tightpara{Defragmentation and Garbage Collection.}  Many of the file systems
+in this study provide online or offline defragmentation utilities~\cite{Tso15,
+oracleXFSdefrag, btrfsmanpage}, which can be used to gather each file's blocks and group related data and metadata on disk.
+%Defragmenters can be used to gather each file's blocks and group related data
+%and metadata.  This type of defragmentation may include two effects:
+%increasing the proximity of logical objects and creating contiguous regions of
+%free space.  After such defragmentation, reads and allocations can become more
+%efficient.
+In addition to on-demand tools, log-structured file
+systems~\cite{RosenblumOu92} garbage collect data to free up space and to
+defragment free space. 
+However, this may harm read performance because related
+blocks can be moved farther from each other. A recently proposed
+defragmentation scheme for log-structure file systems~\cite{ParkKaEo16}
+reorders blocks in inode order before writing back to disk.
+This can improve locality within a segment, but cannot
+address all types of fragmentation, such as scattering a file across segments.
+% which improves but
+%does not resolve all types of fragmentation.\fixmedp{Would be stronger with a concrete example}
+%. Their techniques, although reduce fragmentation, doesn't resolve the root
+%cause of fragmentation in garbage collection.
+\end{comment}
+\begin{comment}
+\tightpara{Copying into a fresh partition.} 
+An in-order copy of a file system directory tree onto a newly formatted disk
+partition should create an optimal disk layout. However, 
+file systems may reserve space or reorder files 
+for convenience or perceived efficiency. 
+
+For example, \ext places the contents of a directory ordered by the hashes 
+of the file names rather than
+	logical order. \shepherd{What is "logical order"?  Is that alphabetical order of file names in a folder?}\fixmeac{This is a good question.}
+%Moreover, it attempts to leave space between files and in directories for
+%future file creation and extension.
+Moreover, \ext intersperses free space so that files and directories may grow
+(e.g., \figref{mb-intra-layout}).  These heuristics can potentially harm
+read
+%performance on in-order copied data.  We will show that under certain
+%conditions these heuristics have the perverse effect of greatly reducing read
+performance on data that does not grow to fill these spaces, or that
+is typically read in logical order, because these spaces will need to be seeked over during a scan.
+\end{comment}
+\fixmedp{I think the copying thing is weak tea.  There is a point about reserving space, but
+we dont' have a clear justification here, and I think it coudl be dropped or added to grouped allocation}
+%;
+%even if a file system does, initial allocation decisions affect
+%the amount of work required to defragment the file system later.
+
+%Because most file systems generally
+%do not actively and repeatedly move data blocks to ensure data locality, the
+%strategy for allocating these blocks is critical to control
+%fragmentation. 
+%\fixmemab{see comment}
+%\fixmemab{Im afraid to touch the previous sentence. There are tons of disclaimers that I dont want to remove, in case they are there for a reasons. But it cannot stay as it is.} 
+%\fixmemab{I am afraidto touch the previous sentence.  see comment}
+%In
+%many file systems, especially update-in-place file systems such as \ext{},
+% dp: Is ZFS really update in place?
+%% and \zfs{}, 
+%data is essentially never moved, which makes initial block
+%allocation even more important.
+
+
+% While not implemented in any current major file system, the natural
+% extension of this sort of heuristic would be to use a Packed Memory
+% Array~\cite{BenderDeFa05} for block allocation, which puts these
+% techniques on a sound theoretical foundation, though perhaps at too
+% high a cost in terms of moving previously allocated data.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Old text here
+
+%The placement of file system objects in the logical block address
+%space has a first order impact on the performance of file system
+%operations.  Over time, the placement decisions in many file system
+%become less optimal \fixmemfc{what does this mean?}; this
+%deterioration over time is commonly called 
+%{\em aging}. \fixmemfc{Intro material?  Also, this seems to add an
+%  etiology to a diagnosis.} \fixmemfc{Kill?}
+
+%This section summarizes related work on aging.
+%The file system community understands that file systems age, and that
+%one must take care to perform certain experiments \fixmedp{which ones?} on an aged file
+%system.
+%\fixmedp{I think the point is that only experiments on an aged file system
+%are representative of the common user experience?}
+%  Thus, several
+
+%To speak broadly, the goal of these tools is to carefully
+%construct a representative file system \textit{state}.  In contrast,
+%this paper examines a file system's \textit{path} along the aging
+%continuum, showing that the worst-case aging behavior is easy to
+%trigger, and argues for measuring worst-case aging as a principal
+%evaluation criterion.  \fixmerob{This paragraph is too philosophical.}
+
+%; most
+%file systems use heuristics at allocation time, but do little to
+%mitigate suboptimal decisions after initial placement.  
+
+%Although some
+%file systems do have defragmenters, defragmentation (sometimes called
+%anti-aging) tends to be an expensive, brute-force, offline process.
+%An essential finding of this study is that aging can only be prevented
+%with active, online defragmentation. \fixmerob{Gack!  Do not like.}
+
+%File system layout can be charactarized by the size, number, and distribution
+%of file system objects throughout the namespace,
+%as well as the logical block addresses of individual file system objects.
+%File system layout evolves over time in a process called aging.
+%Previous work related to % the understanding of
+%file system aging can be broadly classified
+%into three categories.
+
+\begin{comment}
+\tightpara{Measurement storage environments.}
+%to quantify the impact of aging and identify causes of the problem.
+Several studies have reported statistics about the numbers of files,
+distributions of file sizes and types, and organization of file system
+namespaces in real-world environments~\cite{missing}.  These studies provide data that file systems
+practitioners may use to reason about the nature of (a)typical
+real-world file system states.  However, these studies do not try to
+solve the problem of generating reproducible file system states, and
+they %generally do not study the evolution of physical file system
+layouts over time.
+\end{comment}
+
+
+
+\begin{comment}
+Occasionally, a file system 
+
+Write-in-place file systems need to make block allocation decision
+wisely in order to deliver sustainable performance as time goes by.
+Log-structured file systems need to cleanup unreferenced data
+periodically or on-demand when data in the file system increase.
+Modern file systems also provide the ability to defragment the
+file system without unmounting it.
+
+{\bf File system block allocation --} The block allocation algorithms
+is important for file system performance, especially for write-in-place
+ones such as FFS, Ext2/3/4, \xfs and etc.  For this type of file
+systems, the performance degrades as more data are filled in the
+file system and free space gets fragmented.  In this sense, the most
+critical guiding rule for good performance on these file systems is to
+put related blocks together. Specifically, the allocation mechanisms
+employed to achieve high performance can be classified in two
+categories --- block clustering and extent-based allocation.
+
+Block clustering was exemplified by FFS and its Linux counterpart Ext2
+file system, which is a simplified version of FFS.  In a nutshell, FFS
+divides a disk or disk partition into a bunch of groups known as
+\defn{cylinder groups} or \defn{block group}.  FFS uses cylinder group
+to allocate clusters of inodes that are spread over the whole disk
+close to the blocks that they reference, instead of them all being
+located at the same place of the disk.  As an illustrative example,
+FFS attempts to allocate file blocks close to the inodes that describe
+them to avoid long seeks between getting the inode and the associated
+data. What's more, when the inodes are spread out there is less chance
+of losing all of them in a single disk failure. The cylinder groups
+are managed separately. Each cylinder group contains bookkeeping
+information that includes a redundant copy of data structure to
+describe the whole file system (\textbf{a.k.a,} superblock), space for
+inodes, bitmaps describing available inode and data blocks in the
+cylinder group, and summary information describing available the usage
+data blocks within the cylinder group. Bitmaps instead of the free
+list are used to manage free space in FFS because it is easy to find a
+large chunk of free space and allocate it to a file.  Under the disk
+given layout, FFS need to decide how to place files and directories
+and associated metadata on disk. The FFS block allocation policies
+have two levels. At the top level are global layout policies that to
+decide the placement of new inodes and data blocks according to
+summary information.  The guideline of global layout policies is to
+cluster related information.  For example, inodes of files in the same
+directory frequently are accessed together and FFS tries to place them
+in the same cylinder group.  For directory inodes, a different policy
+is employed.  When the directory is created in the root of the
+file system, its inodes is placed in a cylinder group whose number of
+free blocks and inodes is greater than the average and number of
+directories is smallest. This policy is to allow inode clustering to
+succeed most of the time.  When a directory is created in the lower
+level of file-system tree, it is placed in a cylinder group that has
+free blocks and inodes more than the average meanwhile near to its
+parent directory.  This policy is to reduce the seek times for
+traversing the file system tree in a depth-first search. After the
+cylinder group is decided, the inode is allocated using a first-free
+strategy by scanning the per-group inode bitmap.  Since the data
+blocks for a file are usually accessed together. The global layout
+policy attempts to place data blocks for a file in the same cylinder
+group and lay them out contiguously.  However, this is problematic in
+that large files quickly use up the available space.  This causes
+future allocations for any file in the cylinder group to spill to
+other areas.  Therefore, FFS avoids any of the cylinder group becoming
+completely full.  The data block placement policy employed by FFS is
+to change to a different cylinder group after every a few \mega\byte{}
+of allocation.  For small files, the blocks are always within the same
+cylinder group.  For large files, they can make use of the contiguous
+space available in the cylinder group by ignoring the scattered blocks
+around the cylinder group.  The newly chosen cylinder group for block
+allocation is the next cylinder group that has free blocks greater
+than the average.  Although big files tend to be spread out over the
+disk, several \mega\byte{} of data typically are accessible before a
+seek to new cylinder group is necessary.  FFS uses the first 4\% of
+data blocks in each cylinder group as metadata area. Metadata can the
+indirect block of files. For the first indirect block of a file, it is
+placed together with the file data.  This policy is to avoid extra
+seeks when reading the first a few file blocks which are referenced
+from its indirect block. On the contrary, the second and third level
+indirects, along with the indirects that they reference are allocated
+in the metadata area.
+
+Extents are being used in many modern file
+systems~\cite{SweeneyDoHu96, jfs, MathurCaBh07}, and it is well-known
+as a way to efficiently represent large files by reducing the metadata
+needed to address large files. Extents help improve the performance of
+sequential file accesses and reduce the file system overhead with
+fewer metadata I/Os.  Extents also reduces the time to truncate a file
+as the metadata updates are reduced. The following paragraph
+introduces the block allocation algorithms and data placement policies
+of Ext4 file system which is a famous extent-based file system in
+Linux.  An disk with Ext4 file system is split into a series of block
+groups. To reduce performance degradation due to fragmentation, the
+block allocator makes much effort to keep each file's blocks within
+the same group, thereby reducing seek times. With the default block
+size of \unit{4}\kibi\byte, each group will contain 32,768 blocks, for
+a length of \unit{128}\mebi\byte{}. The number of block groups is the
+size of the device divided by the size of a block group. Similar to
+FFS, each block group is manipulated separately and contains its own
+bookkeeping information. For block group 0, it contains the superblock
+and group descriptors of the file system. Redundant copies of the
+superblock and group descriptors are written to some of the block
+groups across the disk in case the beginning of the disk gets trashed,
+though not all block groups necessarily host a redundant copy.  Each
+group block has one block of inode bitmap, one block of data block
+bitmap, many blocks of inode table and many more blocks of data
+blocks.  In Ext4, several block groups can be tied together as one
+logical block group, in which case the bitmap spaces and the inode
+table space in the first block group are expanded to include the
+bitmaps and inode tables of all other block groups. The introduction
+of this feature is to provide contiguous extents larger then
+\unit{128}\mebi\byte{} for very large files.  Ext4 respects the facts
+that data locality is a desirable quality of a file system.  For
+spinning disks, keeping related blocks close to each other reduces the
+amount of disk head movement thus speeding up disk IO. Even on an SSD
+which has no moving parts, locality still can increase the size of
+each transfer request while reducing the total number of
+requests. This locality can also help to concentrate writes on a
+single erase block, which can speed up file rewrites
+significantly. Therefore, it is beneficial to reduce fragmentation
+whenever possible.  One technique Ext4 uses is delayed block
+allocation.  Under this scheme, when more blocks are needed for a
+file, the file system defers deciding the exact placement of data on
+the disk until all the dirty buffers are being written out to
+disk. Delayed allocation reduces file fragmentation because many
+blocks of a single file can be allocated at the same time. Delayed
+allocation also makes the underlying block allocator aware of the
+total number of blocks of the files so that it can find a suitable
+chunk of free space for each file. Other benefits of delayed
+allocations are in that it reduces CPU utilization by allocating many
+blocks at a time and that it avoids disk metadata update for
+short-lived files.  The underlying block allocator of Ext4 is called
+multi-block allocator. The multi-block allocator allows many blocks to
+be allocated to a file in a single operation. Ext4 also provides the
+feature of persistent preallocation which allows applications to
+preallocate disk space.  This is helpful for P2P applications. For
+instance, when transferring a large file through the Internet, the
+client can preallocate disk space for this file since the size of the
+file is known, In this way, the file system can make better decision
+to reduce fragmentation. Ext4 also support online
+defragmentation. This feature allows an end user to defragment
+individual files or the whole file system.  Traditional file systems
+can only be created on a single disk at a time. If there were two
+disks then two separate file systems have to be created. In a hardware
+RAID configuration, this problem can be solved by presenting the
+operating system with a single logical disk made up of the space
+provided by a number of physical disks.  In a pooled storage file
+system, multiple physical storage devices are managed are by a pool,
+and the storage space can be shared by multiple file systems.  The
+storage capacity can also be increased by adding new storage devices
+to the pool.  The idea of pooled storage file system makes storage
+devices can be used similarly to a computer's RAM.
+ZFS is the first pooled storage file system
+which combines the role of the volume manager and traditional file
+system.  In the following the block allocation algorithm of ZFS is
+discussed. What makes ZFS block allocation algorithm interesting is
+that ZFS uses a copy-on-write transactional object model, for which
+blocks containing active data are never overwritten in place. Instead,
+a new block is allocated, modified data is written to it, then any
+metadata blocks referencing it are similarly read, reallocated, and
+written.  Consequently, ZFS needs to makes block allocation decision
+more frequently than traditional file systems and the allocation
+algorithm needs to be efficient.  Moreover, ZFS uses transaction
+groups to batch up chunks of data to be written to disk, and thus
+contiguous disk blocks need to be allocated for high write
+performance. Intriguingly, there are many places mentioning that ZFS
+suffers from performance degradation due to
+fragmentation~\cite{zfs_frag_sol, zfs_write_performance_on_frag_disk}.
+ZFS storage pools are made up of a collection of virtual devices, for
+example, disks. The space on the virtual devices are divided into
+meta-slabs which are consisted of blocks. Each meta-slab is managed
+separately.  More information related to on disk format of ZFS is
+in~\cite{microsystem2006zfs}.  There are three levels in the block
+allocation algorithm which are device selection, meta-slab selection
+and block selection~\cite{zfs_block_alloc}.  Device selection tries to
+spread the data across all devices in the pool so that maximum
+bandwidth can be obtained.  ZFS supports dynamic striping for which
+the file system takes care of data striping on the fly rather than at
+configuration time by the administrator. To keep load balanced, the
+block allocation algorithm is in favor of underutilized devices.  This
+keeps space usage uniform across all devices.  For special data, such
+as ZFS intent log, the round-robin mechanism is used each time the
+file system writes a log block since they are very short-lived and not
+expected to ever be read. Round-robin is better in that it maximizes
+IOPs when writing log blocks.  With a selected device, ZFS next
+decides which meta-slab should be used. Modern disks have uniform bit
+density and constant angular velocity. Therefore, the outer recording
+zones are faster than the inner zones. ZFS considers this fact and
+assigns a higher weight to the meta-slabs with lower Logical Block
+Address. In other words, ZFS selects the meta-slab with the most free
+bandwidth rather than simply the one with the most free space.  When a
+pool is relatively empty, ZFS also assigns a higher weight to
+meta-slabs that have been used before to minimize seek distance.
+Multiple factors need to be considered and a final weight is
+calculated. With the weight calculated, the selection algorithm is
+simply to choose the meta-slab with the highest weight. In the
+selected meta-slab, ZFS chooses a block within the meta-slab with a
+variant of first-fit policy.  The way of how ZFS manages meta-slabs is
+innovative. ZFS does not use traditional block allocation algorithm
+and free space management data structures such as bitmap and B-trees
+since they do not scale well and perform poorly with random frees.
+Instead, ZFS takes the approach similar to the Log Structured File
+system. As blocks are deallocated, they are added to a list of
+recently freed blocks and this list represents the free space
+available~\cite{zfs_block_alloc}.  ZFS use the data structure called
+\defn{space map} for its block allocation which is a series of logs of
+allocations and frees ordered by time.  When space is deallocated, the
+extent are appended to the space map, and each allocation is recorded
+as an extent in the space map as well.  The space map and its
+associated allocations and frees are maintained in memory in the form
+of an AVL tree.  When ZFS needs to allocate blocks from a particular
+meta-slab, it first reads that meta-slab's space map from disk and
+replays the allocations and frees in the in-memory AVL tree.  ZFS also
+condenses the space map when there are allocation and free extents
+that cancel out each other.  Space maps have some good properties.
+First, a space map with no entries means that there have been no
+allocations and no frees, indicating that all space is free. Second,
+space maps scale well because they are append-only.  Space maps are
+efficient to update regardless of the pattern of allocations and
+frees.  Space maps are equally efficient at finding free space whether
+the pool is empty or full.  This is different to bitmaps which takes
+longer time to scan as they fill up.
+
+For update-in-place file systems, the initial placement of data is
+important.  The Unix Fast File System tries to place all files from
+the same directory in the same cylinder group.  Inodes are spread
+throughout the system in an effort to keep metadata objects near the
+data it represents.
+
+Preallocating/reserving data blocks when a file is opened.
+
+Ext4 defers the physical allocation of file blocks until data
+writeback in an attempt to maximize the information available to the
+block allocator.
+
+
+{\bf file system Garbage Collection --} For copy-on-write file systems
+such as LFS, F2FS, BtrFS and ZFS, the garbage collection algorithm
+they use can impact performance significantly.
+
+A challenging design of LFS is to manage free space.  Maintaining
+large free space to write new date is critical for
+performance. However, when the log reaches the end of the disk, free
+space is likely to be fragmented into many small chunks.  There are
+mainly two options to reuse free data blocks --- threaded log scheme
+and copy-and-compaction.
+
+Threaded log means that the file system keeps track of freed blocks and
+reuses these blocks when writing new data. This is what has been
+implemented in many write-in-place file systems and a lot of effort has
+been paid to make it perform well. The big downside of threaded log is
+that it causes severe fragmentation gradually.  At some point large
+and contiguous write are rare and a lot of time is spent with seeking
+again which make LFS perform no better than other file systems.
+Copy-and-compaction algorithm means that live data is copied to
+contigous blocks and free data blocks are coalesced into large
+groups. This avoids fragmentation but the copying can be rather
+expensive. Moreover, long lived files that remain unmodified are
+copied over and over again.
+
+SpriteLFS~\cite{RosenblumOu92}, the first prototype implementation of
+LFS, implements Segment Cleaning to get free space out of dead data.
+Segment Cleaning works by reading a number of segments into memory,
+identifying the live data blocks and then writing them back to a
+smaller number of clean segments.  In order to identify live data
+blocks when cleaning segments, SpriteLFS writes additional data to the
+log which is called Segment Summary Block and the Segment Usage Table
+Block.  SSB identifies all data that is written to the segment in
+question.  SUT records how many bytes are still live in a segment and
+all segment usage table blocks are referenced from the checkpoint
+region.
+
+
+F2FS~\cite{lee15f2fs}, known as a flash-friendly log-structured
+file system, employs a hybrid scheme of threaded log and
+copy-and-compaction where the latter is adopted by default and the
+policy can dynamically changed to the threaded log scheme according to
+the file system status.  Compared with SpriteLFS, F2FS use an effective
+hot/cold data separation scheme applied during block allocation time.
+It runs multiple active log segments concurrently and appends data and
+metadata to separate log segments based on their anticipated update
+frequency. This is applicable for flash storage devices which exploit
+media parallelism.
+
+
+Because random writes are less poor on SSDs, F2FS uses a
+log-structured design.  Instead of focusing on inter-file locality,
+F2FS prioritizes LBA layout with respect to write-erase blocks.
+
+\fixme{I (Bill) just made this up, so please sanity check this claim.}
+
+
+
+{\bf file system Online Defragmentation --} 
+
+BTRFS~\cite{RodehBaMa13} provides \textit{autodefrag} mount option for
+the file system. Under the autodefrag policy, the system continuously
+looks for files that are good candidates and schedules them for
+defragmentation. In order to defrag a file, it is read, COWed, and
+written to disk in the next checkpoint.  This is likely to make it
+much more sequential, because the allocator will try to write it out
+in as few extents as possible.
+
+
+\fixme{dp/misc: Cites 6 and 7 in Smith and Seltzer use creation and
+  deletion of files from a hyperexponential distribution as a means to
+  simulate aging.  Not great, but could be a useful microbenchmark.
+  May want to mention this}
+\end{comment}
+
+
+%% Local Variables:
+%% mode: latex
+%% End:

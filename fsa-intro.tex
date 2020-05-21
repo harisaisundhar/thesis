@@ -1,0 +1,173 @@
+\section{Introduction}\label{sec:fsa-intro}
+
+File systems tend to become fragmented, or \defn{age}, as files are created,
+deleted, moved, appended to, and
+truncated~\cite{DBLP:conf/sigmetrics/SmithS97,DBLP:journals/tocs/McKusickJLF84}. 
+
+Fragmentation occurs when logically contiguous file blocks---either
+blocks from a large file or small files from the same
+directory---become scattered on disk.  Reading these files requires
+additional seeks, and on hard drives, a few seeks can have an
+outsized effect on performance.  For example, if a file system places
+a \SI{100}{\mebi\byte} file in \num{200} disjoint pieces (i.e.,
+\num{200} seeks) on a disk with \SI{100}{\mebi\byte\per\second}
+bandwidth and \SI{5}{\milli\second} seek time, reading the data will
+take twice as long as reading it in an ideal layout.  Even on SSDs,
+which do not perform mechanical seeks, a decline in logical block
+locality can harm performance~\cite{DBLP:conf/fast/MinKCLE12}.
+
+The state of the art in mitigating aging applies
+best-effort heuristics at allocation time to avoid fragmentation.  
+For example,
+file systems attempt to place related files close together on disk, while also
+leaving empty space for future files~\cite{DBLP:journals/tocs/McKusickJLF84,ext2,ext3,DBLP:journals/usenix-login/MathurCD07}.  Some file systems (including \ext, \xfs, \btrfs, and
+\ftwofs among those tested in this paper) 
+also include defragmentation tools that
+attempt to reorganize files and file blocks into contiguous regions to
+counteract aging.
+
+Over the past two decades, there have been differing opinions about the
+significance of aging.  The seminal work of Smith and
+Seltzer~\cite{DBLP:conf/sigmetrics/SmithS97} showed that file systems age under
+realistic workloads, and this aging affects
+performance. 
+%They also proposed methods, based on traces, for artificially
+%aging a file system. 
+On the other hand, there is a widely held view in the developer
+community that aging is a solved problem in production file systems.
+For example, the Linux System Administrator's
+Guide~\cite{linux-system-admin-guide} says:
+\begin{displayquote}
+  Modern Linux file systems keep fragmentation at a minimum by keeping
+  all blocks in a file close together, even if they can't be stored in
+  consecutive sectors. Some file systems, like ext3, effectively
+  allocate the free block that is nearest to other blocks in a
+  file. Therefore it is not necessary to worry about fragmentation in
+  a Linux system.
+\end{displayquote}
+%Similarly, the Oracle Linux Administrator's Solutions
+%Guide~\cite{oracleXFSdefrag} states, ``As XFS is an extent-based file
+%system, it is usually unnecessary to defragment a whole file system,
+%and doing so is not recommended.''\mfc{This is exactly where we are   confusing different notions of fragmentation.}
+
+There have also been changes in storage technology and file system design that
+could substantially affect aging.  For example, a back-of-the-envelope analysis
+suggests that aging should get worse as rotating disks get bigger, as seek
+times have been relatively stable, but bandwidth grows (approximately) as the
+square root of the capacity.  Consider the same level of fragmentation as the
+above example, but on a new, faster disk with 600MiB/s bandwidth but still
+a 5ms seek time.  Then the 200 seeks would introduce four-fold slowdown
+rather than a two-fold slowdown.  Thus, we expect fragmentation to become an
+increasingly significant problem as the gap between random I/O and sequential
+I/O grows. 
+
+As for SSDs, there is a widespread belief that fragmentation is not an issue.
+For example, PCWorld measured the performance gains from defragmenting an NTFS
+file system on SSDs\cite{pcworld-ssd-defrag-benchmarks}, and concluded that,
+``From my limited tests, I'm firmly convinced that the tiny difference that
+even the best SSD defragger makes is not worth reducing the life span of your
+SSD.'' 
+
+In this paper, we revisit the issue of file system aging in light of changes
+in storage hardware, file system design, and data-structure theory.  We make
+several contributions:
+%
+(1)~We give a simple, fast, and portable method for aging file systems.
+%
+(2)~We show that fragmentation over time (i.e., aging) is a first-order
+performance concern, and that this is true even on modern hardware, such as SSDs,
+and on modern file systems.
+%
+(3)~Furthermore, we show that aging is not inevitable.  We present several
+techniques for avoiding aging.  We show that
+\betrfs~\cite{DBLP:journals/tos/JannenYZAEJMPRW15,DBLP:conf/fast/YuanZJPACDKWBFJ16,DBLP:conf/fast/JannenYZAEJMPRW15,DBLP:conf/hotstorage/EsmetBFK12},
+a research prototype that includes several of these design techniques, is much
+more resistant to aging than the other file systems we tested.  In fact,
+\betrfs essentially did not age in our experiments, establishing that aging is
+a solvable problem.
+
+% What we did
+% x Benchmarked several file systems
+% x simulate realistic workloads using git and a mailserver
+% x measure fragmentation in terms of raw performance (i.e. time to
+%   perform operations) and 
+% - in terms of dynamic locality
+% x Dive into observations with microbenchmarks
+% - why these file systems? (update-in-place, cow, write-optimized) 
+%   (inode, full-path indexed)  What about log-based?
+
+\paragraph{Results.} We use realistic application workloads to age five
+widely-used file systems---\btrfs~\cite{DBLP:journals/tos/RodehBM13},
+\ext~\cite{ext2, ext3, DBLP:journals/usenix-login/MathurCD07},
+\ftwofs~\cite{DBLP:conf/fast/LeeSHC15}, \xfs~\cite{DBLP:conf/usenix/Sweeney96}
+and \zfs~\cite{DBLP:conf/lisa/Bonwick07a}---as well as the \betrfs research
+file system.  One workload ages the file system by performing successive git
+checkouts of the Linux kernel source, emulating the aging that a developer
+might experience on her workstation.  A second workload ages the file system by
+running a mail-server benchmark, emulating aging over continued use of the
+server.
+
+We evaluate the impact of aging as follows.  We periodically stop the
+aging workload and measure the overall read throughput of the file
+system---greater fragmentation will result in slower read throughput.
+To isolate the impact of aging, as opposed to performance degradation due
+to changes in, say, the distribution of file sizes, we then copy the
+file system onto a fresh partition, essentially producing a
+defragmented or ``unaged'' version of the file system, and perform the
+same measurement.  We treat the differences in read throughput
+between the aged and unaged copies as the result of aging.  
+
+We find that:
+\begin{itemize}
+\item All the production file systems age on both rotating disks and
+  SSDs.  For example, under our git workload, we observe over
+  50$\times$ slowdowns on hard disks and $2$--$5\times$ slowdowns on
+  SSDs.  Similarly, our mail-server slows down $4$--$30\times$ 
+  on HDDs due to aging.
+\item Aging can happen quickly.  For example, \ext shows over a
+  2$\times$ slowdown after 100 git pulls;
+  \btrfs and \zfs slow down similarly after 300 pulls.
+\item \betrfs exhibits essentially no aging.  
+  Other than \btrfs, 
+  \betrfs's aged performance is better than the other file systems'
+  unaged performance on almost all benchmarks.
+  For instance, on our mail-server workload, unaged \ext is 6$\times$ slower
+  than aged \betrfs.
+% MAB: The following was a sentence in the submission, but now that
+% the paper is deanonymized, it really isn't necessary any more.
+%
+%  We note that, although \betrfs has been
+ % described in previous work~\cite{JannenYuZh15tos,YuanZhJa16,jannen15betrfs,upcoming-tos17-paper,hotstorage}
+%  to our knowledge, this is the first analysis of the design
+ % properties of this system that counteract aging.
+\item The costs of aging can be staggering in concrete terms.  For
+  example, at the end of our git workload on an HDD, all four
+  production file systems took over \num{8} minutes to
+  grep through 1GiB of data.  Two of the four
+  took over \num{25} minutes. \betrfs took \num{10} seconds.
+\end{itemize}
+%
+We performed several microbenchmarks to dive into the causes of aging and
+found that performance in the production file systems was sensitive to numerous
+factors:
+
+\begin{itemize} \item If only 10\% of files are created out of order
+		relative to the directory structure (and therefore relative to a
+		depth-first search of the directory tree), \btrfs, \ext, \ftwofs, \xfs
+		and \zfs cannot achieve a throughput of
+                \SI{5}{\mebi\byte\per\second}. If the files are copied completely out
+		of order, then of these only \xfs significantly exceeds
+                \SI{1}{\mebi\byte\per\second}. This need not be the case; \betrfs
+                maintains a throughput of roughly \SI{50}{\mebi\byte\per\second}.
+	\item If an application writes to a file in small chunks, then the file's
+		blocks can end up scattered on disk, harming performance when reading
+		the file back.  For example, in a benchmark that appends
+                \SI{4}{\kibi\byte} chunks to 10 files in a round-robin fashion on a
+		hard drive, \btrfs and \ftwofs realize 10 times lower read throughput
+		than if each file is written completely, one at a time.
+%        in \btrfs and \ftwofs on a hard drive by a factor aging reduced of
+		%        about 10.
+		\ext and \xfs are more stable but eventually age by a factor of 2. \zfs
+		has relatively low throughout but did not age. \betrfs throughput is
+		stable, at two thirds of full disk bandwidth throughout the test.
+\end{itemize}

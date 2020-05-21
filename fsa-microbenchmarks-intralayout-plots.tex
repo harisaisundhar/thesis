@@ -1,0 +1,180 @@
+\newcommand{\addnewlayoutplot}[2]
+{
+	%\pgfplotstableread{../data/camera_ready_layout/#1/layout_rr_#2}\thistable
+	\addplot[color=blue, mark=|, only marks] table [x=block, y=round] {../data/camera_ready_layout/#1/layout_rr_#2_0};
+	\addplot[color=purple, mark=|, only marks] table [x=block, y=round] {../data/camera_ready_layout/#1/layout_rr_#2_1};
+	\addplot[color=red, mark=|, only marks] table [x=block, y=round] {../data/camera_ready_layout/#1/layout_rr_#2_2};
+	\addplot[color=orange, mark=|, only marks] table [x=block, y=round] {../data/camera_ready_layout/#1/layout_rr_#2_3};
+	\addplot[color=yellow, mark=|, only marks] table [x=block, y=round] {../data/camera_ready_layout/#1/layout_rr_#2_4};
+	\addplot[color=green, mark=|, only marks] table [x=block, y=round] {../data/camera_ready_layout/#1/layout_rr_#2_5};
+	\addplot[color=cyan, mark=|, only marks] table [x=block, y=round] {../data/camera_ready_layout/#1/layout_rr_#2_6};
+	\addplot[color=gray, mark=|, only marks] table [x=block, y=round] {../data/camera_ready_layout/#1/layout_rr_#2_7};
+	\addplot[color=pink, mark=|, only marks] table [x=block, y=round] {../data/camera_ready_layout/#1/layout_rr_#2_8};
+	\addplot[color=black, mark=|, only marks] table [x=block, y=round] {../data/camera_ready_layout/#1/layout_rr_#2_9};
+}
+
+\begin{figure}[t]
+{ \centering
+	\begin{subfigure}{\columnwidth}
+		\centering
+		\tikzsetnextfilename{layout-intra_ext4}
+		\begin{tikzpicture}[xscale=0.825, yscale=0.825, trim axis left, trim axis right]
+			\begin{axis}[
+				%xlabel={relative LBA},
+				ylabel style={align=center},
+				ylabel={(a) \ext\\round\vspace*{-1.5em}},
+				xmin=0,
+				xmax=1200,
+				ymin=0,
+				ymax=100,
+				width=1.21\columnwidth,
+				height=0.44\linewidth,
+				]
+				\addnewlayoutplot{ext4}{0}
+				\addnewlayoutplot{ext4}{10}
+				\addnewlayoutplot{ext4}{20}
+				\addnewlayoutplot{ext4}{30}
+				\addnewlayoutplot{ext4}{40}
+				\addnewlayoutplot{ext4}{50}
+				\addnewlayoutplot{ext4}{60}
+				\addnewlayoutplot{ext4}{70}
+				\addnewlayoutplot{ext4}{80}
+				\addnewlayoutplot{ext4}{90}
+				\addnewlayoutplot{ext4}{100}
+			\end{axis}
+		\end{tikzpicture}
+		%\caption{\ext}
+	\end{subfigure}\\
+%\end{figure*}
+%\begin{figure*}[t]
+	\begin{subfigure}{\columnwidth}
+		\centering
+		\tikzsetnextfilename{layout-intra_btrfs}
+		\begin{tikzpicture}[xscale=0.825, yscale=0.825, trim axis left, trim axis right]
+			\begin{axis}[
+				%xlabel={relative LBA},
+				ylabel style={align=center},
+				ylabel={(b) \btrfs\\round\vspace*{-1.5em}},
+				xmin=0,
+				xmax=1200,
+				ymin=0,
+				ymax=100,
+				width=1.21\columnwidth,
+				height=0.44\linewidth,
+				]
+				\addnewlayoutplot{btrfs}{0}
+				\addnewlayoutplot{btrfs}{10}
+				\addnewlayoutplot{btrfs}{20}
+				\addnewlayoutplot{btrfs}{30}
+				\addnewlayoutplot{btrfs}{40}
+				\addnewlayoutplot{btrfs}{50}
+				\addnewlayoutplot{btrfs}{60}
+				\addnewlayoutplot{btrfs}{70}
+				\addnewlayoutplot{btrfs}{80}
+				\addnewlayoutplot{btrfs}{90}
+				\addnewlayoutplot{btrfs}{100}
+			\end{axis}
+		\end{tikzpicture}
+		%\caption{\btrfs}
+	\end{subfigure}\\
+%\end{figure*}
+%\begin{figure*}[t]
+%{ \centering
+	\begin{subfigure}{\columnwidth}
+		\centering
+		\tikzsetnextfilename{layout-intra_xfs}
+		\begin{tikzpicture}[xscale=0.825, yscale=0.825, trim axis left, trim axis right]
+			\begin{axis}[
+				%xlabel={relative LBA},
+				ylabel style={align=center},
+				ylabel={(c) \xfs\\round\vspace*{-1.5em}},
+				xmin=0,
+				xmax=1200,
+				ymin=0,
+				ymax=100,
+				width=1.21\columnwidth,
+				height=0.44\linewidth,
+				]
+				\addnewlayoutplot{xfs}{0}
+				\addnewlayoutplot{xfs}{10}
+				\addnewlayoutplot{xfs}{20}
+				\addnewlayoutplot{xfs}{30}
+				\addnewlayoutplot{xfs}{40}
+				\addnewlayoutplot{xfs}{50}
+				\addnewlayoutplot{xfs}{60}
+				\addnewlayoutplot{xfs}{70}
+				\addnewlayoutplot{xfs}{80}
+				\addnewlayoutplot{xfs}{90}
+				\addnewlayoutplot{xfs}{100}
+			\end{axis}
+		\end{tikzpicture}
+		%\caption{\xfs}
+	\end{subfigure}\\
+%\end{figure*}
+%\begin{figure*}[t]
+%{ \centering
+	\begin{subfigure}{\columnwidth}
+		\centering
+		\tikzsetnextfilename{layout-intra_zfs}
+		\begin{tikzpicture}[xscale=0.825, yscale=0.825, trim axis left, trim axis right]
+			\begin{axis}[
+				%xlabel={relative LBA},
+				ylabel style={align=center},
+				ylabel={(d) \zfs\\round\vspace*{-1.5em}},
+				xmin=0,
+				xmax=1200,
+				ymin=0,
+				ymax=100,
+				width=1.21\columnwidth,
+				height=0.44\linewidth,
+				]
+				\addnewlayoutplot{zfs}{0}
+				\addnewlayoutplot{zfs}{10}
+				\addnewlayoutplot{zfs}{20}
+				\addnewlayoutplot{zfs}{30}
+				\addnewlayoutplot{zfs}{40}
+				\addnewlayoutplot{zfs}{50}
+				\addnewlayoutplot{zfs}{60}
+				\addnewlayoutplot{zfs}{70}
+				\addnewlayoutplot{zfs}{80}
+				\addnewlayoutplot{zfs}{90}
+				\addnewlayoutplot{zfs}{100}
+			\end{axis}
+		\end{tikzpicture}
+		%\caption{\zfs}
+	\end{subfigure}\\
+%\end{figure*}
+%\begin{figure*}[t]
+%{ \centering
+	\begin{subfigure}{\columnwidth}
+		\centering
+		\tikzsetnextfilename{layout-intra_f2fs}
+		\begin{tikzpicture}[xscale=0.825, yscale=0.825, trim axis left, trim axis right]
+			\begin{axis}[
+				xlabel={Relative LBA},
+				ylabel style={align=center},
+				ylabel={(e) \ftwofs\\round\vspace*{-1.5em}},
+				xmin=0,
+				xmax=1200,
+				ymin=0,
+				ymax=100,
+				width=1.21\columnwidth,
+				height=0.44\linewidth,
+				]
+				\addnewlayoutplot{f2fs}{0}
+				\addnewlayoutplot{f2fs}{10}
+				\addnewlayoutplot{f2fs}{20}
+				\addnewlayoutplot{f2fs}{30}
+				\addnewlayoutplot{f2fs}{40}
+				\addnewlayoutplot{f2fs}{50}
+				\addnewlayoutplot{f2fs}{60}
+				\addnewlayoutplot{f2fs}{70}
+				\addnewlayoutplot{f2fs}{80}
+				\addnewlayoutplot{f2fs}{90}
+				\addnewlayoutplot{f2fs}{100}
+			\end{axis}
+		\end{tikzpicture}
+		%\caption{\ftwofs}
+	\end{subfigure}
+	\caption{\label{fig:mb-intra-layout}Intrafile benchmark layout visualization.  Each color represents blocks of a file.  The x-axis is the logical block address (LBA) of the file block relative to the first LBA of any file block, and y-axis is the round of the experiment.  Rectangle sizes indicate contiguous placement, where larger is better. The brown regions with vertical lines indicate interleaved blocks of all 10 files. Some blocks are not shown for \ext, \xfs and \zfs.}}
+\end{figure}

@@ -1,0 +1,166 @@
+\section{Application Level Read-Aging: Git}\label{sec:fsa-git}
+
+To measure aging in the ``real-world,'' we create a workload designed to
+simulate a developer using git to work on a collaborative project.
+
+Git is a distributed version control system that enables collaborating
+developers to synchronize their source code changes.  Git users \defn{pull}
+changes from other developers, which then get merged with their own changes.
+In a typical workload, a Git user may perform pulls multiple times per day over
+several years in a long-running project.  Git can synchronize all types of file
+system changes, so performing a Git pull may result in the creation of new
+source files, deletion of old files, file renames, and file modifications.  Git
+also maintains its own internal data structures, which it updates during pulls.
+Thus, Git performs many operations which are similar to those shown in
+\secref{microbenchmarks} that cause file system aging.
+
+We present a git benchmark that performs 10,000 pulls from the Linux git repository, starting
+from the initial commit. After every 100 pulls, the benchmark performs a recursive grep
+test and computes the file system's dynamic layout score.
+This score is compared to the same contents copied to a freshly formatted partition.
+%\figref{git-20gb} shows the results
+%of the grep tests on both hard disk and SSD.
+
+% \subsection{HDD} The above microbenchmarks highlight the compromises that
+% traditional file systems must make when files are manipulated, and we now
+% demonstrate this effect under a ``realistic workload.'' Git is a \fixme{blah
+% blah about what git is}. From the perspective of the file system, much of a
+% programmer's workload consists of fetching changes to the source code from a
+% remote repository and merging them into the local source. Thus we use this
+% process to simulate such a workload.
+
+% The data on the file system consists of a git repository into which we pull successive commits from the linux source code repository, starting with the initial one. The first 10,000 commits reachable from the current HEAD (as of whenever) are used in commit time order, and are pulled via the command \texttt{git pull \$remote \$commit}, where the remote repository has the config option \texttt{uploadpack.allowReachableSHA1InWant} enabled to allow fetching of arbitrary commits. After initializing the repository with the first commit, and after every thousand commits, we perform a \texttt{grep} test as above.
+
+% As git pulls commits, files are created, deleted and changed in the target file system, and we expect that over time the file system will respond to the aging stress this creates. \fixme{maybe some discussion of the sorts of operations that git does?} The results are shown in figure \fixme{***}.
+
+\input{git-main-plots}
+
+\fixmeac{remember to update corr coeffs with data}
+
+On a hard disk (Figure~\ref{fig:git:results:hdd:20gb:on}), there is a clear
+aging trend in all file systems except \betrfs.  By the end of the experiment,
+all the file systems except \betrfs show performance drops under aging on the
+order of at least 3x and as much as 15x relative to their unaged versions. All
+are at least 15x worse than \betrfs. In all of the experiments in this section,
+\ftwofs ages considerably more than all other file systems, commensurate with
+significantly lower layout scores than the other file systems---indicating less
+effective locality in data placement. The overall correlation between grep
+performance and dynamic layout score is moderate, at $-0.41$. 
+
+On an SSD (Figure~\ref{fig:git:results:ssd:20gb:on}), \btrfs and \xfs show
+clear signs of aging, although they converge to a fully aged configuration
+after only about 1,000 pulls. While the effect is not as drastic as on HDD, in
+all the traditional file systems we see slowdowns of 2x-4x over \betrfs, which
+does not slow down.  In fact, aged \betrfs on the HDD outperforms all the other
+aged file systems on an SSD, and is close even when they are unaged. Again,
+this performance decline is strongly correlated ($-0.79$) with the dynamic
+layout scores.
+
+The aged and unaged performance of \ext and \zfs are comparable, and slower
+than several other file systems.  We believe this is because the average file
+size decreases over the course of the test, and these file systems are not as
+well-tuned for small files.  To test this hypothesis, we constructed
+synthetic workloads similar to the interfile fragmentation microbenchmark
+(\secref{microbenchmarks}), but varied the file size (in the microbenchmark it
+was uniformly 4KB). 
+Figure~\ref{fig:git:filesize} shows both the measured, average file
+size of the git workload (one point is one pull), and the microbenchmark.
+Overall, there is a clear relationship between the average file size and grep
+cost. 
+%, and the grep cost increases steeply when the average file is
+%smaller than 16 KiB.
+
+\input{git-filesize-plots}
+
+The zig-zag pattern in the graphs is created by an automatic garbage collection
+process in Git. Once a certain number of ``loose objects'' are created (in git
+terminology), many of them are collected and compressed into a ``pack.'' At the
+file system level, this corresponds to merging numerous small files into a
+single large file.  According to the Git manual, this process is designed to
+``reduce disk space and increase performance,'' so this is an example of an
+application-level attempt to mitigate file system aging. If we turn off the git
+garbage collection, as show in Figures~\ref{fig:git:results:hdd:20gb:off},
+\ref{fig:git:results:ssd:20gb:off} and \ref{subfig:git:layout:20gb:off}, the
+effect of aging is even more pronounced, and the zig-zags essentially disappear.
+
+%\fixmeac{Kill this paragraph or add HDD results description?}
+On both the HDD and SSD, the same patterns emerge as with garbage collection
+on, but exacerbated: \ftwofs aging is by far the most extreme.  \zfs ages
+considerably on the HDD, but not on the SSD.  \zfs on SSD and \ext perform
+worse than the other file systems (except \ftwofs aged), but do not age
+particularly.  \xfs and \btrfs both aged significantly, around 2x each, and
+\betrfs has strong, level performance in both states. This performance
+correlates with dynamic layout score both on SSD ($-0.78$) and moderately so on
+HDD ($-0.54$).
+
+We note that this analysis, both of the microbenchmarks and of the git
+workload, runs counter to the commonly held belief that locality is solely a
+hard drive issue. While the random read performance of solid state drives does
+somewhat mitigate the aging effects, aging clearly has a major
+performance impact.
+
+%\fixmedp{This is a good start on measuring what is going on.  I'd like to better understand the file placement heuristics on ext4 and btrfs---why do they make different choices?  Maybe even see a different example directory layout + physical placement}
+%\fixmeac{Reminder to add a deferred allocation comment here somewhere}
+
+\tightpara{Git Workload with Warm Cache.}
+The tests we have presented so far have all been performed with a cold cache,
+so that they more or less directly test the performance of the file systems'
+on-disk layout under various aging conditions. In practice, however, some data
+will be in cache, and so it is natural to ask how much the layout choices that
+the file system makes will affect the overall performance with a warm cache.
+
+We evaluate the sensitivity of the git workloads to varying amounts of system
+RAM.  We use the same procedure as above, except that we do not flush any
+caches or remount the hard drive between iterations.  This test is performed on
+a hard drive with git garbage collection off.  The size of the data on disk is
+initially about 280MiB and grows throughout the test to approximately 1GiB.
+
+\input{git-wc-plots}
+
+The results are summarized in \figref{git:warmcache}. We present data for \ext
+and \ftwofs; the results for \btrfs, \xfs and \zfs are similar. \betrfs is a
+research prototype and unstable under memory pressure; although we plan to fix
+these issues in the future, we omit this comparison.
+% low-memory conditions, 
+%in this test for reasons unrelated to disk layout.  Although we plan to fix
+%this issue in the future, we omit the \betrfs comparison in the interest of
+%clarity.  under memory pressure, for so we omit this data in the interest of
+%clarity.  Unfortunately \betrfs is a research prototype and does not behave
+%well in low memory conditions. As such we are unable to present its results
+%here outright.
+
+In general, when the caches are warm and there is sufficient memory to keep all
+the data in cache, then the read is very fast. However, as soon as there is no
+longer sufficient memory, the performance of the aged file system with a warm
+cache is generally worse than unaged with a cold cache.  In general, unless all
+data fits into DRAM, a good layout matters more than a having a warm cache.
+%good layout and cold cache---Cold Cache Unaged and \betrfs Cold Cache lines in
+%the figures---quickly outperforms the aged layout when all data doesn't fit in
+%DRAM, even with a warm cache.
+  
+\tightpara{Btrfs Node-Size Trade-Off.}
+\Btrfs allows users to specify the node size of its metadata B-tree 
+at creation time. Because small files are stored in the metadata
+B-tree, a larger node size results in a less fragmented file system, at a cost of
+more expensive metadata updates.
+%One of the design considerations we put forth in \secref{model} is that, in
+%general, the use of larger block sizes would lead to reduced aging. However,
+%doing so naively leads to write-amplification as the larger blocks are still
+%written even for small modifications. We demonstrate this using the above git
+%workload on \btrfs, a B-Tree-based file system. Here block size corresponds to
+%the size of the nodes of the tree, which \btrfs allows us to configure when
+%formatting.
+
+We present the git test with a 4KiB node size, the default setting, as well as 8KiB,
+16KiB, 32KiB, and 64KiB (the maximum).  
+\figref{btrfsGrepTime:results:hdd:20gb:off} shows similar
+performance graphs to \figref{git-20gb}, one line for each node size.  The 4KiB
+node size has the worst read performance by the end of the test, and the
+performance consistently improves as we increase the node size all the way to
+64KiB.  \figref{btrfsBlocksWritten:results:hdd:20gb:off} plots the number
+of 4KiB blocks written to disk between each test (within the 100 pulls).  As
+expected, the 64KiB node size writes the maximum number of blocks and the 4KiB
+node writes the least.  We thus demonstrate---as predicted by our model---that
+aging is reduced by a larger block size, but at the cost of write-amplification.
+
+\input{git-node_size-plots}

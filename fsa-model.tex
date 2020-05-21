@@ -1,0 +1,764 @@
+\section{A Framework for Aging}\label{sec:fsa-framework}
+
+\subsection{Natural Transfer Size}\label{sec:fsa-nts}
+
+Our model of aging is based on the observation that the bandwidth of many types
+of hardware is maximized when I/Os are large; that is, sequential I/Os are
+faster than random I/Os.  We abstract away from the particulars of the storage
+hardware by defining the \defn{natural transfer size} (NTS) to be the amount of
+sequential data that must be transferred per I/O in order to obtain some fixed
+fraction of maximum throughput, say 50\% or 90\%.  Reads that
+involve more than the NTS of a device will run near bandwidth.
+
+\iffalse 
+Figure~\ref{fig:alpha-plot} Shows
+measurements of SSD and HDD bandwidth as a function of read size.
+%, indicating that both types of devices
+%can realize a high bandwidth guarantee if
+%file systems can issue reads and writes of at least this size.
+On both the HDD and SSD we measured, a reasonable natural transfer size
+would be 4MiB.
+
+
+\fi
+
+%Any any storage with an NTS, an optimal layout
+%of files in a file system should be as follows.  If a file is much
+%larger than the NTS, it can be placed anywhere and
+%still be read at near bandwidth.  Related files (or parts of the same
+%f\ile) that are much smaller than the NTS must be
+%stored together if the file system is to have any hope of delivering
+%high read performance.
+
+%This is generally true
+%for hard drives, where
+%, except for when the device remaps failed sectors.  
+%large discontinuities in the LBA space lead to seek overheads.  
+%
+%SSDs can also realize higher read performance when requesting
+%contiguous logical blocks~\cite{JuKa13}.
+
+From Figure~\ref{fig:alpha-plot}, which plots SSD and HDD bandwidth as a
+function of read size, we conclude that a reasonable NTS for
+both the SSDs and HDDs we measured is 4MiB.
+
+The cause of the gap between sequential- and random-I/O speeds differs
+for different hardware.  For HDDs, seek times offer a simple
+explanation.  For SSDs, this gap is hard to explain conclusively
+without vendor support, but common theories include: sequential
+accesses are easier to stripe across internal banks, better leveraging
+parallelism~\cite{JuKa13};
+%SSDs can have limited onboard RAM to store FTL translation data; and that 
+some FTL translation data structures have nonuniform search
+times~\cite{MaFeLi14}; and fragmented SSDs are not able to prefetch
+data~\cite{ChenKoZh09} or metadata~\cite{JiChSh16}.
+% This
+%impact will vary from device to device, which will have different
+%ratios of RAM to flash storage~\cite{DePeePee13}, as well as different
+%FTL algorithms.
+Whatever the reason, SSDs show a gap between sequential and
+random reads, though not as great as on disks.
+
+In order to avoid aging, file systems should avoid breaking large files into
+pieces significantly smaller than the NTS of the hardware. They should also
+group small files that are logically related (close in recursive traversal
+order) into clusters of size at least the NTS and store the clusters near each
+other on disk.  We consider the major classes of file systems and explore the
+challenges each file system type encounters in achieving these two goals.
+
+%Figure~1 shows the relationship between read size
+%and read bandwidth.  It shows that in both hard disks and SSDs, larger
+%(more sequential) reads lead to faster reads.
+
+
+\newcommand{\addalphaplot}[3]
+{
+  \addplot[color=#2, line width=0.75pt, mark=#3]
+  table[x=read_size_bytes, y expr=\thisrow{read_size_bytes} * \thisrow{num_reads} / \thisrow{time_seconds} / 1000000] {../data/device_measurements/#1_alpha_bw.csv};
+  %\addlegendentry{\pgfkeysvalueof{/hardware-names/#1}}
+}
+
+\begin{figure}
+  {\centering
+	\tikzsetnextfilename{seq-read_bandwidth}
+    \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+      \begin{axis}[
+        width=1.21\columnwidth,
+        % scale only axis,
+        % title=Insertion per second against Load Factor, 
+		  xlabel style={at={(axis description cs:0.5,-0.05)},anchor=north},
+		  xlabel={Read size (MiB)}, 
+		ylabel={Effective bandwidth (MiB per second)}, 
+        xmin=4096,
+        %xmax=16777216, 
+        xmax=268435456,
+        %ymin=0, 
+        % ymax=50, 
+        xtick={4096,16384,65536,262144,1048576,4194304,16777216,67108864,268435456},
+		xticklabel style={align=center},
+		%xticklabels={4\\KiB, 16\\KiB, 64\\KiB, 256\\KiB, 1\\MiB, 4\\MiB, 16\\MiB, 64\\MiB, 256\\MiB},
+		xticklabels={0.004, 0.016, 0.063, 0.25, 1, 4, 16, 64, 256},
+        ytick={0.25,1,4,16,64,256,1024},
+		yticklabel style={align=center},
+		%yticklabels={256\\KiB, 1\\MiB, 4\\MiB, 16\\MiB, 64\\MiB, 256\\MiB, 1\\GiB},
+		yticklabels={0.25, 1, 4, 16, 64, 256, 1024},
+        xmode=log,
+        ymode=log,
+        log basis x=2,
+        log basis y=2,
+        grid=major, 
+        scaled x ticks=false,
+        scaled y ticks=false,
+        legend columns=2,
+        legend cell align=left,
+        legend pos=north west,
+        % legend to name=alphaplotslegend,
+        % transpose legend,
+        ]
+        \addalphaplot{ssd}{red}{square*}
+        \addlegendentry{SSD}
+        \addalphaplot{hdd}{blue}{*}
+        \addlegendentry{HDD}
+      \end{axis}
+    \end{tikzpicture}
+  \caption{\label{fig:alpha-plot}Effective bandwidth vs.\ read size (higher is
+	better).  Even on SSDs, large I/Os can yield an order of magnitude more
+	bandwidth than small I/Os.}
+  }
+\end{figure}
+
+
+\begin{comment}
+Thus, thinking about access contiguity within the LBA space is a good
+proxy for overall read performance; Figures~1 and 2 show the
+performance of different degrees of sequential LBA access on our test
+devices, a hard drive and an SSD.
+
+
+
+Aging in a file system describes the deviation from the sequential
+layout of data in the LBA space that occurs over time as it is
+disrupted by file system operations. Specifically we consider aging as
+two forms of fragmentation.  Intra-file fragmentation occurs when the
+extents of a file are not contiguous in the logical block address
+space; this is what most readers will recognize as ``file
+fragmentation.''  However, we also consider inter-file fragmentation,
+also known as ``file scattering,'' which occurs when files that are
+frequently accessed together are not co-located in the logical block
+address space. We generally assume that files and directories which
+are close within the directory tree are frequently accessed together.
+
+We will show that due to the performance impact of good LBA space
+layout of data both forms of file system fragmentation can have a
+first-order impact on performance \fixme{ref to YZ's table}.  For
+instance, during recursive scans of a directory structure, files in a
+directory or subdirectory that are not adjacent in the LBA space will
+require seeking on a hard drive, or random accesses on an SSD. We
+demonstrate this effect on performance in Section
+\ref{sec:microbenchmarks}.
+
+\fixmeac{I don't understand what the following is trying to prove? Is
+  this a counter-point to the idea that LBAs are the story? That would
+  seem to weaken our overall argument, so I'm not sure how to present
+  it} \fixme{Yang: I feel the conclusion is not very intuitive. you
+  have to persuade others that SSDs use log-structured approaches so
+  that random patterns achieve fragmented SSDs.}
+Table~\ref{table:ssd_read_aging} compares read throughput on an SSD
+after issuing a number of writes with different LBA sequences.  In the
+experiment, the SSD driver is written to as a raw block device. The
+amount of data of each write is 4KB or 2MiB.  The total number of
+writes issued in each test is 1,000.  The device is written with a
+sequence of LBAs which is in sequential or random order. After the
+write test is complete, the system is rebooted to eliminate any
+caching effect. Then, the device is read with the same LBA sequence
+and the read throughput is measured. From the result, it can be noted
+that when the data written with random LBA sequence, the read
+performance is worse than the case when data is written with
+sequential LBAs.
+
+
+\begin{table}[h]
+\begin{center}
+    \begin{tabular}{| c | c | r |}
+    \hline
+    Write Granularity & LBA Pattern & Perf. (MiB/s) \\ \hline
+       4KB & Seq. & 266 \\ \hline
+       4KB & Rand. & 85 \\ \hline
+       2MiB & Seq. & 541 \\ \hline
+       2MiB & Rand. & 328 \\ \hline
+    \end{tabular}
+\end{center}
+\caption{SSD read performance comparison.}
+\label{table:ssd_read_aging}
+\end{table}
+
+
+\end{comment}
+
+
+
+%\secput{model}{File System Design and Aging}
+%This section discusses file system design decisions and their effect on aging.
+%We consider the design of traditional file systems which may not have aging as
+%a first-order design consideration, and we present a collection of design
+%principles which can provide strong guarantees against aging.
+
+\subsection{Allocation Strategies and Aging}\label{sec:fsa-allocation}
+
+The major file systems currently in use can be roughly  categorized as
+B-tree-based, such as \xfs, \zfs, and \btrfs,  update-in-place, such as \ext,
+and log-structured, such as \ftwofs~\cite{lee15f2fs}.
+%\fixme{this is the only
+%occurrence of f2fs}.
+The research file system that we consider, \betrfs, is based on \bets.
+Each of these fundamental designs creates
+different aging considerations, discussed in turn below. 
+In later sections,
+we present experimental 
+validation for the design principles presented below.
+
+
+
+%This is shown as the intersections in
+%Figure~1. If data is written sequentially in chunks of this size, then this
+%provides a bandwidth guarantee when it is read. Thus, we recommend that a file
+%system utilize a large block size within which files and data are kept in
+%sequential order.
+
+\tightpara{B-trees.}
+The aging profile of a B-tree depends on the leaf size.  If the
+leaves are much smaller than the NTS, then the
+B-tree will age as the leaves are split and merged, and thus moved
+around on the storage device.
+
+Making leaves as large as the  NTS increases 
+\emph{write amplification}, or the ratio between the
+amount of data changed and the amount of data written to storage.  In the extreme
+case, a single-bit change to a B-tree leaf can cause the entire leaf
+to be rewritten.  Thus, B-trees are usually implemented with small
+leaves.  Consequently, we expect them to age under a wide variety of
+workloads.
+
+In~\secref{git}, we show that the aging of \btrfs is inversely
+related to the size of the leaves, as predicted.  There are, in
+theory, ways to mitigate the aging due to B-tree leaf movements.  For
+example, the leaves could be stored in a packed memory
+array~\cite{BenderDeFa05}.  However, such an arrangement might well
+incur an unacceptable performance overhead to keep the leaves arranged
+in logical order, and we know of no examples of B-trees implemented
+with such leaf-arrangement algorithms.
+
+\iffalse
+When using blocks of NTS, small updates
+may cause very large reads and rewrites.
+%is that generally such
+%blocks will be quite large---4\mb is reasonable for hard drives for example---so
+%that when making small writes and updates, a large block must be
+%re-sequentialized and written. Thus a small logical write ends up generating a
+%large write to disk, a process known as ``write amplification.''
+In general, this creates a trade-off between read and write performance,
+which we demonstrate empirically in the \btrfs file system
+by varying the node size (\secref{btrfs_node}).
+%We
+%experimentally demonstrate the tradeoff of block size on both read performance
+%and write amplification when using \btrfs in 
+
+\fi
+
+
+\iffalse
+\tightpara{Packed Memory Arrays.}
+Another way to prevent large block sizes from leading to excessive
+write-amplification is to strategically leave spaces between the data inside
+each block. This allows for small writes, updates and deletions to occur within
+those spaces. By dynamically maintaining this structure, the data can be kept
+relatively sequentially and with room for small modifications. This is the
+basic principle behind the Packed Memory Array (PMA)~\cite{BenderDeFa05},
+a data structure
+which provides strong guarantees as to both the write-amplification incurred
+and the sequentiality of the data in the block.
+\fi
+
+\tightpara{Write-Once or Update-in-Place Filesystems.}  
+When data is written once and never moved, such as in update-in-place file
+systems like \ext, sequential order is very difficult to maintain: imagine a
+workload that writes two files to disk, and then creates files that should
+logically occur between them. Without moving one of the original files, data
+cannot be maintained sequentially.  Such pathological cases abound, and the
+process is quite brittle. As noted above, delayed allocation is an attempt to
+mitigate the effects of such cases by batching writes and updates before
+committing them to the overall structure. 
+
+%This process is brittle; if we imagine the current
+%state of a write-once file system as a sort of sieve with holes of free space,
+%and start putting files into those holes without altering the sieve, there is
+%an obvious tension between the size and number of the holes---the current
+%sequentiality of the file system, and the availability of space to put new
+%files while maintaining order---the potential future sequentiality.
+
+
+%A heuristic which attempts to overcome this brittleness is to batch writes and
+%updates before committing them to the overall structure.%, similar to
+%                                %how we suggest that file systems
+%                                %batch small writes into large blocks
+%                                %above. 
+%The \zfs intent log (ZIL),
+%for example, implements this heuristic.
+%Before commit, ZIL updates are stored
+%in an unsorted disk region that will not be sequential.
+%After commit, there is still no guarantee that the file system
+%will be stored in logical order.
+%when it is committed will be much 
+%improved. \fixmeac{Should this go in related or here? It's interesting either
+%way though.}
+
+\tightpara{\bets.}  \bets batch changes to the file system in a
+sequence of cascading logs, one per node of the tree.  Each time a
+node overflows, it is flushed to the next node.  The seeming
+disadvantage is that data is written many times, thus increasing the
+write amplification.  However, each time a node is modified, it
+receives many changes, as opposed to B-tree, which might receive only
+one change.  Thus, a \bet has asymptotically lower write amplification
+than a B-tree.  Consequently, it can have much larger nodes, and
+typically does in implementation.  \betrfs uses a \bet with 4MiB nodes.  
+
+Since 4MiB is around the NTS for our storage devices,
+we expect \betrfs not to age---which we verify below.
+
+%\fixmedp{please review}
+Log-structured merge trees (LSMs)~\cite{OneilChGa96} and other write-optimized
+dictionaries can resist aging, depending on the implementation.
+As with \bets, it is essential that node sizes match the NTS, the schema reflect logical access order, and enough 
+writes are batched to avoid heavy write amplification.  
+%It is possible
+%to implement these structures such that they do age; for instance, one might implement an LSM-tree
+%with a B-tree library that uses small nodes, which will age.
+%in an LSM-tree built with B-trees, one might use a B-tree library with small 
+
+
+
+\iffalse
+In order for small writes and updates to be performed without writing entire
+blocks, these operations can be batched together into larger writes. This issue
+then becomes how to make sure these writes maintain some sort of overarching logical order
+to ensure efficient searches of the written data.
+%within each block,
+%rather than turning each block into a log-like structure, that does 
+%which would of course defeat the large block size.
+Here a write-optimized dictionary,
+such as a \bet or \lsm, provides a theoretical solution.
+%\fixmeac{blah blah blah about this awesome stuff}
+
+\fi
+
+\begin{comment}
+\tightpara{Log-Structured File Systems}
+The general principle behind log-structured file systems is that very little
+logical or sequential order in maintained. Thus log-structured file systems
+will become fragmented and aged under all but the most trivial workloads.
+\end{comment}
+
+\begin{comment}
+
+\tightpara{I/O Overhead.} 
+Most block-storage devices, including \tightpara{Write-Optimization.}
+In order for small writes and updates to be performed without writing entire
+blocks, these operations can be batched together into larger writes. This issue
+then becomes how to make sure these writes maintain some sort of overarching logical order
+to ensure efficient searches of the written data.
+%within each block,
+%rather than turning each block into a log-like structure, that does 
+%which would of course defeat the large block size.
+Here a write-optimized dictionary,
+such as a \bet or \lsm, provides a theoretical solution.
+%\fixmeac{blah blah blah about this awesome stuff}hard drives and SSDs, have a
+\defn{natural transfer size} (NTS), which is generally larger than the
+device's minimum transfer unit.  The NTS is the
+amount of data from a contiguous region that needs to be read so that
+the access time is a negligible percentage of the total cost of the
+read.
+
+For a rotating disk, this means that the transfer has to be large
+enough so that the transfer time dominates the disk-seek time.
+The natural transfer size of most current HDDs is on the order of
+megabytes.  SSDs also exhibit better performance when moving larger
+chunks of data, largely because the flash-translation layer can
+leverage this locality to improve internal operations.  \fixmedp{Would
+  be nice to say more here about how the FTL does this} \fixme{MAB:
+  Are there papers that that have this concept, which we can cite?}
+
+For any given device, the natural transfer size can be measured. See
+Figure~1 for the devices used herein.\fixmedp{huh? The details are not
+  explained in the figure (or anywhere else).  It is ok to give a
+  forward ref to S5, but we need to explain how this data was
+  collected in more detail} \fixme{Bill: I also think we should give a
+  brief reference to the devices themselves (500 GiB HDD and 240 GiB
+  Sandisk Extreme Pro).}
+
+
+\tightpara{Read I/O.}  Consider the logical order of bytes in a file
+system.  Specifically, we can define an order on all the files $(f_0,
+f_1, \ldots )$ in a file system where the order is defined by the
+order in which files are accessed during a recursive traversal, say
+\texttt{grep -r \textbackslash}.  
+
+It is not necessary to store all files packed tightly in that order on
+the storage device in order to achieve good read bandwidth.  Such a
+stringent requirement would make updating the file system prohibitive.
+
+
+
+In order to read at the NTS and
+therefore to achieve a high percent of bandwidth, it is necessary 
+
+ for
+files to be kept 
+
+Transferring large chunks of data to and from disk is of value only if
+the system can use most of this data.  This correspondence between
+physical placement and a logical relationship is what we mean by
+locality. \fixme{MAB: For concreteness, consider
+  Btrfs~\cite{cite-Btrfs}, a B-tree-based file system. }
+
+\fixmedp{I think we should say more about the relationship between LBA
+  space and physical placement on SSDs.  Does this happen, or do FTLs
+  just place things in the order they were written?  Or do we know?  I
+  mean, I'm not sure we have made the case that LBA-level
+  fragmentation matters.  Either way, it woudl be nice to see more
+  background on how FTLs physically place data. }
+
+\tightpara{Read bandwidth.}  Thus, aging is the phenomenon
+where the average transfer size becomes smaller over the life of the
+file system.  As a file system's average tranfer size drops further
+below the device's natural transfer size, I/O performance suffers by
+increasingly large margins.
+
+\fixmedp{Is aging just a read phenomenon?  What about fragmentation of
+  available free space?  Is this write aging, or something else?}
+
+% \begin{comment}
+% We observe four conditions that can lead to aging, and then argue that
+% a data structural solution to avoid these conditions can avoid aging.
+
+% \tightpara{Small block allocations.}  By default, most file systems
+% allocate space at the granularity of disk sectors (typically
+% \unit{4}\kibi\byte), rather than the natural transfer size of the
+% device.
+
+% This pressure is out of fear of write amplification.
+
+% Bottom line: shit gets interleaved
+
+% \tightpara{Writing data only once.}  You can de-interleave your shit by rewriting it.
+% Many file systems never move data, or only move data when it is rewritten.
+
+% Rewriting data isn't always that bad.  Especially if you have a write-optimized structure.
+
+% \tightpara{Avoiding sub-block allocations.}  For small block sizes (\unit{4}\kibi\byte), the value
+% of packing is minimal (although FFS did this).  
+% For bigger objects, you have to pack shit in.  But this dovetails nicely if you are
+% going to rewrite your data anyway
+% % FFS does pack things, btw.
+% \end{comment}
+ 
+
+%So if $\alpha = 1/2$, then the transfer time
+%must equal the seek time, and if $\alpha = 9/10$, then the transfer
+%time must be 10 times the seek time.
+
+Most file systems use blocks that are smaller than the natural
+transfer size.  The choice of small blocks is the result of balancing
+competing pressures in file-system design. For instance, it is
+convenient to place small files in a single block, and a small block
+size bounds the amount of wasted space per file.  In principle,
+multiple small files could share regions of a block, but this
+bookkeeping is rather complex, especially if these small files grow
+later.
+
+%n(E.g., smaller blocks often means less write amplification and
+%less space wastage.)
+
+% There are two good
+% reasons for this design decision:
+
+% (1) large write amplification when blocks are big. Updating a single
+% byte in a 4MiB block has a huge write amplification of 4 million. Write
+% amplification is not long bad for SSD lifetimes, but it also wastes
+% bandwidth, which can limit write performance when the workload is
+% small random writes.
+
+% (2) space wastage. If the minimum allocation size is 4MiB, then small
+% files, which are common, will waste lots of space.
+
+Then file systems heuristically try to store logically contiguous
+small blocks physically together on disk. However, it is challenging
+to maintain this order because file systems deal with objects whose
+sizes change over time, often by many orders of
+magnitude. Furthermore, keeping related file-system objects (i.e.,
+files in the same directory) together is difficult since rename needs
+to be a fast operation.
+
+As a result, most file systems do best-effort heuristics to avoid
+fragmentation, but provide no strong guarantees. Over time, file
+systems will fragment and age as the heuristics fail.
+
+The following design principles can be applied to avoid aging:
+
+\tightpara{Operate in big chunks.} File systems should store data in
+chunks on the order of the devices natural transfer size, and store
+related objects within these chunks.
+
+\tightpara{Pack small objects into the big chunks.}  To avoid wasting
+space and hurting performance, pack small objects into the big chunks.
+
+\tightpara{Batch updates.} To avoid write amplification, file systems
+should apply large batches of updates to objects within chunks.
+
+
+\tightpara{Rewrite objects multiple times.}  
+\fixmedp{Why?  This is where we probably do need a proof that 
+you simply can't make perfect predictions and you have to move things 
+when you guess wrong}
+Don't be afraid to write
+objects multiple times.  There are data structures (write-optimized
+data structures), that can perform small writes extremely quickly.
+
+\end{comment}
+
+% This paper shows that aging happens much more rapidly and more
+% severely than folk wisdom holds.
+
+% This paper also shows that a file system that satisfies (1)-(4), in
+% particular, BetrFS, does not exhibit aging in our experiments. We
+% claim that the lack of aging is because of (1)-(4).
+
+
+% \begin{comment}
+
+% For many storage devices, as read requests get longer, the device
+% achieves a larger fraction of its sustained bandwidth.  This is
+% well-known on hard drives, which have to physically move the
+% read/write head between non-contiguous I/Os, but also turns out to be
+% true of solid state devices, such as SSDs.
+
+% %A consequence of this is that the read performance of a file system
+% %under some work loads depends on the size of read requests issued to
+% %the underlying storage device,
+% To gain better read performance from issuing larger read requesets,
+% a file system needs the ability to store closely related data together,
+% which is sometimes referred to as the \defn{locality} of a file system.
+% In this paper, we study the read
+% performance of file systems as a function of the workload that leads
+% to a particular arrangement of files.  Specifically, we observe that
+% for most file systems the locality of a file system is a \defn{path
+%   variable}, dependant on the history of the file system, and not a
+% \defn{state variable}, dependant on the contents of a file system.  We
+% will refer to the decay in locality (and consequent decay in read
+% performance) of a file system as it undergoes modifications as
+% \defn{aging}.
+
+% In order to understand locality and its relationship with read
+% performance, we consider the relationship between the \defn{logical
+%   order} and \defn{physical order} of a set of files, as a function of
+% the file system used to store them and the order in which they were
+% created and modified to reach their current state.
+
+% The logical order is unrelated to both: it is simply the order in
+% which the bytes of files are accessed during a depth-first search
+% traversal\footnote{Other traversals are equally valid.  One can define
+%   logical order and aging with respect to any traversal of the
+%   directory tree, for example a breadth-first search.  Tools such as
+%   \texttt{find} or recursive \texttt{grep} traverse directory
+%   structures in depth-first order, however.}  of the directory tree,
+% or equivalently, the contents of a file system, ordered
+% lexicographically by full path.  The physical order is the order these
+% bytes appear on the storage device, and it depends on both the file
+% system used and the history of file creation and modification.
+
+% We define a \defn{logical transfer size} to be a maximal region of physical
+% memory where the stored bytes are in logical order.
+% %  The larger the logical transfer size, the less the aging. 
+% For a storage device and an acceptable percent bandwidth utilization
+% $\alpha$, there is a minimum size so that read of that size or
+% greater achieve at least $\alpha$ fraction of the maximum sustainable
+% bandwidth of the device.  We call this size the \defn{natural transfer size}
+% of the storage device.  For a rotating disk, the natural transfer size
+% is easier to think about: the transfer has to be large enough that
+% the read time sufficiently bigger than the seek time to to
+% dominate the total run time.
+% So if $\alpha = 1/2$, then the transfer time
+% must equal the seek time, and if $\alpha = 9/10$, then the transfer
+% time must be 10 times the seek time.  On an SSD, it's hard to reason
+% about the natural transfer size, but it's easy enough to measure it.
+
+% If the average logical transfer size is smaller than the natural transfer size of
+% the storage device, then read performance suffers.  Aging happens in a
+% file system when the average logical transfer size drops in the course of
+% maintaining files and directories as they change.  So then the
+% question becomes, why should average logical transfer size shrink?
+
+% To understand the downward pressure in average logical transfer size,
+% consider two examples: file systems in which data is maintained in a
+% trie that corresponds to the directory tree (inode-based file
+% systems); and file systems in which data is maintained in the leaves a
+% B-tree.
+
+% In an inode-based file system, it makes sense, from the point of view
+% of read performance, to keep all the files in a directory in physical
+% proximity in storage.  However, suppose a new file is introduced.
+% Space needs to be made to accommodate this new file.  In order to
+% guarantee read performance, a region of size at least the natural
+% transfer size of the storage device needs to be read, the file needs
+% to be added to this region, and the region needs to be written. For a
+% rotating disk, the natural transfer size might be as large as a
+% megabyte or more, whereas a new file might be only a few bytes in
+% size.  The consequence is that enforcing large logical transfer sizes
+% in an inode-based system yields large write amplification for some
+% workloads, in which every byte written to the file system might
+% involve writing thousands or millions of bytes.  This level of write
+% amplification is usually considered unacceptable, and so inode-based
+% file systems often fail to match the locality their directories (the
+% ``effective block size'') with the natural transfer size of the
+% underlying storage.
+
+% B-tree file systems suffer from the same write amplification.  Each
+% time a leaf is modified, it has to be read if it is not in memory, and
+% then it might be written before it is modified again, due to cache
+% pressure.  As a result, most B-tree implementations keep the B-tree
+% node size below a few kilobytes, well below the natural transfer size
+% of most storage devices.
+
+
+% Surprisingly, many modern file systems do little to actively preserve
+% data locality over time, often relying on the application of
+% heuristics at the moment that data is first written.  Yet logical
+% blocks are allocated, moved, and freed as file systems evolve, and the
+% layout of a file system at any point in time may be very different
+% from its layout at the time an allocation decision was made.
+
+% When heuristics are unable to accurately predict future data patterns,
+% or when no optimal choice is available for a given data layout,
+% related objects become scattered across the logical block space.  In
+% this too-common case, the cost to access an individual or set of
+% closely related file system objects worsens over time.
+
+% There would seem to be a tradeoff between poor write performance due
+% to write amplification and poor read performance due to small logical
+% transfer sizes.  But this need not be the case.  Instead, a solution
+% is possible if there is a way to address the write-amplification
+% problem, since reducing write amplification allows one to keep larger
+% logical transfer sizes in storage and therefore increases read
+% performance.
+
+% Write-optimized data structures, such as \bets \cite{BrodalFa03b} and
+% many versions of \lsms~\cite{OneilChGa96, SearsRa12, ShettySpMa13,
+%   wu15atc}, have very low write amplification, and TokuDB, an
+% implementation of \bets, has leaves (and therefore logical transfer sizes) of
+% size 4MiB, more than enough to achieve high bandwidth on most storage
+% devices \cite{TokuDB}.
+
+
+% \fixme{Do we want to say something specific here?}
+% \fixme{Do we want to more about BetrFS?}
+
+% \subsection{Our results}
+
+% In this paper,
+% we quantify the cost of locality in five local file systems.
+% We show that a file system's performance over time is highly dependent
+% on its ongoing efforts to preserve locality.
+% %and that many file systems do not appropriately weight the cost
+% Update-in-place file systems, like \ext,
+% apply heuristics when physically allocating space for new data
+% and overwrite existing blocks during subsequent updates.
+% These file systems continue to pay a cost for any suboptimal layout decisions.
+% %
+% No-overwrite file systems, like \btrfs,
+% also apply heuristics when allocating new data,
+% but reallocate physical space when data is logically overwritten.
+% These file systems may become increasingly fragmented as parts of a file
+% are relocated during subsequent overwrites.
+% %
+% \betrfs uses a write-optimized dictionary (\wod) to organize its data.
+% A \wod preserves locality by sorting data in large contiguous regions
+% and rewriting these regions as data evolves.
+% \betrfs performance does not degrade over time.
+
+
+
+
+
+% %% In the short run, a file system may endure write aging:
+% %% \begin{itemize}
+% %% \item Costs paid upfront to preserve locality can result in higher latency per operation
+% %% \item Deferring locality preservation can result in bursty latencies when deferred work has built up and needs to be performed before an operation can complete OR background work competes with resources needed by foreground work.
+% %% \end{itemize}
+
+% %% In the medium run, a file system may endure read aging:
+% %% \begin{itemize}
+% %% \item Cost can be paid when data is accessed if locality is ignored or poorly maintained
+% %% \end{itemize}
+
+% %% In the long run, a file system may endure capacity aging:
+% %% \begin{itemize}
+% %% \item Poor planning results in degraded performance when capacity limits are met
+% %% \end{itemize}
+
+% We outline a set of data structural requirements sufficient to prevent file system aging.
+
+% We show one file system that uses a data structure with these properties and does in fact resist aging
+
+% The cost of these anti-aging efforts results in some work being deferred.
+% We evaluate the cost of this deferred work. (It isn't so bad.)
+
+% The amount of deferred work is bounded. We have a model to show this and experiments to demonstrate that this overhead is low in practice.
+
+% We show,
+% through long-running experiments and 99th-percentile latency measurements,
+% that \betrfs performs consistently well over time.
+% Given even a XXX\% ratio of random to sequential I/O performance,
+% the small short-term cost of active locality preservation
+% is worth paying.
+
+
+% %% The file system cannot enter a state
+% %% where it is unable to make progress due to background work competing for critical resources.
+
+
+
+% %% \section{Introduction Attempt Two}
+% %% Modern file systems are large and complex pieces of software
+% %% that serve many masters: (application-level features/API, device features/optimizations, security, data indexing)
+
+% %% Because of this complexity, data structures are tightly coupled to file system design.
+% %% %(there is a tight coupling between features/devices/heuristics).
+
+% %% This tight coupling means file system layout and allocation heuristics are often fixed during the early stages of the development process, are often prompted by specific goals (wafl snapshots, LFS random write performance), and often reflect assumptions about specific devices/environmental conditions/relative operation costs that existed when the file system was developed.
+
+% %% Changing file system heuristics is very difficult, and flexibility is often limited to tuning specific static parameters (number of of inodes, size of block groups, etc.).
+
+% %% This tight coupling creates many problems for today's file systems:
+% %% \begin{itemize}
+% %% \item heterogeneous storage devices: one optimization for HDDs might not work on flash
+% %% \item newer device properties may violate original designer's assumptions
+% %% \item Application usage patterns deviate from ideal behavior
+% %% \item Invalid assumptions about system downtime for completing background tasks.
+% %% \item when approaching storage capacity limits, file system heuristics have such limited flexibility that they are forced to make suboptimal decisions.
+% %% \end{itemize}
+
+% %% These heuristics, although intended to solve specific problems, fail to do so. They instead create new problems and harm long-run file system performance.
+
+% %% Instead of complicated yet ineffective heuristics,
+% %% the small short-term cost of active (moving data) locality preservation
+% %% is worth paying.
+
+% %% Intuition for the DDW lemma (Don Deferred Work).
+% \end{comment}
+
+%% Local Variables:
+%% mode: latex
+%% End:
+
+%%  LocalWords:  lexicographically SSDs SSD trie inode tradeoff wafl
+%%  LocalWords:  TokuDB BetrFS suboptimal MiB bursty latencies LFS DDW
+%%  LocalWords:  inodes HDDs

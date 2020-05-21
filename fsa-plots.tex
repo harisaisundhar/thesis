@@ -1,0 +1,118 @@
+%\section{Evaluation}
+%\label{sec:eval}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This file defines common presentation-level
+% details about our graphs, e.g. the colors
+% we use for each file system, etc.  These
+% are universal across graphs.
+% Code for parsing input files and what-not
+% should go with the corresponding graphs.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%
+% all the dimensions for our experiments
+%
+\newcommand{\fses}{betrfs, btrfs, ext4, f2fs, xfs, zfs}
+\newcommand{\agednesses}{clean, aged}
+\newcommand{\hardwares}{ssd, hdd, ssd_raoff}
+\newcommand{\partitionsizes}{4gb, 20gb}
+
+%
+% Configuration of how things are presented
+%
+\pgfkeys{
+  /fs-names/betrfs/.initial=\betrfs,
+  /fs-names/btrfs/.initial=\btrfs,
+  /fs-names/ext4/.initial=\ext,
+  /fs-names/f2fs/.initial=\ftwofs,
+  /fs-names/xfs/.initial=\xfs,
+  /fs-names/zfs/.initial=\zfs
+}
+
+\pgfkeys{
+  /agedness-names/clean/.initial=clean,
+  /agedness-names/aged/.initial=aged
+}
+
+\pgfkeys{
+  /hardware-names/ssd/.initial=SSD,
+  /hardware-names/hdd/.initial=HDD,
+  /hardware-names/ssd_raoff/.initial={SSD, no readahead}
+}
+
+\pgfkeys{
+  /git-gc-mode-names/on/.initial=on,
+  /git-gc-mode-names/off/.initial=off
+}
+
+\pgfkeys{
+  /partition-size-names/4gb/.initial={4GB},
+  /partition-size-names/20gb/.initial={20GB}
+}
+
+\pgfkeys{
+  /fs-colors/betrfs/.initial=Black,
+  /fs-colors/btrfs/.initial=Red,
+  /fs-colors/ext4/.initial=Plum,
+  /fs-colors/f2fs/.initial=Aquamarine,
+  /fs-colors/xfs/.initial=LimeGreen,
+  /fs-colors/zfs/.initial=Dandelion
+}
+
+\pgfkeys{
+  /fs-marks/betrfs/.initial=*,
+  /fs-marks/btrfs/.initial=pentagon*,
+  /fs-marks/ext4/.initial=triangle*,
+  /fs-marks/f2fs/.initial=x,
+  /fs-marks/xfs/.initial=square*,
+  /fs-marks/zfs/.initial=diamond*
+}
+
+\pgfkeys{
+  /agedness-styles/clean/.initial=dashed,
+  /agedness-styles/aged/.initial=solid
+}
+
+\pgfkeys{
+  /ram-sizes/768mb/.initial={768MiB},
+  /ram-sizes/1024mb/.initial={1024MiB},
+  /ram-sizes/1280mb/.initial={1280MiB},
+  /ram-sizes/1536mb/.initial={1536MiB},
+  /ram-sizes/2048mb/.initial={2048MiB},
+  /ram-sizes/cold/.initial={Cold Cache Aged},
+  /ram-sizes/cold_clean/.initial={Cold Cache Unaged},
+  /ram-sizes/betrfs/.initial={\betrfs Cold Cache Aged},
+}
+
+\pgfkeys{
+  /rs-marks/768mb/.initial=*,
+  /rs-marks/1024mb/.initial=pentagon*,
+  /rs-marks/1280mb/.initial=triangle*,
+  /rs-marks/1536mb/.initial=square*,
+  /rs-marks/2048mb/.initial=diamond*,
+  /rs-marks/cold/.initial=otimes,
+  /rs-marks/cold_clean/.initial=x,
+  /rs-marks/betrfs/.initial=oplus,
+}
+
+\pgfkeys{
+  /rs-colors/768mb/.initial=Plum,
+  /rs-colors/1024mb/.initial=Red,
+  /rs-colors/1280mb/.initial=LimeGreen,
+  /rs-colors/1536mb/.initial=CarnationPink,
+  /rs-colors/2048mb/.initial=Dandelion,
+  /rs-colors/cold/.initial=RoyalBlue,
+  /rs-colors/cold_clean/.initial=Cyan,
+  /rs-colors/betrfs/.initial=Black,
+}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% This should go in a different file.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% hdd/ssd hardware bandwidth measurements by read size
+
+
+
+

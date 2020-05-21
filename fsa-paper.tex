@@ -1,0 +1,72 @@
+\documentclass[letterpaper,10pt,twocolumn]{article}
+\usepackage{usenix,epsfig,endnotes}
+
+\usepackage[binary]{SIunits}            % typset units correctly
+\usepackage[justification=centering]{caption}
+\usepackage[hyphens]{url}  % Allow long urls to break at hyphens.
+%\usepackage[hidelinks]{hyperref}
+%\newcommand*{\doi}[1]{\href{http://dx.doi.org/#1}{doi:~#1}}
+\newcommand*{\doi}[1]{{http://dx.doi.org/#1}{doi:~#1}}
+\usepackage{geometry}
+\usepackage{paralist}
+\geometry{margin=1in}
+%\setlength{\columnsep}{.25in} %Set in usenix sty file
+
+\pdfpagewidth=8.5in
+\pdfpageheight=11in
+
+\input{packages}
+\input{defines}
+
+\begin{document}
+%\setlength{\droptitle}{-.5in}
+
+%don't want date printed
+\date{}
+
+\def\longconferencenames{}
+\input{../../conferences}
+
+\input{titleauth}
+\maketitle
+
+% Use the following at camera-ready time to suppress page numbers.
+% Comment it out when you first submit the paper for review.
+%\thispagestyle{empty}
+\pagenumbering{gobble}
+
+\input{abstract}
+\input{intro}
+\input{related}
+\input{mitigation}
+%\input{seq}
+\input{model}
+
+% \iffalse 
+
+\input{plots}
+\input{metrics}
+\input{setup}
+\input{microbenchmarks}
+\input{git}
+%\input{warmcache}
+\input{mailserver}
+%\input{hddlocality}
+%\input{ssdlocality}
+%\input{deferred}
+\input{conclusion}
+\fixme{12pp max, plus refs and acks }
+
+\input{acks}
+
+
+% \fi
+
+% just for now because of tables overlapping bibliography entries
+%\clearpage
+\bibliographystyle{acm-url}
+ \balance
+%\small
+\bibliography{../../bibliography,../../all-refs}
+
+\end{document}

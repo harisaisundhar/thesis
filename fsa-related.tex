@@ -1,0 +1,155 @@
+\section{Related Work}\label{sec:fsa-related}
+%AC: old text at bottom of tex file
+Prior work on file system aging falls into three categories:
+techniques for artificially inducing aging, for
+measuring aging, and for mitigating aging.
+% In this section we first survey some of the tools that have been developed to
+% age a file system synthetically, along with measures for quantifying aging.
+%Then we discuss some of the techniques that file systems currently include to
+%mitigate aging.
+%Most file systems also include techniques to mitigate aging.  Here we review
+%the main approaches that file systems take.
+
+% \fixmerob{The big problem with the related work is that it is simply a
+%   list of prior work with no comparisons/contrasts or wisdom.  At the
+%   end of the related work section, the reader should be able to place
+%   this work in the context of past work, and be able to describe the
+%   research hole that this paper is filling.  I'm not getting that from
+%   the current related work write-up.  Here are questions to answer in
+%   this section: Why are we doing this research if Smith and Seltzer
+%   already did aging?  Why do we use a dynamic score instead of their
+%   static score?  What about distributions of what-not affect aging?
+%   The sentence seems completely disconnected from the topic of this
+%   paper.  Why aren't we using Smith and Seltzer's traces to age our
+%   file systems?  What is deficient about the artificial aging tools of
+%   the past?}
+
+
+
+\subsection{Creating Aged File Systems}
+
+The seminal work of Smith and Seltzer~\cite{SmithSe97} created a
+methodology for 
+simulating and measuring aging on a file system---leading
+to more representative benchmark results than 
+running on a new, empty file system.
+The study is based on data  collected
+from daily snapshots of over fifty real file systems from five servers
+over durations ranging from one to three years. 
+An overarching goal of Smith and Seltzer's work was to evaluate
+file systems with representative levels of aging.
+%our goal is instead to identify the root causes of aging
+%and evaluate preventive techniques under more extreme circumstances.
+%Our paper extends Smith and Seltzer's layout score to capture
+%metadata and dynamic access patterns, and 
+%identifies benchmarks that induce precipitous aging on most
+%file systems.
+
+%Their method takes a long time
+%to construct workloads while fails to capture the directory hierarchy of
+%the file system. 
+
+%\fixmemab{see comment}
+%\fixmemab{I don't like this second sentence. It
+%  sounds insinuatingly critical. Better to say what they do and say
+%  how this compares with what we do. }
+
+Other tools have been subsequently developed for
+synthetically aging a file system.
+In order to measure NFS performance,
+TBBT~\cite{ZhuChCh05} was designed 
+to synthetically age a disk 
+to create a initial state for NFS trace replay.
+%% initial \fixmemfc{what does ``initial'' mean in this context?},
+%% synthetically aged state upon which to replay an NFS trace.  If a file
+%% system snapshot is copied onto a fresh file system, the placement will
+%% be essentially optimal \fixmerob{Is that really true?}  \fixmemfc{It
+%%   is not.  I'd kill it but I don't understand what it means in this
+%%   context.}.
+%% In order to create a more\mfc{more than what?}
+%% realistic initial state for trace replay,
+%\mfc{IF we are cutting, this sentence can go: TBBT first creates a
+%namespace hierarchy, then interleaves synthetic operations so that
+%allocations are more fragmented.}
+
+The Impressions framework~\cite{AgrawalArAr09} was designed so that
+users can synthetically age a 
+file system by setting a small number of parameters,
+%% Impressions~\cite{AgrawalArAr09} is a framework for creating and
+%% compactly representing synthetic file system images.  Impressions
+%% exports\mfc{``exports''?} a number of parameters that influence aging,
+such as the organization of the directory hierarchy.
+Impressions also lets users specify a target layout score for the resulting image.
+%layout score of the resulting image \fixmerob{``export''?}.
+%\fixme{BILL: identifying which dimensions contribute to aging
+%  may be file system specific, but applicaiton (trace) replays
+%  are always file system agnostic}
+
+Both TBBT and Impressions
+create file systems with a specific level of fragmentation,
+%focus on creating an aged file system with a
+%specific level of fragmentation, while
+whereas our study identifies realistic
+workloads that induce fragmentation. 
+%to see if they lead to
+%\mfc{Is this accurate?}
+
+\subsection{Measuring Aged File Systems}
+
+
+Smith and Seltzer also introduced a \defn{layout score} for studying aging,
+which was used by subsequent studies~\cite{ahn02mascots,AgrawalArAr09}. Their
+layout score is the fraction of file blocks that are placed in consecutive
+physical locations on the disk. We introduce a variation of this measure, the
+\defn{dynamic layout score} in \secref{metrics}.
+
+%\mfc{Don't we explain this in detail
+%  later?  If so, then we can shorten this to a forward reference, to a
+%  particular section.  And thus cut lines from the paper:
+%In this paper, we use a \emph{dynamic} version
+%of this layout score that performs a recursive scan through the file system and
+%tracks what fraction of blocks are requested from the driver in sequential
+%order. Thus this dynamic layout score both incorporates metadata traversal and
+%allows for the OS to perform some collalescing of requests. }
+
+The \defn{degree of fragmentation} (\defn{DoF}) is used in the study of
+fragmentation in mobile devices~\cite{JiChSh16}. DoF is the ratio of the actual
+number of extents, or ranges of contiguous physical blocks, to the ideal number
+of extents.  Both the layout score and DoF measure how one file is fragmented.
+
+\iffalse
+\fixme{BILL: do any
+  fragmentation tools report layout scores?  e2fsprogs?}\fixmeac{I
+  checked the man pages quickly for e2fsprogs, and I don't think they
+  do}\fixme{Yang: Just to mention it contains tools for reporting file
+  fragmentation, so one can probably calculate from there. Another
+  thing, there is one paper "The Effects of Filesystem Fragmentation"
+  describing some theoretic fragmentation but mainly on video files
+  (so they are big)}
+\fi
+
+Several studies have reported file system statistics
+% that can be used to reason about aging
+such as number of files, distributions of
+file sizes and types, and organization of file system
+namespaces~\cite{AgrawalBoDo07,Downey01,RoselliLoAn01}.
+%\fixme{BILL: validate some of these and choose:
+%  a five-year study of file system metadata,
+%  structural cause of file size distributions,
+%  a comparison of file system workloads,
+%  a study of file sizes and functional lifetimes}
+%These statistics can be used as parameters to aging frameworks like TBBT and Impressions~\cite{ZhuChCh05,AgrawalArAr09}.
+These statistics can inform parameter choices in aging frameworks like TBBT and Impressions~\cite{ZhuChCh05,AgrawalArAr09}.
+%For example, as we describe
+%later on, the file-size distribution can have an impact on fragmentation.
+
+%% Finally, the \texttt{genbackupdata}~\cite{genbackupdata} tool
+%% synthetically generates file system images, but is primarily designed
+%% for studying backup systems, not aging, and does not provide the same
+%% degree of control over system behavior as Impressions.
+%% \fixme{This generates a disk image in a principled way, but is not related to aging}
+
+
+%% Local Variables:
+%% mode: latex
+%% End:

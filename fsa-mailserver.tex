@@ -1,0 +1,219 @@
+\section{Application Level Aging: Mail Server}\label{sec:fsa-mailserver}
+In addition to the git workload, we evaluate aging with the Dovecot email server.
+Dovecot is configured with the Maildir backend, which stores each message in a file,
+and each inbox in a directory.
+%Dovecot is
+%an open source IMAP and POP3 email server for LINUX/UNIX, and Maildir
+%stores each mail as a file.
+We simulate 2 users, each having 80 mailboxes
+receiving new email, deleting old emails, and searching through
+their mailboxes. 
+%We simulate this behavior for 2 users, each having 80
+%mailboxes.
+
+A cycle or ``day'' for the mailserver comprises of 8,000 operations, where each
+operation is equally likely to be a insert or a delete, corresponding to
+receiving a new email or deleting an old one. Each email is a string of random
+characters, the length of which is uniformly distributed over the range [1,
+32K]. Each mailbox is initialized with 1,000 messages, and, because inserts and
+deletes are balanced, mailbox size tends to stay around 1,000.  \fixmedp{Is
+this right?} We simulate the mailserver for 100 cycles and after each cycle we
+perform a recursive grep for a random string. As in our git benchmarks, we then
+copy the partition to a freshly formatted file system, and run a recursive
+grep.
+
+\figref{mailserver} shows the read costs in seconds per GiB of the grep test on
+hard disk.  Although the unaged versions of all file systems show consistent
+performance over the life of the benchmark,
+%though some are faster than others,
+the aged versions of \ext, \btrfs, \xfs and \zfs all show significant
+degradation over time. In particular, aged \ext performance degrades by
+4.4$\times$, and is 28$\times$ slower than aged \betrfs.
+%and by a factor of 15 compared to the fastest file systems \fixmeac{ get real
+%factor here },
+\xfs slows down by a factor of 7 and \btrfs by a factor of 30. \zfs slows down
+drastically, taking about 20 minutes per GiB by cycle 20.
+%and after running the test for 3 weeks, we were only able to get as far as
+%4,300 iterations.
+However, the aged version of \betrfs does not slow down. As with the other HDD
+experiments, dynamic layout score is moderately correlated ($-0.63$) with grep
+cost.
+
+%
+% space constraints we have not included a figure with the dynamic layout
+%scores, however, these are similarly correlated with the read performance
+%shown in \figref{mailserver}.
+
+%At the time of submission, we were not able to complete the \zfs clean
+%test, as it regularly crashed.  The \betrfs{} clean results were also not complete
+%at the time of submission, but were consistent with the aged version.
+%This experiment was also conducted on a slightly different machine setup, using the first
+%partition of the hard drive to store the root file system image, and 
+%We spot checked these results against the default setup (booting from a USB device)
+%but were not able to get a complete dataset at the time of submission.
+
+%Due to unforeseen circumstances, we do not currently show the \betrfs
+%clean version, although preliminary testing showed it to be almost identical
+%to the aged one.
+
+
+%
+% File parsing definitions
+%
+\newcommand{\mailserverDataDir}{../data/mailserver_aging}
+% Args: hardware, partition-size, file-system
+\newcommand{\mailserverDataFileName}[3]{\mailserverDataDir/mailserver_#3_#1_#2.csv}
+\newcommand{\mailserverOperationCountColumn}{pulls_performed}
+\newcommand{\mailserverFSSizeColumn}{filesystem_size}
+\newcommand{\mailserverLayout}[1]{#1_layout_score}
+
+% construct a table with the reference FS sizes from ext4 on hdd
+\pgfplotstableread{\mailserverDataFileName{hdd}{20gb}{ext4}}\extfourmsdata
+
+% args are: FS agedness hardware partition-size
+\newcommand{\addmailserverplot}[4]
+{
+  \pgfplotstableread{\mailserverDataFileName{#3}{#4}{#1}}\thistable
+  \pgfplotstablecreatecol[copy column from table={\extfourmsdata}{\mailserverFSSizeColumn}]{ext4_fs_size}{\thistable}
+  \addplot[color=\pgfkeysvalueof{/fs-colors/#1}, style=\pgfkeysvalueof{/agedness-styles/#2}, line width=0.75pt, mark=\pgfkeysvalueof{/fs-marks/#1}, mark repeat=5] 
+  table[x=\mailserverOperationCountColumn, y expr=\thisrow{\pgfkeysvalueof{/agedness-columns/#2}} / \thisrow{ext4_fs_size} * 1048576] \thistable;
+  %\addfsplot{#1}{#2}{\pullCountColumn}{\thisrow{\pgfkeysvalueof{/agedness-columns/#2}} / \expandafter\thisrow{ext4_fs_size} * 1000000}{\thistable}
+  %\addlegendentry{\pgfkeysvalueof{/fs-names/#1} \pgfkeysvalueof{/agedness-names/#2}}
+}
+
+% args are: hardware partition-size
+\newcommandx{\startmsplot}[2]
+{
+	\begin{tikzpicture}[xscale = 0.825, yscale = 0.825, trim axis left, trim axis right]
+    \begin{axis}[
+      width=1.21\columnwidth,
+      % scale only axis,
+      % title=Insertion per second against Load Factor, 
+      xlabel={Operations performed}, 
+      ylabel={Grep cost (sec/GiB)}, 
+      xmin=0,
+      xmax=100, 
+      ymin=0, 
+      % ymax=50, 
+      % xtick={0,20,40,60,80,100},
+      % ytick={0,5,10,15,20,25,30,35,40,45,50},
+      grid=major, 
+      scaled x ticks=false,
+      scaled y ticks=false,
+	  legend entries = { \btrfs,
+						 \betrfs,
+                         \ext,
+						 \ftwofs,
+						 \xfs,
+						 \zfs,
+						 aged,
+						 unaged},
+      legend columns=3,
+      legend cell align=center,
+      legend pos=north west,
+      legend to name=mailserverplotslegend_#1_#2,
+      ]
+  	\addlegendimage{\pgfkeysvalueof{/fs-colors/btrfs}, mark=\pgfkeysvalueof{/fs-marks/btrfs}}
+  	\addlegendimage{\pgfkeysvalueof{/fs-colors/betrfs}, mark=\pgfkeysvalueof{/fs-marks/betrfs}}
+  	\addlegendimage{\pgfkeysvalueof{/fs-colors/ext4}, mark=\pgfkeysvalueof{/fs-marks/ext4}}
+  	\addlegendimage{\pgfkeysvalueof{/fs-colors/f2fs}, mark=\pgfkeysvalueof{/fs-marks/f2fs}}
+  	\addlegendimage{\pgfkeysvalueof{/fs-colors/xfs}, mark=\pgfkeysvalueof{/fs-marks/xfs}}
+  	\addlegendimage{\pgfkeysvalueof{/fs-colors/zfs}, mark=\pgfkeysvalueof{/fs-marks/zfs}}
+    %\pgfplotsinvokeforeach{btrfs, betrfs, ext4, f2fs, xfs, zfs} {
+  	%  \addlegendimage{\pgfkeysvalueof{/fs-colors/#1}, mark=\pgfkeysvalueof{/fs-marks/#1}}
+    %}
+  	\addlegendimage{mark=\pgfkeysvalueof{/fs-marks/ext4}, color=\pgfkeysvalueof{/fs-colors/ext4},  style=\pgfkeysvalueof{/agedness-styles/aged}}
+  	\addlegendimage{mark=\pgfkeysvalueof{/fs-marks/ext4}, color=\pgfkeysvalueof{/fs-colors/ext4}, style=\pgfkeysvalueof{/agedness-styles/clean}}
+}
+
+\NewEnviron{msplot}{\expandafter\startmsplot\BODY
+\end{axis}
+\end{tikzpicture}
+}
+
+\newcommand{\msplotsubcaption}[2]{\label{fig:ms:results:#1:#2} Results: \pgfkeysvalueof{/hardware-names/#1}, \pgfkeysvalueof{/partition-size-names/#2} partition}
+
+% fs agedness hardware partition-size
+\newcommand{\addmslayoutplot}[4]
+{
+  \pgfplotstableread{\mailserverDataFileName{#3}{#4}{#1}}\thistable
+  \addplot[color=\pgfkeysvalueof{/fs-colors/#1}, style=\pgfkeysvalueof{/agedness-styles/#2}, line width=0.75pt, mark=\pgfkeysvalueof{/fs-marks/#1}, mark repeat=5] 
+  table[x=\mailserverOperationCountColumn, y=\mailserverLayout{#2}] \thistable;
+  %\addfsplot{#1}{#2}{\pullCountColumn}{\thisrow{\pgfkeysvalueof{/agedness-columns/#2}} / \expandafter\thisrow{ext4_fs_size} * 1000000}{\thistable}
+  %\addlegendentry{\pgfkeysvalueof{/fs-names/#1} \pgfkeysvalueof{/agedness-names/#2}}
+}
+
+% args are: hardware partition-size
+\newcommandx{\startmslayoutplot}[2]
+{
+	\begin{tikzpicture}[xscale = 0.825, yscale = 0.825, trim axis left, trim axis right]
+    \begin{axis}[
+      width=1.21\columnwidth,
+      % scale only axis,
+      % title=Insertion per second against Load Factor, 
+      xlabel={Operations performed}, 
+      ylabel={Dynamic layout score}, 
+      xmin=0,
+      xmax=100, 
+      ymin=0, 
+      % ymax=50, 
+      % xtick={0,20,40,60,80,100},
+      % ytick={0,5,10,15,20,25,30,35,40,45,50},
+      grid=major, 
+      scaled x ticks=false,
+      scaled y ticks=false,
+      ]
+}
+
+\NewEnviron{mslayoutplot}{\expandafter\startmslayoutplot\BODY
+\end{axis}
+\end{tikzpicture}
+}
+%
+% mailserver figures
+%
+
+\begin{figure}
+  {\centering
+    ~~~~~\ref{mailserverplotslegend_hdd_20gb}\\
+    \begin{subfigure}{\columnwidth}
+      \centering
+	  \tikzsetnextfilename{mailserver-hdd}
+      \begin{msplot}{hdd}{20gb}
+        \addmailserverplot{betrfs}{clean}{hdd}{20gb}
+        \addmailserverplot{betrfs}{aged}{hdd}{20gb}
+        \addmailserverplot{btrfs}{clean}{hdd}{20gb}
+        \addmailserverplot{btrfs}{aged}{hdd}{20gb}
+        \addmailserverplot{ext4}{clean}{hdd}{20gb}
+        \addmailserverplot{ext4}{aged}{hdd}{20gb}
+        \addmailserverplot{f2fs}{clean}{hdd}{20gb}
+        \addmailserverplot{f2fs}{aged}{hdd}{20gb}
+        \addmailserverplot{xfs}{clean}{hdd}{20gb}
+        \addmailserverplot{xfs}{aged}{hdd}{20gb}
+        \addmailserverplot{zfs}{clean}{hdd}{20gb}
+        \addmailserverplot{zfs}{aged}{hdd}{20gb}
+      \end{msplot}
+		\caption{Grep cost during mailserver workload (lower is better).}
+    \end{subfigure}
+    \begin{subfigure}{\columnwidth}
+      \centering
+	  \tikzsetnextfilename{mailserver-layout}
+      \begin{mslayoutplot}{hdd}{20gb}
+        \addmslayoutplot{betrfs}{clean}{hdd}{20gb}
+        \addmslayoutplot{betrfs}{aged}{hdd}{20gb}
+        \addmslayoutplot{btrfs}{clean}{hdd}{20gb}
+        \addmslayoutplot{btrfs}{aged}{hdd}{20gb}
+        \addmslayoutplot{ext4}{clean}{hdd}{20gb}
+        \addmslayoutplot{ext4}{aged}{hdd}{20gb}
+        \addmslayoutplot{f2fs}{clean}{hdd}{20gb}
+        \addmslayoutplot{f2fs}{aged}{hdd}{20gb}
+        \addmslayoutplot{xfs}{clean}{hdd}{20gb}
+        \addmslayoutplot{xfs}{aged}{hdd}{20gb}
+        \addmslayoutplot{zfs}{clean}{hdd}{20gb}
+        \addmslayoutplot{zfs}{aged}{hdd}{20gb}
+      \end{mslayoutplot}
+		\caption{Mailserver layout (higher is better).}
+    \end{subfigure}
+    \caption{\label{fig:mailserver} Mailserver performance and layout scores.}
+  }
+\end{figure}

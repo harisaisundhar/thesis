@@ -1,0 +1,133 @@
+% interfile microbenchmark (degrees of random order copy)
+
+\newcommand{\addsfplot}[2] %\addrrplot{fs}{hdd/ssd/ssd_raoff}
+{
+	\pgfplotstableread{../data/camera_ready_microbenchmarks/inter_#2.csv}\thistable
+	\addplot[color=\pgfkeysvalueof{/fs-colors/#1}, style=\pgfkeysvalueof{/agedness-styles/aged}, line width=0.75pt, mark=\pgfkeysvalueof{/fs-marks/#1}, mark repeat=5] table[x=round, y=#1_time] \thistable;
+	\addlegendentry{\pgfkeysvalueof{/fs-names/#1}}
+}
+
+\newcommand{\addsflayoutplot}[2] % \addsfplot{fs}{hdd/ssd/ssd_raoff}
+{
+  \pgfplotstableread{../data/camera_ready_microbenchmarks/inter_#2.csv}\thistable
+  \addplot[color=\pgfkeysvalueof{/fs-colors/#1}, style=\pgfkeysvalueof{/agedness-styles/aged}, line width=0.75pt, mark=\pgfkeysvalueof{/fs-marks/#1}, mark repeat=5]
+  table[x=round, y=#1_layout] \thistable;
+  \addlegendentry{\pgfkeysvalueof{/fs-names/#1}}
+}
+
+\newcommandx{\startsfplot}[2] %\startsfplot{hdd/ssd/ssd_raoff}{maxy}
+{
+  \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+    \begin{axis}[
+      width=1.21\columnwidth,
+	  height=0.95\columnwidth,
+      % scale only axis,
+      % title=Insertion per second against Load Factor, 
+      ylabel style={at={(axis description cs:0.075,0.5)},anchor=south},
+	  xlabel={Percentage of files copied out-of-order}, 
+      ylabel={Grep cost (sec/GiB)}, 
+      xmin=0,
+      xmax=100, 
+      ymin=0,  
+      ymax=#2,
+      % xtick={0,20,40,60,80,100},
+      % ytick={0,5,10,15,20,25,30,35,40,45,50},
+      grid=major, 
+      scaled x ticks=false,
+      scaled y ticks=false,
+      legend columns=3,
+      legend cell align=center,
+      legend pos=north west,
+      legend to name=sfplotslegend_#1,
+      %transpose legend,
+      ]
+    }
+
+\NewEnviron{sfplot}{\expandafter\startsfplot\BODY
+\end{axis}
+\end{tikzpicture}
+}
+
+% args are: hardware 
+\newcommandx{\startsflayoutplot}[1]
+{
+  \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+    \begin{axis}[
+      width=1.21\columnwidth,
+	  height=0.95\columnwidth,
+      % scale only axis,
+      % title=Insertion per second against Load Factor, 
+      ylabel style={at={(axis description cs:0.075,0.5)},anchor=south},
+      xlabel={Percentage of files copied out-of-order}, 
+      ylabel={Dynamic layout score}, 
+      xmin=0,
+      xmax=100, 
+      ymin=0, 
+      ymax=1, 
+      % xtick={0,20,40,60,80,100},
+      % ytick={0,5,10,15,20,25,30,35,40,45,50},
+      grid=major, 
+      scaled x ticks=false,
+      scaled y ticks=false,
+      legend columns=3,
+      legend cell align=center,
+      legend pos=north west,
+      legend to name=sfplotslegend_#1,
+      %transpose legend,
+      ]
+    }
+
+\NewEnviron{sflayoutplot}{\expandafter\startsflayoutplot\BODY
+\end{axis}
+\end{tikzpicture}
+}
+
+\newcommand{\sfplotsubcaption}[1]{\label{subfig:sf:#1} Recursive grep cost: \pgfkeysvalueof{/hardware-names/#1} (Lower is better).}
+\newcommand{\sflayoutplotsubcaption}[1]{\label{subfig:sfl:#1} Dynamic layout score (higher is better).}
+
+\begin{figure}
+  {\centering
+    ~\ref{sfplotslegend_hdd}~\\
+	\begin{subfigure}{\columnwidth}\label{subfig:sfhdd}
+      \centering
+	  \tikzsetnextfilename{micro-inter_hdd}
+      \begin{sfplot}{hdd}{1000}
+        \addsfplot{betrfs}{hdd}
+        \addsfplot{btrfs}{hdd}
+        \addsfplot{ext4}{hdd}
+        \addsfplot{f2fs}{hdd}
+        \addsfplot{xfs}{hdd}
+        \addsfplot{zfs}{hdd}
+      \end{sfplot}
+      \caption{\sfplotsubcaption{hdd}}
+	\end{subfigure}\\
+    \begin{subfigure}{\columnwidth}\label{subfig:sfssd}
+      \centering
+      \tikzsetnextfilename{micro-inter_ssd}
+      \begin{sfplot}{ssd}{100}
+        \addsfplot{betrfs}{ssd}
+        \addsfplot{btrfs}{ssd}
+        \addsfplot{ext4}{ssd}
+		\addsfplot{f2fs}{ssd}
+        \addsfplot{xfs}{ssd}
+        \addsfplot{zfs}{ssd}
+      \end{sfplot}
+      \caption{\sfplotsubcaption{ssd}}
+    \end{subfigure}\\
+     \begin{subfigure}{\columnwidth} \label{subfig:sflayout}
+       \centering
+		 \tikzsetnextfilename{micro-inter_layout}
+       \begin{sflayoutplot}{hdd}
+         \addsflayoutplot{betrfs}{hdd}
+         \addsflayoutplot{btrfs}{hdd}
+         \addsflayoutplot{ext4}{hdd}
+         \addsflayoutplot{f2fs}{hdd}
+         \addsflayoutplot{xfs}{hdd}
+         \addsflayoutplot{zfs}{hdd}
+       \end{sflayoutplot}
+       \caption{\sflayoutplotsubcaption{ssd}}
+     \end{subfigure}
+    \caption{\label{fig:micro:inter} Interfile benchmark: The TensorFlow github repository with all files replaced by 4KiB random data and copied in varying degrees of order. Dynamic layout scores again are predictive of recursive grep test performance. }
+  }
+\end{figure}
+

@@ -1,0 +1,163 @@
+% comment out the following line when submitting
+% \def \ftfsdebug{}
+%\def \ftfsreviews{}
+
+% Make list indentation tight\
+\setdefaultleftmargin{1em}{0em}{}{}{}{}
+%\setlength{\droptitle}{-.5in}     % Eliminate the default vertical space
+\captionsetup{belowskip=0pt,aboveskip=4pt}
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+
+% Figure adjustments for space
+\renewcommand{\topfraction}{0.95}
+\renewcommand{\dbltopfraction}{0.95}
+\setcounter{dbltopnumber}{4}
+\renewcommand\textfraction{.05}
+\setcounter{totalnumber}{5}
+\renewcommand{\floatpagefraction}{.95}
+\renewcommand{\textfloatsep}{8pt}
+\renewcommand{\dbltextfloatsep}{8pt}
+
+\newcommand{\tightpara}[1]{\vspace{5pt} \noindent \textbf{#1}}
+
+%% draw a circled around some text. can be used for labels
+\newcommand*\circled[1]{\tikz[baseline=(char.base)]{
+    \node[shape=circle,draw,inner sep=0.5pt] (char) {#1};}}
+
+\definecolor{cerisepink}{rgb}{0.93, 0.23, 0.51}
+\definecolor{ballblue}{rgb}{0.13, 0.67, 0.8}
+
+\ifx \ftfsdebug \undefined
+\newcommand{\fixme}[1]{{}}
+\newcommand{\fixmedp}[1]{{}}
+\newcommand{\fixmeac}[1]{{}}
+\newcommand{\fixmemfc}[1]{{}}
+\newcommand{\fixmerob}[1]{{}}
+\newcommand{\fixmemab}[1]{{}}
+\else
+\newcommand{\fixme}[1]{{\bf\textcolor{red}{ [ FIXME: #1 ]}}}
+\newcommand{\fixmedp}[1]{{\bf\textcolor{red}{ [ FIXME dP: #1 ]}}}
+\newcommand{\fixmeac}[1]{{\bf\textcolor{red}{ [ FIXME AC: #1 ]}}}
+\newcommand{\fixmemfc}[1]{{\bf\textcolor{red}{ [ FIXME MFC: #1 ]}}}
+\newcommand{\fixmerob}[1]{{\bf\textcolor{red}{ [ FIXME ROB: #1 ]}}}
+\newcommand{\fixmemab}[1]{{\bf\textcolor{red}{ [ FIXME MAB: #1 ]}}}
+\newcommand{\shepherd}[1]{{\bf\textcolor{YellowOrange}{ [ PHIL: #1 ]}}}
+\fi
+\newcommand{\mfc}[1]{{\fixmemfc{#1}}}
+
+\newcommand{\del}[1]{{~\color{orange} #1 \marginpar{To Delete}}}
+
+
+
+\ifx \ftfsreviews \undefined
+\newcommand{\reviewer}[1]{{}}
+\else
+\newcommand{\reviewer}[1]{{\bf\textcolor{red}{ [ REVIEWER: #1 ]}}}
+\fi
+
+\ifx \ftfsreviews \undefined
+\newcommand{\reviewerfixed}[2]{{#2}}
+\newcommand{\reviewerfixedyang}[2]{{#2}}
+\else
+\newcommand{\reviewerfixed}[2]{{\bf\textcolor{cerisepink}{ [ REVIEWER(#1): #2]}}}
+\newcommand{\reviewerfixedyang}[2]{{\bf\textcolor{ballblue}{ [ REVIEWER(#1): #2]}}}
+\fi
+
+
+
+\newcommand{\punt}[1]{}
+\newcommand{\wod}{WOD\xspace}
+\newcommand{\wods}{WODs\xspace}
+\newcommand{\wofs}{write-optimized file system\xspace}
+\newcommand{\wofss}{write-optimized file systems\xspace}
+
+\newcommand{\ft}{Fractal Tree\xspace}
+\newcommand{\fti}{\ft index\xspace}
+\newcommand{\FTI}{FTI\xspace}
+\newcommand{\FTIs}{FTIs\xspace}
+\newcommand{\ftis}{\ft indexes\xspace}
+\newcommand{\ftistitle}{\ft Indexes\xspace}
+\newcommand{\lsm}{LSM-tree\xspace}
+\newcommand{\lsms}{LSM-trees\xspace}
+\newcommand{\vttree}{VT-tree\xspace}
+\newcommand{\vttrees}{VT-trees\xspace}
+
+
+\newcommand{\kvbfs}{key-value-based file system\xspace}
+\newcommand{\kvbfses}{\kvbfs{}s\xspace}
+\newcommand{\Kvbfs}{Key-value-based file system\xspace}
+\newcommand{\Kvbfses}{\Kvbfs{}s\xspace}
+\newcommand{\bet}{B$^{\varepsilon}$-tree\xspace}
+\newcommand{\beT}{B$^{\varepsilon}$-Tree\xspace}
+\newcommand{\bets}{B$^{\varepsilon}$-trees\xspace}
+\newcommand{\sysname}{BetrFS\xspace}
+\newcommand{\betrfs}{BetrFS\xspace}
+\newcommand{\Ext}{{Ext4}\xspace}
+\newcommand{\ext}{{ext4}\xspace}
+\newcommand{\btrfs}{{Btrfs}\xspace}
+\newcommand{\Btrfs}{{Btrfs}\xspace}
+\newcommand{\xfs}{{XFS}\xspace}
+\newcommand{\zfs}{{ZFS}\xspace}
+\newcommand{\Zfs}{{Zfs}\xspace}
+\newcommand{\ftwofs}{{F2FS}\xspace}
+\newcommand{\tablefs}{{TableFS}\xspace}
+\newcommand{\kvfs}{{KVFS}\xspace}
+\newcommand{\tokufs}{{TokuFS}\xspace}
+
+\newcommand{\libc}{{\tt libc}\xspace}
+\newcommand{\klibc}{{\tt klibc}\xspace}
+\newcommand{\grep}{\texttt{grep}\xspace}
+\newcommand{\blktrace}{\texttt{blktrace}\xspace}
+\newcommand{\defn}[1]           {\textit{\textbf{\boldmath #1}}}
+\newcommand{\proc}[1]		{\ifmmode\mbox{\textsc{#1}}\else\textsc{#1}\fi}
+
+\newcommand{\gb}{{GB}\xspace}
+\newcommand{\gib}{{GiB}\xspace}
+\newcommand{\mb}{{MB}\xspace}
+\newcommand{\mib}{{MiB}\xspace}
+\newcommand{\kib}{{KiB}\xspace}
+\newcommand{\mbps}{{\mb/s}\xspace}
+\newcommand{\mibps}{{\mib/s}\xspace}
+% standardize benchmarking operations, libc text references
+\newcommand{\lmdd}{\texttt{lmdd}\xspace}
+\newcommand{\rsync}{\texttt{rsync}\xspace}
+\newcommand{\fsync}{\texttt{fsync}\xspace}
+\newcommand{\mkdir}{\texttt{mkdir}\xspace}
+\newcommand{\unlink}{\texttt{unlink}\xspace}
+\newcommand{\truncate}{\texttt{truncate}\xspace}
+\newcommand{\memcpy}{\texttt{memcpy}\xspace}
+\newcommand{\pread}{\texttt{pread}\xspace}
+\newcommand{\pwrite}{\texttt{pwrite}\xspace}
+\newcommand{\libcread}{\texttt{read}\xspace}
+\newcommand{\libcwrite}{\texttt{write}\xspace}
+
+\newcommand{\linuxver}{{$3.11.10$}\xspace}
+
+% It makes no sense to use cref for typed references such as secref.
+% You lose the type checking.  For example if I
+% write \secput{intro}{Introduction} and later write \figref{intro},
+% this code will give undefined warnings.  If I write \cref, the
+% system will automagically turn that into a Section~\ref{secintro}
+% which won't be what you wanted, since I was trying to reference a
+% figure.
+%
+% It makes doubly no sense to explicitly write \Cref{fig:foo} instead
+% of \figref{foo}.
+%
+% -Bradley
+\newcommand{\secput}[2]{\section{#2}\label{sec:#1}}
+\newcommand{\secref}[1]{Section~\ref{sec:#1}}     
+\newcommand{\subsecput}[2]{\subsection{#2}\label{sec:#1}}
+\newcommand{\figputt}[2]{%
+ \begin{figure}[t]%
+ \begin{center}%
+  \input{#1.pdf_tex}%
+ \end{center}%
+ \caption{#2}%
+ \label{fig:#1}%
+ \end{figure}%
+}
+\newcommand{\figlabel}[1]{\label{fig:#1}}
+\newcommand{\figref}[1]{Figure~\ref{fig:#1}}
+
+\newcommand{\DATA}[1]{\textcolor{red}{#1}}

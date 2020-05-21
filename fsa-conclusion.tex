@@ -1,0 +1,85 @@
+\section{Conclusion}\label{sec:fsa-conclusion}
+
+The experiments above suggest that conventional wisdom on fragmentation, aging,
+allocation and file systems is inadequate in several ways.
+
+First, while it may seem intuitive to write data as few times as possible,
+writing data only once creates a tension between the logical ordering
+of the file system's current state and the potential to make modifications
+without disrupting the future order. Rewriting data
+multiple times allows the file system to maintain locality.  The overhead
+of these multiple writes can be managed by rewriting data in batches, as is done in
+write-optimized dictionaries.
+
+% , and the overhead can
+% be managed. The point is that not all writes are created equal; a logarithmic
+% number of writes with very low write amplification will induce a lower write
+% workload than a single write with large write amplification.
+
+For example, in \betrfs, data might be written as many as a
+logarithmic number of times, whereas in \ext, it will be written once,
+yet \betrfs in general is able to perform as well as or better than an
+unaged \ext file system and significantly outperforms aged \ext file
+systems.
+
+Second, today's file system heuristics are not able to maintain enough
+locality to enable reads to be performed at the disks natural transfer
+size.  And since the natural transfer size on a rotating disk is a
+function of the seek time and bandwidth, it will tend to increase with
+time. Thus we expect this problem to possibly become worse with newer
+hardware, not better.
+
+We experimentally confirmed our expectation that non-write-optimized
+file systems would age, but we were surprised by how
+quickly and dramatically aging impacts performance.
+%It was somewhat surprising how quickly they all aged.  
+This rapid aging is important: a user's
+%(of at least certain workloads)
+experience with unaged
+file systems is likely so fleeting that they do not notice performance degradation.
+Instead, the performance costs of aging
+are built into their expectations of file system performance.
+
+% dp: This para really doesn't do it for me
+%%% There is quite a lot of future work to perform on aging.  Write
+%%% optimization, and specifically \betrfs, appears to avoid aging, as
+%%% predicted by our framework and design considerations.  Is there
+%%% anything short of wholesale adoption of write optimization that could
+%%% be applied to existing file systems to mitigate the effects of aging?
+%%% Furthermore, SSDs present further issues, due to their performance
+%%% profile and the FTL. Nonetheless, write optimization does generally
+%%% improve aged performance on these devices, suggesting that integrating
+%%% write-optimized data structures could further improve performance if
+%%% they were incorporated to FTL designs.
+
+Finally, because representative aging is a difficult goal, simulating multi-year workloads,
+%Because of the perceived difficulty of aging file systems, 
+many research 
+papers benchmark on unaged file systems.
+Our results indicate that it is relatively easy to quickly drive
+a file system into an aged state---even if
+this state is not precisely the state of the file system after, say, three
+years of typical use---and this degraded state can be easily 
+measured.
+
+%%%  remark is that the current opinion generally appears to be
+%%% that aging a file system is a difficult and elusive goal, since it may
+%%% require simulating multi-year workloads. As a
+%%% result, %of the perceived level of care required 
+%%% many current research papers
+%%% routinely benchmark on an unaged file system. 
+%%% %We argue that it is
+%%% %important to measure the expected state of use, even though precisely
+%%% %recreating a specific aged state requires significant effort.  
+%%% A key
+%%% observation from our experiments, however, is that there is a
+%%% precipitous drop from a clean, initial state, to an aged state in
+%%% current file systems.  In other words, it is relatively easy to
+%%% quickly drive a file system into a significantly aged state, even if
+%%% this state is not precisely the state of the file system after three
+%%% years of typical use.
+
+
+%% Local Variables:
+%% mode: latex
+%% End:

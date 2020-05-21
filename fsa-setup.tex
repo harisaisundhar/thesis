@@ -1,0 +1,83 @@
+\section{Experimental Setup}\label{sec:fsa-setup}
+
+%To understand the ways that file systems' read performance can change
+%over time, we exercise
+%six local file systems using a series of microbenchmarks and
+%application workloads.  After each experiment, we measure
+%both the recursive scan latency and the
+%dynamic layout score.
+%
+%% dynamic layout score is related to Smith et al.'s layout score
+%% but differs in key ways.
+%% Like the layout score,
+%% dynamic layout score is a ratio of the number of logical blocks
+%% that are laid out optimally.
+%% However, dynamic layout score is a function of
+%% file system access patterns.
+%% Whereas the layout score statically examines the logical addresses
+%% of data blocks within a single file or file set,
+%% the dynamic layout score considers the pattern of logical addresses
+%% accessed by the file system during a recursive traversal
+%% of its contents.
+%% Thus, the dynamic layout score ignores underlying file system
+%% data structures,
+%% includes metadata accesses,
+%% and is potentially dependent on the namespace traversal order.
+%% We believe that dynamic layout score is a more meaningful
+%% measure of file system layout,
+%% since it captures the way that data organization translates
+%% into real access patterns.
+%
+%Our evaluation is organized around the following questions:
+%\begin{compactitem}
+%\item How sensitive is file system locality to the order that files
+%  are created?
+%\item How sensitive is file system locality to write patterns within
+%  existing file system objects?
+%\item Under realistic application workloads, how does file system
+%  locality change over time?
+%\end{compactitem}
+
+Each experiment compares several file systems: \betrfs, \btrfs, \ext, \ftwofs,
+\xfs, and \zfs.  We use the versions of \xfs, \btrfs, \ext and \ftwofs that are
+part of the \linuxver kernel, and \zfs 0.6.5-234\_ge0ab3ab, downloaded from the
+zfsonlinux repository on \url{www.github.com}.  We used BetrFS 0.3 in the 
+experiments\footnote{Available at \url{github.com/oscarlab/betrfs}}.
+%% dp: I think a footnote is ok
+%\mfc{shouldn't this be a
+%citation?}
+%We applied several patches provided to us by the \betrfs authors in response
+%to bugs uncovered during our benchmarking.
+We use default recommended file system settings unless otherwise noted.  Lazy
+inode table and journal initialization are turned off on \ext, pushing more
+work onto file system creation time and reducing experimental noise. 
+
+%% dp: semi-plausible explanation, but I don't think we should do this going forward
+% \fixmedp{why?}
+%\fixme{for the \betrfs papers, this was so that the initialization costs weren't pushed into the performance tests, but for this paper it doesn't matter.}
+%% Error bars
+%% and $\pm$ ranges
+%% denote $95\%$ confidence intervals
+%% and are shown on all experiments that were run at least four times. \fixme{Alex: does this actually come up?}
+
+
+All experimental results are collected on a Dell Optiplex 790 with a
+4-core 3.40 GHz Intel Core i7 CPU, 4 GB RAM, a 500 GB, 7200 RPM ATA
+Seagate Barracuda ST500DM002 disk with a \unit{4096}\byte{} block size, and a 240 GB Sandisk
+Extreme Pro---both disks used SATA 3.0.  Each file system's block size
+is set to \unit{4096}\byte{}.
+Unless otherwise noted, all experiments are cold-cache.
+
+The system runs 64-bit Ubuntu 13.10 server with Linux kernel version
+\linuxver{} on a bootable USB stick.  All HDD tests are performed on two 20GiB
+partitions located at the outermost region of the drive.
+% important to specify for ZCAV effects
+For the SSD tests, we additionally partition the remainder of the drive and
+fill it with random data, although we have preliminary data that indicates this
+does not affect performance.
+%we securely erase the device initially, and between tests we perform a trim
+%operation on each partition used.  We use a 20Gib partitions for all
+%experiments.
+%% Local Variables:
+%% mode: latex
+%% End:
