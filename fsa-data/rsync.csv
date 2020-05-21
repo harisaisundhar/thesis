@@ -1,0 +1,85 @@
+fs, op, size.MB, src, dest, in.place, throughput.Mbps
+
+#ext4, rsync, 500.48, benchmark, benchmark, yes, 23.37
+ext4, rsync, 500.48, benchmark, benchmark, yes, 14.56
+ext4, rsync, 500.48, benchmark, benchmark, yes, 15.00
+ext4, rsync, 500.48, benchmark, benchmark, yes, 17.03
+ext4, rsync, 500.48, benchmark, benchmark, yes, 17.63
+ext4, rsync, 500.48, benchmark, benchmark, yes, 21.38
+ext4, rsync, 500.48, benchmark, benchmark, yes, 15.00
+
+xfs, rsync, 501.44, benchmark, benchmark, yes, 1.19
+xfs, rsync, 501.44, benchmark, benchmark, yes, 1.25
+xfs, rsync, 501.44, benchmark, benchmark, yes, 1.22
+xfs, rsync, 501.44, benchmark, benchmark, yes, 1.24
+
+btrfs, rsync, 500.48, benchmark, benchmark, yes, 10.36
+btrfs, rsync, 500.48, benchmark, benchmark, yes, 10.36
+btrfs, rsync, 500.48, benchmark, benchmark, yes, 10.57
+btrfs, rsync, 500.48, benchmark, benchmark, yes, 10.15
+
+zfs, rsync, 500.48, benchmark, benchmark, yes, 13.76
+zfs, rsync, 500.48, benchmark, benchmark, yes, 14.56
+zfs, rsync, 500.48, benchmark, benchmark, yes, 13.40
+zfs, rsync, 500.48, benchmark, benchmark, yes, 14.15
+
+BetrFS-0.1, rsync, 501.40, benchmark, benchmark, yes, 30.44
+BetrFS-0.1, rsync, 501.40, benchmark, benchmark, yes, 32.40
+BetrFS-0.1, rsync, 501.40, benchmark, benchmark, yes, 32.40
+BetrFS-0.1, rsync, 501.40, benchmark, benchmark, yes, 30.44
+BetrFS-0.1, rsync, 501.40, benchmark, benchmark, yes, 30.44
+
+# fast16 submission:
+#BetrFS-0.2, rsync, 501.40, benchmark, benchmark, yes, 34.64
+#BetrFS-0.2, rsync, 501.40, benchmark, benchmark, yes, 34.64
+#BetrFS-0.2, rsync, 501.40, benchmark, benchmark, yes, 34.64
+#BetrFS-0.2, rsync, 501.40, benchmark, benchmark, yes, 34.64
+
+# with circle merge:
+BetrFS-0.2, rsync, 501.40, benchmark, benchmark, yes, 37.20
+BetrFS-0.2, rsync, 501.40, benchmark, benchmark, yes, 40.18
+BetrFS-0.2, rsync, 501.40, benchmark, benchmark, yes, 40.18
+BetrFS-0.2, rsync, 501.40, benchmark, benchmark, yes, 37.20
+
+# data without the --inplace flag below
+
+ext4, rsync, 500.48, benchmark, benchmark, no, 13.76
+ext4, rsync, 500.48, benchmark, benchmark, no, 13.05
+ext4, rsync, 500.48, benchmark, benchmark, no, 12.72
+ext4, rsync, 500.48, benchmark, benchmark, no, 14.15
+ext4, rsync, 500.48, benchmark, benchmark, no, 14.15
+
+xfs, rsync, 501.44, benchmark, benchmark, no, 1.80
+xfs, rsync, 501.44, benchmark, benchmark, no, 1.56
+xfs, rsync, 501.44, benchmark, benchmark, no, 1.70
+xfs, rsync, 501.44, benchmark, benchmark, no, 1.80
+
+btrfs, rsync, 500.48, benchmark, benchmark, no, 13.76
+btrfs, rsync, 500.48, benchmark, benchmark, no, 11.29
+btrfs, rsync, 500.48, benchmark, benchmark, no, 12.72
+btrfs, rsync, 500.48, benchmark, benchmark, no, 12.72
+
+zfs, rsync, 500.48, benchmark, benchmark, no, 14.56
+zfs, rsync, 500.48, benchmark, benchmark, no, 14.15
+zfs, rsync, 500.48, benchmark, benchmark, no, 13.40
+zfs, rsync, 500.48, benchmark, benchmark, no, 14.56
+
+BetrFS-0.1, rsync, 501.40, benchmark, benchmark, no, 24.50
+BetrFS-0.1, rsync, 501.40, benchmark, benchmark, no, 24.50
+BetrFS-0.1, rsync, 501.40, benchmark, benchmark, no, 24.50
+BetrFS-0.1, rsync, 501.40, benchmark, benchmark, no, 24.50
+
+# fast16 submission:
+#BetrFS-0.2, rsync, 501.40, benchmark, benchmark, no, 27.15
+#BetrFS-0.2, rsync, 501.40, benchmark, benchmark, no, 25.76
+#BetrFS-0.2, rsync, 501.40, benchmark, benchmark, no, 30.44
+#BetrFS-0.2, rsync, 501.40, benchmark, benchmark, no, 27.15
+#BetrFS-0.2, rsync, 501.40, benchmark, benchmark, no, 25.76
+
+# with circle merge:
+BetrFS-0.2, rsync, 501.40, benchmark, benchmark, no, 34.64
+BetrFS-0.2, rsync, 501.40, benchmark, benchmark, no, 34.64
+BetrFS-0.2, rsync, 501.40, benchmark, benchmark, no, 34.64
+BetrFS-0.2, rsync, 501.40, benchmark, benchmark, no, 32.40
+BetrFS-0.2, rsync, 501.40, benchmark, benchmark, no, 34.64
+

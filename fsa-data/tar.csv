@@ -1,0 +1,107 @@
+fs, op, time.s
+
+# fast16 submission:
+#BetrFS-0.2, untar, 13.761
+#BetrFS-0.2, untar, 13.714
+#BetrFS-0.2, untar, 13.675
+#BetrFS-0.2, untar, 13.654
+#BetrFS-0.2, untar, 13.771
+#BetrFS-0.2, untar, 14.238
+
+#BetrFS-0.2, tar, 17.470
+#BetrFS-0.2, tar, 17.480
+#BetrFS-0.2, tar, 17.436
+#BetrFS-0.2, tar, 17.452
+#BetrFS-0.2, tar, 17.572
+#BetrFS-0.2, tar, 17.403
+
+# with circle merge:
+BetrFS-0.2, untar, 10.829
+BetrFS-0.2, untar, 9.987
+BetrFS-0.2, untar, 10.018
+BetrFS-0.2, untar, 10.058
+BetrFS-0.2, untar, 10.234
+BetrFS-0.2, untar, 10.569
+
+BetrFS-0.2, tar, 18.537
+BetrFS-0.2, tar, 17.545
+BetrFS-0.2, tar, 18.727
+BetrFS-0.2, tar, 18.645
+BetrFS-0.2, tar, 17.938
+BetrFS-0.2, tar, 17.762
+
+ext4, untar, 11.803
+ext4, untar, 11.101
+ext4, untar, 10.738
+ext4, untar, 11.078
+ext4, untar, 10.297
+ext4, untar, 10.755
+ext4, untar, 10.733
+ext4, untar, 10.514
+ext4, untar, 11.758
+ext4, untar, 11.805
+
+ext4, tar, 58.033
+ext4, tar, 51.727
+ext4, tar, 54.138
+ext4, tar, 63.217
+ext4, tar, 50.525
+ext4, tar, 49.464
+ext4, tar, 49.801
+ext4, tar, 52.838
+ext4, tar, 56.610
+ext4, tar, 53.597
+
+xfs, untar, 15.728
+xfs, untar, 15.296
+xfs, untar, 15.160
+xfs, untar, 15.622
+xfs, untar, 14.700
+xfs, untar, 14.536
+xfs, untar, 14.221
+xfs, untar, 14.854
+xfs, untar, 14.612
+xfs, untar, 14.889
+
+xfs, tar, 74.564
+xfs, tar, 76.462
+xfs, tar, 90.000
+xfs, tar, 79.567
+xfs, tar, 85.161
+xfs, tar, 75.145
+xfs, tar, 70.576
+xfs, tar, 71.333
+xfs, tar, 80.498
+xfs, tar, 73.092
+
+zfs, untar, 14.660
+zfs, untar, 13.902
+zfs, untar, 13.611
+zfs, untar, 13.214
+
+zfs, tar, 57.409
+zfs, tar, 53.994
+zfs, tar, 56.604
+zfs, tar, 56.830
+
+btrfs, untar, 7.619
+btrfs, untar, 8.513
+btrfs, untar, 7.735
+btrfs, untar, 7.795
+
+btrfs, tar, 22.732
+btrfs, tar, 21.780
+btrfs, tar, 22.930
+btrfs, tar, 22.828
+
+BetrFS-0.1, untar, 11.480
+BetrFS-0.1, untar, 12.348
+BetrFS-0.1, untar, 12.031
+BetrFS-0.1, untar, 12.530
+BetrFS-0.1, untar, 11.291
+
+BetrFS-0.1, tar, 18.113
+BetrFS-0.1, tar, 17.856
+BetrFS-0.1, tar, 18.146
+BetrFS-0.1, tar, 18.026
+BetrFS-0.1, tar, 18.229

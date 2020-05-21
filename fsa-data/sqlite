@@ -1,0 +1,220 @@
+ext4
+SQLite:     version 3.8.11.1
+Date:       Tue Sep  8 23:45:41 2015
+CPU:        4 * Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz
+CPUCache:   8192 KB
+Keys:       16 bytes each
+Values:     100 bytes each
+Entries:    1000000
+RawSize:    110.6 MB (estimated)
+------------------------------------------------
+fillseqsync  :   27252.295 micros/op;    0.0 MB/s
+fillrandsync :   27352.181 micros/op;    0.0 MB/s
+fillseq      :      12.773 micros/op;    8.7 MB/s
+fillseqbatch :       4.244 micros/op;   26.1 MB/s
+fillrandom   :      16.281 micros/op;    6.8 MB/s
+fillrandbatch:       9.524 micros/op;   11.6 MB/s
+overwrite    :      32.309 micros/op;    3.4 MB/s
+readrandom   :       5.517 micros/op;
+readseq      :       1.631 micros/op;   58.5 MB/s
+readreverse  :       1.618 micros/op;   58.9 MB/s
+
+Betrfs_seqio_rename
+SQLite:     version 3.8.11.1
+Date:       Tue Sep  8 23:51:28 2015
+CPU:        4 * Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz
+CPUCache:   8192 KB
+Keys:       16 bytes each
+Values:     100 bytes each
+Entries:    1000000
+RawSize:    110.6 MB (estimated)
+------------------------------------------------
+fillseqsync  :   27229.895 micros/op;    0.0 MB/s
+fillrandsync :   27430.838 micros/op;    0.0 MB/s
+fillseq      :     226.266 micros/op;    0.5 MB/s
+fillseqbatch :       7.531 micros/op;   14.7 MB/s
+fillrandom   :     250.563 micros/op;    0.4 MB/s
+fillrandbatch :     113.679 micros/op;    1.0 MB/s
+Segmentation fault ops
+
+bnc_apply_messages_to_basement_node: Assertion `ancestor->unbound_insert_count >= bnc->unbound_insert_count' failed (errno=0)
+[25964.390115] ------------[ cut here ]------------
+[25964.391408] Kernel BUG at ffffffffa0792478 [verbose debug info unavailable]
+[25964.392634] invalid opcode: 0000 [#1] SMP
+[25964.393842] Modules linked in: ftfs(OF) xfs zlib vtsspp(OF) sep3_15(OF) pax(OF) i915 snd_hda_codec_hdmi nls_iso8859_1 x86_pkg_temp_thermal snd_hda_codec_realtek intel_powerclamp snd_hda_intel coretemp snd_hda_codec kvm_intel kvm snd_hwdep snd_pcm crc32_pclmul drm_kms_helper snd_page_alloc ghash_clmulni_intel aesni_intel drm snd_timer aes_x86_64 lrw mei_me gf128mul snd mei glue_helper ablk_helper cryptd psmouse dcdbas soundcore lpc_ich video microcode i2c_algo_bit serio_raw mac_hid lp parport btrfs xor zlib_deflate raid6_pq libcrc32c e1000e ahci libahci ptp pps_core [last unloaded: ftfs]
+[25964.397957] CPU: 1 PID: 1623 Comm: db_bench_sqlite Tainted: GF          O 3.11.10ftfs #6
+[25964.399292] Hardware name: Dell Inc. OptiPlex 790/0D28YY, BIOS A18 09/24/2013
+[25964.400613] task: ffff88011664c680 ti: ffff8801143ec000 task.ti: ffff8801143ec000
+[25964.401936] RIP: 0010:[<ffffffffa0792478>]  [<ffffffffa0792478>] toku_do_assert_fail+0x28/0x30 [ftfs]
+[25964.403275] RSP: 0018:ffff8801143eef10  EFLAGS: 00010292
+[25964.404661] RAX: 00000000000000a3 RBX: ffff8801143ef050 RCX: 0000000000000000
+[25964.406077] RDX: ffff88012dc30000 RSI: ffff88012dc2e428 RDI: 0000000000000246
+[25964.407472] RBP: ffff8801143eef10 R08: 0000000000000000 R09: 0000000000000636
+[25964.408773] R10: 00000000000000f0 R11: ffffc90015959ff8 R12: ffff8800414dc9c0
+[25964.410088] R13: ffff880060470700 R14: ffff8801143ef2f8 R15: ffff880015385400
+[25964.411412] FS:  00007f254d784740(0000) GS:ffff88012dc20000(0000) knlGS:0000000000000000
+[25964.412763] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[25964.414159] CR2: 00000000077ca2e8 CR3: 0000000101fbd000 CR4: 00000000000407e0
+[25964.415577] Stack:
+[25964.416890]  ffff8801143ef038 ffffffffa07daf0f ffff8801143eefa0 0000000044520002
+[25964.418227]  ffff88005c778228 0000000000000004 ffff8800ae06d000 0000000000000000
+[25964.419553]  0000000000000000 00000000000000f0 ffffffff816dfb72 0000000000ff814f
+[25964.420899] Call Trace:
+[25964.422318]  [<ffffffffa07daf0f>] _ZL35bnc_apply_messages_to_basement_nodeP9ft_handleP25ftnode_leaf_basement_nodeP6ftnodeiPK12pivot_boundsmPb+0xa4f/0xad0 [ftfs]
+[25964.423744]  [<ffffffff816dfb72>] ? mutex_lock+0x12/0x2f
+[25964.425112]  [<ffffffffa07db05a>] _ZL30apply_ancestors_messages_to_bnP9ft_handleP6ftnodeiP9ancestorsPK12pivot_boundsmPb+0xca/0x180 [ftfs]
+[25964.426503]  [<ffffffffa07db211>] _Z37toku_apply_ancestors_messages_to_nodeP9ft_handleP6ftnodeP9ancestorsPK12pivot_boundsPbi+0x101/0x150 [ftfs]
+[25964.427903]  [<ffffffffa07b631b>] _Z23toku_pin_ftnode_batchedP9ft_handle10blocknum_sjP9unlockersP9ancestorsPK12pivot_boundsP18ftnode_fetch_extrabPP6ftnodePb+0x38b/0x400 [ftfs]
+[25964.429333]  [<ffffffffa07d1cd0>] ? _Z29toku_destroy_ftnode_internalsP6ftnode+0x330/0x330 [ftfs]
+[25964.430758]  [<ffffffffa07c97f0>] ? _ZL14ft_leaf_run_gcP6ftnodeP2ft+0x120/0x120 [ftfs]
+[25964.432266]  [<ffffffffa07cfdd0>] ? _Z25toku_evict_bn_from_memoryP6ftnodeiP2ft+0x160/0x160 [ftfs]
+[25964.433767]  [<ffffffffa07baaa0>] ? _Z19toku_ft_merge_childP2ftP6ftnodei+0x50/0x50 [ftfs]
+[25964.435194]  [<ffffffffa07cf220>] ? _Z29ftnode_flip_unbound_msgs_typeP6ftnode+0x2a0/0x2a0 [ftfs]
+[25964.436623]  [<ffffffffa07c8830>] ? _ZL16toku_dump_ftnodeP8_IO_FILEP9ft_handle10blocknum_siPK10__toku_dbtS6_+0x730/0x730 [ftfs]
+[25964.438068]  [<ffffffffa07cdfc0>] ? _Z31toku_bfe_rightmost_child_wantedP18ftnode_fetch_extraP6ftnode+0x170/0x170 [ftfs]
+[25964.439568]  [<ffffffffa07d0760>] ? _Z39toku_ft_status_update_deserialize_timesP6ftnodemm+0x170/0x170 [ftfs]
+[25964.441066]  [<ffffffffa07d1cd0>] ? _Z29toku_destroy_ftnode_internalsP6ftnode+0x330/0x330 [ftfs]
+[25964.442508]  [<ffffffffa07c97f0>] ? _ZL14ft_leaf_run_gcP6ftnodeP2ft+0x120/0x120 [ftfs]
+[25964.443945]  [<ffffffffa07cfdd0>] ? _Z25toku_evict_bn_from_memoryP6ftnodeiP2ft+0x160/0x160 [ftfs]
+[25964.445374]  [<ffffffffa07baaa0>] ? _Z19toku_ft_merge_childP2ftP6ftnodei+0x50/0x50 [ftfs]
+[25964.446802]  [<ffffffffa07cf220>] ? _Z29ftnode_flip_unbound_msgs_typeP6ftnode+0x2a0/0x2a0 [ftfs]
+[25964.448233]  [<ffffffffa07c8830>] ? _ZL16toku_dump_ftnodeP8_IO_FILEP9ft_handle10blocknum_siPK10__toku_dbtS6_+0x730/0x730 [ftfs]
+[25964.449673]  [<ffffffffa07d1cd0>] ? _Z29toku_destroy_ftnode_internalsP6ftnode+0x330/0x330 [ftfs]
+[25964.451106]  [<ffffffffa07c97f0>] ? _ZL14ft_leaf_run_gcP6ftnodeP2ft+0x120/0x120 [ftfs]
+[25964.452543]  [<ffffffffa07cfdd0>] ? _Z25toku_evict_bn_from_memoryP6ftnodeiP2ft+0x160/0x160 [ftfs]
+[25964.453979]  [<ffffffffa07baaa0>] ? _Z19toku_ft_merge_childP2ftP6ftnodei+0x50/0x50 [ftfs]
+[25964.455415]  [<ffffffffa07cf220>] ? _Z29ftnode_flip_unbound_msgs_typeP6ftnode+0x2a0/0x2a0 [ftfs]
+[25964.456857]  [<ffffffffa07c8830>] ? _ZL16toku_dump_ftnodeP8_IO_FILEP9ft_handle10blocknum_siPK10__toku_dbtS6_+0x730/0x730 [ftfs]
+[25964.458311]  [<ffffffffa07cbc85>] _ZL15ft_search_childP9ft_handleP6ftnodeiP9ft_searchPFijPKvjS6_PvbES7_PbP9ft_cursorP9unlockersP9ancestorsPK12pivot_boundsb+0x245/0xb30 [ftfs]
+[25964.459795]  [<ffffffffa0826990>] ? _ZL33c_getf_set_range_reverse_callbackjPKvjS0_Pvb+0x100/0x100 [ftfs]
+[25964.461279]  [<ffffffffa07cfdd0>] ? _Z25toku_evict_bn_from_memoryP6ftnodeiP2ft+0x160/0x160 [ftfs]
+[25964.462761]  [<ffffffffa07cf200>] ? _Z29ftnode_flip_unbound_msgs_typeP6ftnode+0x280/0x2a0 [ftfs]
+[25964.464233]  [<ffffffff816dfb72>] ? mutex_lock+0x12/0x2f
+[25964.465708]  [<ffffffffa07c6ef7>] ? _ZL27ft_cursor_compare_set_rangeRK9ft_searchPK10__toku_dbt+0x17/0x30 [ftfs]
+[25964.467197]  [<ffffffffa07c7417>] ? _Z26toku_ft_search_which_childP17__toku_descriptorPFiP9__toku_dbPK10__toku_dbtS5_EP6ftnodeP9ft_search.part.66+0x77/0x1d0 [ftfs]
+[25964.468712]  [<ffffffffa0797030>] ? path_cmp+0x1a0/0x1a0 [ftfs]
+[25964.470217]  [<ffffffffa07cbdc5>] _ZL15ft_search_childP9ft_handleP6ftnodeiP9ft_searchPFijPKvjS6_PvbES7_PbP9ft_cursorP9unlockersP9ancestorsPK12pivot_boundsb+0x385/0xb30 [ftfs]
+[25964.471761]  [<ffffffffa07aa9eb>] ? _Z21toku_cachetable_unpinP9cachefileP6ctpair16cachetable_dirty11pair_attr_s+0x4b/0x50 [ftfs]
+[25964.473313]  [<ffffffffa0826990>] ? _ZL33c_getf_set_range_reverse_callbackjPKvjS0_Pvb+0x100/0x100 [ftfs]
+[25964.474866]  [<ffffffffa07cfdd0>] ? _Z25toku_evict_bn_from_memoryP6ftnodeiP2ft+0x160/0x160 [ftfs]
+[25964.476416]  [<ffffffffa07cf200>] ? _Z29ftnode_flip_unbound_msgs_typeP6ftnode+0x280/0x2a0 [ftfs]
+[25964.477967]  [<ffffffffa07cac10>] ? _ZL28get_key_after_bytes_in_childP9ft_handleP2ftP6ftnodeP9unlockersP9ancestorsPK12pivot_boundsP18ftnode_fetch_extraP9ft_searchi+0x260/0x260 [ftfs]
+[25964.479550]  [<ffffffffa07cbdc5>] _ZL15ft_search_childP9ft_handleP6ftnodeiP9ft_searchPFijPKvjS6_PvbES7_PbP9ft_cursorP9unlockersP9ancestorsPK12pivot_boundsb+0x385/0xb30 [ftfs]
+[25964.481146]  [<ffffffffa0797094>] ? env_keycmp+0x64/0x90 [ftfs]
+[25964.482736]  [<ffffffffa0826990>] ? _ZL33c_getf_set_range_reverse_callbackjPKvjS0_Pvb+0x100/0x100 [ftfs]
+[25964.484319]  [<ffffffffa07cfa00>] ? _Z40toku_ft_status_update_pivot_fetch_reasonP18ftnode_fetch_extra+0x2d0/0x370 [ftfs]
+[25964.485891]  [<ffffffffa07cfd00>] ? _Z25toku_evict_bn_from_memoryP6ftnodeiP2ft+0x90/0x160 [ftfs]
+[25964.487461]  [<ffffffffa07cac10>] ? _ZL28get_key_after_bytes_in_childP9ft_handleP2ftP6ftnodeP9unlockersP9ancestorsPK12pivot_boundsP18ftnode_fetch_extraP9ft_searchi+0x260/0x260 [ftfs]
+[25964.489064]  [<ffffffffa07cc90e>] _ZL14toku_ft_searchP9ft_handleP9ft_searchPFijPKvjS4_PvbES5_P9ft_cursorb+0x39e/0x800 [ftfs]
+[25964.490642]  [<ffffffffa0826990>] ? _ZL33c_getf_set_range_reverse_callbackjPKvjS0_Pvb+0x100/0x100 [ftfs]
+[25964.492191]  [<ffffffffa07cac10>] ? _ZL28get_key_after_bytes_in_childP9ft_handleP2ftP6ftnodeP9unlockersP9ancestorsPK12pivot_boundsP18ftnode_fetch_extraP9ft_searchi+0x260/0x260 [ftfs]
+[25964.493738]  [<ffffffffa0826990>] ? _ZL33c_getf_set_range_reverse_callbackjPKvjS0_Pvb+0x100/0x100 [ftfs]
+[25964.495283]  [<ffffffffa07d76ff>] _Z24toku_ft_cursor_set_rangeP9ft_cursorP10__toku_dbtPFijPKvjS4_PvbES5_+0x6f/0x90 [ftfs]
+[25964.497044]  [<ffffffffa07c6ee0>] ? _ZL22ft_cursor_compare_prevRK9ft_searchPK10__toku_dbt+0x30/0x30 [ftfs]
+[25964.498913]  [<ffffffffa07971d0>] ? ftfs_readdir_cb+0x110/0x110 [ftfs]
+[25964.500697]  [<ffffffffa08271ea>] _ZL16c_getf_set_rangeP10__toku_dbcjP10__toku_dbtPFiPKS1_S4_PvES5_.part.4+0xfa/0x170 [ftfs]
+[25964.502344]  [<ffffffff8119032d>] ? __kmalloc_track_caller+0x4d/0x170
+[25964.503907]  [<ffffffffa07971d0>] ? ftfs_readdir_cb+0x110/0x110 [ftfs]
+[25964.505540]  [<ffffffffa0827304>] _ZL16c_getf_set_rangeP10__toku_dbcjP10__toku_dbtPFiPKS1_S4_PvES5_+0xa4/0xd0 [ftfs]
+[25964.507454]  [<ffffffffa079848a>] ftfs_bstore_scan_pages+0x1ea/0x2d0 [ftfs]
+[25964.509290]  [<ffffffffa079488c>] ftfs_readpages+0x15c/0x2f0 [ftfs]
+[25964.511092]  [<ffffffff8114a5b0>] __do_page_cache_readahead+0x1a0/0x240
+[25964.512645]  [<ffffffff8114aac6>] ondemand_readahead+0x126/0x250
+[25964.514324]  [<ffffffff8114ac23>] page_cache_sync_readahead+0x33/0x50
+[25964.515969]  [<ffffffff81140355>] generic_file_aio_read+0x4b5/0x700
+[25964.517576]  [<ffffffff811a5d50>] do_sync_read+0x80/0xb0
+[25964.519212]  [<ffffffff811a63ae>] vfs_read+0x9e/0x170
+[25964.520734]  [<ffffffff811a6ed9>] SyS_read+0x49/0xa0
+[25964.522248]  [<ffffffff816ec49d>] system_call_fastpath+0x1a/0x1f
+[25964.523763] Code: 00 00 00 66 66 66 66 90 55 48 89 f0 45 89 c1 48 89 d6 49 89 f8 89 ca 48 89 e5 48 89 c1 48 c7 c7 a0 ed 87 a0 31 c0 e8 0a 64 f4 e0 <0f> 0b 66 0f 1f 44 00 00 66 66 66 66 90 55 48 89 e5 5d c3 0f 1f
+[25964.525419] RIP  [<ffffffffa0792478>] toku_do_assert_fail+0x28/0x30 [ftfs]
+[25964.527012]  RSP <ffff8801143eef10>
+[25964.678979] ---[ end trace 7e932d769cd24034 ]---
+
+
+Seq-io
+SQLite:     version 3.8.11.1
+Date:       Wed Sep  9 00:19:13 2015
+CPU:        4 * Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz
+CPUCache:   8192 KB
+Keys:       16 bytes each
+Values:     100 bytes each
+Entries:    1000000
+RawSize:    110.6 MB (estimated)
+------------------------------------------------
+fillseqsync  :   27276.072 micros/op;    0.0 MB/s
+fillrandsync :   27192.760 micros/op;    0.0 MB/s
+fillseq      :     224.732 micros/op;    0.5 MB/s
+fillseqbatch :       7.602 micros/op;   14.6 MB/s
+... finished 100000 ops
+
+[  569.418508] could not find unbound_insert_entry within bnc
+[  569.418526] ------------[ cut here ]------------
+[  569.418549] Kernel BUG at ffffffffa05620f9 [verbose debug info unavailable]
+[  569.418569] invalid opcode: 0000 [#1] SMP
+[  569.418587] Modules linked in: ftfs(OF) zlib vtsspp(OF) sep3_15(OF) pax(OF) i915 snd_hda_codec_hdmi snd_hda_codec_realtek x86_pkg_temp_thermal snd_hda_intel intel_powerclamp snd_hda_codec coretemp kvm_intel kvm nls_iso8859_1 snd_hwdep snd_pcm drm_kms_helper snd_page_alloc drm crc32_pclmul ghash_clmulni_intel snd_timer aesni_intel snd aes_x86_64 lrw gf128mul glue_helper ablk_helper cryptd mei_me psmouse dcdbas soundcore mei serio_raw microcode lpc_ich i2c_algo_bit video mac_hid lp parport btrfs xor zlib_deflate raid6_pq libcrc32c e1000e ptp ahci libahci pps_core
+[  569.418829] CPU: 3 PID: 1664 Comm: ct_client_kibbu Tainted: GF          O 3.11.10ftfs #6
+[  569.418852] Hardware name: Dell Inc. OptiPlex 790/0D28YY, BIOS A18 09/24/2013
+[  569.418872] task: ffff8801076f0000 ti: ffff8801154e8000 task.ti: ffff8801154e8000
+[  569.418893] RIP: 0010:[<ffffffffa05620f9>]  [<ffffffffa05620f9>] abort+0x9/0x10 [ftfs]
+[  569.418930] RSP: 0018:ffff8801154ebb68  EFLAGS: 00010246
+[  569.418947] RAX: 0000000000000000 RBX: ffff8801154ebc60 RCX: 0000000000005713
+[  569.418967] RDX: 0000000000005713 RSI: 0000000000000046 RDI: 0000000000000246
+[  569.418987] RBP: ffff8801154ebb68 R08: 000000000000000a R09: 0000000000000388
+[  569.419008] R10: 0000000000000000 R11: ffff8801154eb8fe R12: ffff88004b892f00
+[  569.419027] R13: ffff880103c5d680 R14: ffff880067804600 R15: ffff88004b892f00
+[  569.419048] FS:  0000000000000000(0000) GS:ffff88012dc60000(0000) knlGS:0000000000000000
+[  569.419070] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[  569.419087] CR2: 000000000279f5d8 CR3: 0000000002c10000 CR4: 00000000000407e0
+[  569.419107] Stack:
+[  569.419115]  ffff8801154ebbf8 ffffffffa05b50ee ffff8801154ebbf8 ffffffffa05882ca
+[  569.419143]  0000000000000246 0000000000000246 ffffc90029543000 ffff8801154ebcd8
+[  569.419171]  00000000154ebc30 000000000000103a ffff8801154ebcd0 000000000000103a
+[  569.419200] Call Trace:
+[  569.419227]  [<ffffffffa05b50ee>] _ZL20iterate_fn_bnc_flushP6ft_msgbPv+0x1ee/0x200 [ftfs]
+[  569.419263]  [<ffffffffa05882ca>] ? _Z18fifo_entry_get_msgP6ft_msgP10fifo_entryP10__toku_dbtS4_S4_+0x14a/0x150 [ftfs]
+[  569.419303]  [<ffffffffa058844e>] _Z17toku_fifo_iterateP4fifoPFiP6ft_msgbPvES3_+0xde/0x110 [ftfs]
+[  569.419341]  [<ffffffffa05b4f00>] ? _Z20toku_ft_maybe_updateP9ft_handlePK10__toku_dbtS3_P7tokutxnb10__toku_lsnb+0x220/0x220 [ftfs]
+[  569.419379]  [<ffffffffa0562b00>] ? ftfs_alloc_small+0x60/0x70 [ftfs]
+[  569.419411]  [<ffffffffa05aaedc>] _Z23toku_bnc_flush_to_childP2ftP24ftnode_nonleaf_childinfoP6ftnodem+0x7c/0x200 [ftfs]
+[  569.419451]  [<ffffffffa058f352>] _ZL19ft_flush_some_childP2ftP6ftnodeP14flusher_advice+0x332/0x640 [ftfs]
+[  569.419489]  [<ffffffffa058f7a5>] _ZL14flush_node_funPv+0x145/0x150 [ftfs]
+[  569.419519]  [<ffffffffa058cc10>] ? _ZL28bring_node_fully_into_memoryP6ftnodeP2ft.part.18+0xc0/0xc0 [ftfs]
+[  569.419556]  [<ffffffffa058c730>] ? _ZL19dummy_update_statusP6ftnodeiPv+0x10/0x10 [ftfs]
+[  569.419589]  [<ffffffffa0590480>] ? _ZL14ft_merge_childP2ftP6ftnodeiPbP14flusher_advice+0xcd0/0xcd0 [ftfs]
+[  569.419626]  [<ffffffffa058c690>] ? _Z27toku_unpin_ftnode_read_onlyP2ftP6ftnode+0x90/0x90 [ftfs]
+[  569.419660]  [<ffffffffa058c860>] ? _ZL19update_flush_statusP6ftnodei.isra.2+0xb0/0xb0 [ftfs]
+[  569.419694]  [<ffffffffa058c6d0>] ? _Z23never_recursively_flushP6ftnodePv+0x10/0x10 [ftfs]
+[  569.419731]  [<ffffffffa05e6bbe>] _ZL15work_on_kibbutzPv+0x4e/0x180 [ftfs]
+[  569.419759]  [<ffffffffa0563630>] ? perror+0x50/0x50 [ftfs]
+[  569.419782]  [<ffffffffa0563658>] kthread_func+0x28/0x40 [ftfs]
+[  569.419801]  [<ffffffff81084670>] kthread+0xc0/0xd0
+[  569.421033]  [<ffffffff810845b0>] ? kthread_create_on_node+0x120/0x120
+[  569.422273]  [<ffffffff816ec3ec>] ret_from_fork+0x7c/0xb0
+[  569.423513]  [<ffffffff810845b0>] ? kthread_create_on_node+0x120/0x120
+[  569.424744] Code: e0 bf 35 81 48 0d c0 c0 35 81 48 0d 60 c2 35 81 48 0d 70 c5 35 81 5d c3 66 2e 0f 1f 84 00 00 00 00 00 66 66 66 66 90 55 48 89 e5 <0f> 0b 0f 1f 44 00 00 66 66 66 66 90 85 ff 75 37 55 48 89 e5 53
+[  569.426197] RIP  [<ffffffffa05620f9>] abort+0x9/0x10 [ftfs]
+[  569.427534]  RSP <ffff8801154ebb68>
+[  569.428866] ---[ end trace 14a90fe51a611431 ]---
+
+master
+
+SQLite:     version 3.8.11.1
+Date:       Wed Sep  9 00:36:11 2015
+CPU:        4 * Intel(R) Core(TM) i7-2600 CPU @ 3.40GHz
+CPUCache:   8192 KB
+Keys:       16 bytes each
+Values:     100 bytes each
+Entries:    1000000
+RawSize:    110.6 MB (estimated)
+------------------------------------------------
+fillseqsync  :   27249.820 micros/op;    0.0 MB/s
+fillrandsync :   27361.180 micros/op;    0.0 MB/s
+fillseq      :     225.314 micros/op;    0.5 MB/s
+fillseqbatch :       6.949 micros/op;   15.9 MB/s
+fillrandom   :     242.685 micros/op;    0.5 MB/s
+fillrandbatch :     101.053 micros/op;    1.1 MB/s
+overwrite    :     384.204 micros/op;    0.3 MB/s
+readrandom   :       5.623 micros/op;
+readseq      :       1.685 micros/op;   56.6 MB/s
+readreverse  :       1.614 micros/op;   59.1 MB/s

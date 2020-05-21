@@ -1,0 +1,13 @@
+fs, circle.size.kb, opr, time.s
+CakeFS, 8388608, find, 0.891
+CakeFS, 4194304, find, 0.902
+CakeFS, 2097152, find, 0.886
+CakeFS, 1048576, find, 0.936
+CakeFS, 8388608, grep, 5.642
+CakeFS, 4194304, grep, 5.399
+CakeFS, 2097152, grep, 5.268
+CakeFS, 1048576, grep, 6.187
+
+
+
+

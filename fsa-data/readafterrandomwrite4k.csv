@@ -1,0 +1,121 @@
+fs, op, seq.or.rand, prev.write, size.MB, time.s, throughput.MBps
+
+ext4, write, seq, none, 10737.418240, 104.199946, 103.046294
+ext4, read, seq, seq, 10737.418240, 99.9276, 107
+ext4, write, random, seq, 40.950000, 111.162439, 0.368380
+ext4, read, seq, random, 10737.418240, 99.3135, 108
+
+ext4, write, seq, none, 10737.418240, 103.213333, 104.031310
+ext4, read, seq, seq, 10737.418240, 99.8981, 107
+ext4, write, random, seq, 40.950000, 111.141850, 0.368448
+ext4, read, seq, random, 10737.418240, 99.3967, 108
+
+ext4, write, seq, none, 10737.418240, 103.714556, 103.528556
+ext4, read, seq, seq, 10737.418240, 99.9221, 107
+ext4, write, random, seq, 40.950000, 111.189457, 0.368290
+ext4, read, seq, random, 10737.418240, 99.8546, 108
+
+ext4, write, seq, none, 10737.418240, 103.463868, 103.779401
+ext4, read, seq, seq, 10737.418240, 100.431, 107
+ext4, write, random, seq, 40.950000, 111.339352, 0.367794
+ext4, read, seq, random, 10737.418240, 99.3884, 108
+
+xfs, write, seq, none, 10737.418240, 101.725654, 105.552707
+xfs, read, seq, seq, 10737.418240, 99.4879, 108
+xfs, write, random, seq, 40.950000, 110.112187, 0.371893
+xfs, read, seq, random, 10737.418240, 100.454, 107
+
+xfs, write, seq, none, 10737.418240, 102.261227, 104.999896
+xfs, read, seq, seq, 10737.418240, 99.4713, 108
+xfs, write, random, seq, 40.950000, 111.581562, 0.366996
+xfs, read, seq, random, 10737.418240, 99.1549, 108
+
+xfs, write, seq, none, 10737.418240, 102.022563, 105.245526
+xfs, read, seq, seq, 10737.418240, 99.4333, 108
+xfs, write, random, seq, 40.950000, 111.580974, 0.366998
+xfs, read, seq, random, 10737.418240, 99.4213, 108
+
+xfs, write, seq, none, 10737.418240, 101.730989, 105.547172
+xfs, read, seq, seq, 10737.418240, 99.4546, 108
+xfs, write, random, seq, 40.950000, 111.394204, 0.367613
+xfs, read, seq, random, 10737.418240, 99.388, 108
+
+btrfs, write, seq, none, 10737.418240, 103.608591, 103.634439
+btrfs, read, seq, seq, 10737.418240, 103.342, 104
+btrfs, write, random, seq, 40.950000, 105.198695, 0.389263
+btrfs, read, seq, random, 10737.418240, 110.1, 97.5
+
+btrfs, write, seq, none, 10737.418240, 103.274310, 103.969886
+btrfs, read, seq, seq, 10737.418240, 102.876, 104
+btrfs, write, random, seq, 40.950000, 104.487758, 0.391912
+btrfs, read, seq, random, 10737.418240, 110.076, 97.5
+
+btrfs, write, seq, none, 10737.418240, 103.529413, 103.713698
+btrfs, read, seq, seq, 10737.418240, 104.241, 103
+btrfs, write, random, seq, 40.950000, 104.861083, 0.390517
+btrfs, read, seq, random, 10737.418240, 109.377, 98.2
+
+btrfs, write, seq, none, 10737.418240, 103.447161, 103.796161
+btrfs, read, seq, seq, 10737.418240, 102.227, 105
+btrfs, write, random, seq, 40.950000, 104.532764, 0.391743
+btrfs, read, seq, random, 10737.418240, 109.319, 98.2
+
+zfs, write, seq, none, 10737.418240, 141.535354, 75.863860
+zfs, read, seq, seq, 10737.418240, 112.014, 95.9
+zfs, write, random, seq, 40.950000, 113.891755, 0.359552
+zfs, read, seq, random, 10737.418240, 205.016, 52.4
+
+zfs, write, seq, none, 10737.418240, 138.094945, 77.753883
+zfs, read, seq, seq, 10737.418240, 105.638, 102
+zfs, write, random, seq, 40.950000, 125.043781, 0.327485
+zfs, read, seq, random, 10737.418240, 204.091, 52.6
+
+zfs, write, seq, none, 10737.418240, 139.540625, 76.948331
+zfs, read, seq, seq, 10737.418240, 113.844, 94.3
+zfs, write, random, seq, 40.950000, 136.059972, 0.300970
+zfs, read, seq, random, 10737.418240, 207.435, 51.8
+
+zfs, write, seq, none, 10737.418240, 138.596000, 77.472786
+zfs, read, seq, seq, 10737.418240, 114.119, 94.1
+zfs, write, random, seq, 40.950000, 125.264916, 0.326907
+zfs, read, seq, random, 10737.418240, 206.47, 52.0
+
+BetrFS-0.2, write, seq, none, 10737.418240, 113.425987, 94.664534
+BetrFS-0.2, read, seq, seq, 10737.418240, 125.302, 85.7
+BetrFS-0.2, write, random, seq, 40.950000, 1.123768, 36.439920
+BetrFS-0.2, read, seq, random, 10737.418240, 124.544, 86.2
+
+BetrFS-0.2, write, seq, none, 10737.418240, 117.133225, 91.668425
+BetrFS-0.2, read, seq, seq, 10737.418240, 123.604, 86.9
+BetrFS-0.2, write, random, seq, 40.950000, 1.355330, 30.214050
+BetrFS-0.2, read, seq, random, 10737.418240, 125.435, 85.6
+
+BetrFS-0.2, write, seq, none, 10737.418240, 114.912695, 93.439791
+BetrFS-0.2, read, seq, seq, 10737.418240, 122.422, 87.7
+BetrFS-0.2, write, random, seq, 40.950000, 1.179733, 34.711248
+BetrFS-0.2, read, seq, random, 10737.418240, 125.061, 85.9
+
+BetrFS-0.2, write, seq, none, 10737.418240, 114.048439, 94.147876
+BetrFS-0.2, read, seq, seq, 10737.418240, 122.555, 87.6
+BetrFS-0.2, write, random, seq, 40.950000, 1.368245, 29.928857
+BetrFS-0.2, read, seq, random, 10737.418240, 129.667, 82.8
+
+BetrFS-0.1, write, seq, none, 10737.418240, 380.422684, 28.224968
+BetrFS-0.1, read, seq, seq, 10737.418240, 150.473, 71.4
+BetrFS-0.1, write, random, seq, 40.950000, 2.604606, 15.722150
+BetrFS-0.1, read, seq, random, 10737.418240, 150.791, 71.2
+
+BetrFS-0.1, write, seq, none, 10737.418240, 381.344419, 28.156747
+BetrFS-0.1, read, seq, seq, 10737.418240, 146.837, 73.1
+BetrFS-0.1, write, random, seq, 40.950000, 2.267626, 18.058530
+BetrFS-0.1, read, seq, random, 10737.418240, 148.935, 72.1
+
+BetrFS-0.1, write, seq, none, 10737.418240, 380.971491, 28.184309
+BetrFS-0.1, read, seq, seq, 10737.418240, 151.116, 71.1
+BetrFS-0.1, write, random, seq, 40.950000, 2.463808, 16.620612
+BetrFS-0.1, read, seq, random, 10737.418240, 151.873, 70.7
+
+BetrFS-0.1, write, seq, none, 10737.418240, 381.679302, 28.132042
+BetrFS-0.1, read, seq, seq, 10737.418240, 143.69, 74.7
+BetrFS-0.1, write, random, seq, 40.950000, 2.814618, 14.549044
+BetrFS-0.1, read, seq, random, 10737.418240, 144.989, 74.1

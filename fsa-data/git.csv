@@ -1,0 +1,97 @@
+fs, op, time.s
+ext4, clone, 13.043
+ext4, clone, 10.883
+ext4, clone, 10.575
+ext4, clone, 10.016
+ext4, clone, 10.293
+ext4, clone, 12.384
+ext4, clone, 10.267
+ext4, clone, 11.083
+
+ext4, diff, 3.788
+ext4, diff, 4.156
+ext4, diff, 3.505
+ext4, diff, 3.441
+ext4, diff, 3.409
+ext4, diff, 3.788
+ext4, diff, 3.799
+ext4, diff, 3.424
+ext4, diff, 3.343
+
+xfs, clone, 10.754
+xfs, clone, 11.810
+xfs, clone, 12.24
+xfs, clone, 12.147
+xfs, clone, 11.322
+xfs, clone, 13.708
+xfs, clone, 12.478
+
+xfs, diff, 5.617
+xfs, diff, 4.360
+xfs, diff, 3.977
+xfs, diff, 5.709
+xfs, diff, 4.351
+xfs, diff, 4.319
+xfs, diff, 5.684
+
+btrfs, clone, 14.173
+btrfs, clone, 14.552
+btrfs, clone, 14.463
+btrfs, clone, 14.362
+
+btrfs, diff, 3.429
+btrfs, diff, 3.266
+btrfs, diff, 3.257
+btrfs, diff, 3.174
+
+zfs, clone, 16.721
+zfs, clone, 17.620
+zfs, clone, 14.900
+zfs, clone, 18.619
+zfs, clone, 14.242
+zfs, clone, 18.711
+zfs, clone, 18.553
+zfs, clone, 19.228
+zfs, clone, 19.045
+zfs, clone, 17.396
+zfs, clone, 19.045
+
+zfs, diff, 7.595
+zfs, diff, 7.445
+zfs, diff, 8.161
+zfs, diff, 8.369
+
+# fast16 submission:
+#BetrFS-0.2, clone, 16.703
+#BetrFS-0.2, clone, 16.802
+#BetrFS-0.2, clone, 16.504
+#BetrFS-0.2, clone, 16.482
+
+#BetrFS-0.2, diff, 2.305
+#BetrFS-0.2, diff, 2.356
+#BetrFS-0.2, diff, 2.284
+#BetrFS-0.2, diff, 2.434
+
+# with circle merge:
+BetrFS-0.2, clone, 16.310
+BetrFS-0.2, clone, 15.341
+BetrFS-0.2, clone, 14.276
+BetrFS-0.2, clone, 14.840
+
+BetrFS-0.2, diff, 2.277
+BetrFS-0.2, diff, 2.205
+BetrFS-0.2, diff, 2.243
+BetrFS-0.2, diff, 2.307
+
+BetrFS-0.1, clone, 24.078
+BetrFS-0.1, clone, 21.687
+BetrFS-0.1, clone, 25.196
+BetrFS-0.1, clone, 23.782
+BetrFS-0.1, clone, 22.432
+
+BetrFS-0.1, diff, 2.718
+BetrFS-0.1, diff, 2.707
+BetrFS-0.1, diff, 2.964
+BetrFS-0.1, diff, 3.319
+BetrFS-0.1, diff, 3.356
+

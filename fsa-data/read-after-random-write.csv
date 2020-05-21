@@ -1,0 +1,29 @@
+fs, op, seq.or.rand, prev.write, size.MB, time.s, throughput.MBps
+
+# BetrFS_seq_io_rename_2m has been renamed to BetrFS_v2
+# for the of purpose graphing
+
+ext4, write, seq, seq, 8589.934592, 82.055552, 104.684380
+ext4, read, seq, seq, 8589.934592, 79.068900, 109
+ext4, write, random, seq, 100.000000, 6047.517562, 0.016536
+ext4, read, seq, random, 8589.934592, 311.783, 27.6
+
+xfs, write, seq, seq, 8589.934592, 81.000558, 106.047844
+xfs, read, seq, seq, 8589.934592, 78.5939, 109
+xfs, write, random, seq, 100.000000, 6268.415199, 0.015953
+xfs, read, seq, random, 8589.934592, 350.74, 24.5
+
+btrfs, write, seq, seq, 8589.934592, 82.422404, 104.218443
+btrfs, read, seq, seq, 8589.934592, 82.2234, 104
+btrfs, write, random, seq, 100.000000, 4800.055478, 0.020833
+btrfs, read, seq, random, 8589.934592, 1470.77, 5.8
+
+zfs, write, seq, seq, 8589.934592, 112.909758, 76.077877
+zfs, read, seq, seq, 8589.934592, 87.0549, 98.7
+zfs, write, random, seq, 100.000000, 3250.685468, 0.030763
+zfs, read, seq, random, 8589.934592, 85.6148, 100
+
+BetrFS_v2, write, seq, seq, 8589.934592, 88.866354, 96.661269
+BetrFS_v2, read, seq, seq, 8589.934592, 105.09, 81.7
+BetrFS_v2, write, random, seq, 100.000000, 18.496155, 5.406529
+BetrFS_v2, read, seq, random, 8589.934592, 121.372, 70.8

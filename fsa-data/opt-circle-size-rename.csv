@@ -1,0 +1,27 @@
+fs, data.set, circle.size.4kb, op, dir.or.file, time.s
+# Moving 10 entities
+BetrFS_v2, linuxsrc, 2048, rename, file, 0.331
+BetrFS_v2, linuxsrc, 1024, rename, file, 0.271
+BetrFS_v2, linuxsrc, 512, rename, 0.313
+BetrFS_v2, linuxsrc, 256, rename, 0.266
+BetrFS_v2, linuxsrc, 128, rename, 0.321
+BetrFS_v2, linuxsrc, 64, rename, 0.357
+BetrFS_v2, linuxsrc, 32, rename, 0.289
+BetrFS_v2, linuxsrc, 16, rename, 0.322
+BetrFS_v2, linuxsrc, 8, rename, 0.310
+BetrFS_v2, linuxsrc, 4, rename, 0.272
+BetrFS_v2, linuxsrc, 2, rename, 0.200
+BetrFS_v2, linuxsrc, 1, rename, 0.158
+# Moving 100 entities
+BetrFS_v2, linuxsrc, 2048, rename, 1.469
+BetrFS_v2, linuxsrc, 1024, rename, 1.437
+BetrFS_v2, linuxsrc, 512, rename, 1.451
+BetrFS_v2, linuxsrc, 256, rename, 1.957
+BetrFS_v2, linuxsrc, 128, rename, 1.463
+BetrFS_v2, linuxsrc, 64, rename, 1.436
+BetrFS_v2, linuxsrc, 32, rename, 1.392
+BetrFS_v2, linuxsrc, 16, rename, 1.383
+BetrFS_v2, linuxsrc, 8, rename, 1.289
+BetrFS_v2, linuxsrc, 4, rename, 1.247
+BetrFS_v2, linuxsrc, 2, rename, 1.025
+BetrFS_v2, linuxsrc, 1, rename, 0.876

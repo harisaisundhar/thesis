@@ -1,0 +1,159 @@
+fs, dir.op, time.s
+ext4, "rm -rf", 2.716
+ext4, "rm -rf", 5.840
+ext4, "rm -rf", 4.156
+ext4, "rm -rf", 3.964
+
+ext4, rename, 0.156
+ext4, rename, 0.130
+ext4, rename, 0.226
+ext4, rename, 0.227
+
+ext4, grep, 51.966
+ext4, grep, 49.906
+ext4, grep, 47.475
+ext4, grep, 49.105
+
+ext4, find, 3.910
+ext4, find, 3.319
+ext4, find, 3.652
+ext4, find, 3.152
+
+xfs, "rm -rf", 6.281
+xfs, "rm -rf", 12.797
+xfs, "rm -rf", 7.761
+xfs, "rm -rf", 5.790
+
+xfs, rename, 0.093
+xfs, rename, 0.092
+xfs, rename, 0.092
+xfs, rename, 0.059
+
+xfs, grep, 67.784
+xfs, grep, 56.256
+xfs, grep, 59.728
+xfs, grep, 60.602
+
+xfs, find, 9.229
+xfs, find, 8.114
+xfs, find, 11.626
+xfs, find, 7.065
+
+btrfs, "rm -rf", 7.764
+btrfs, "rm -rf", 9.235
+btrfs, "rm -rf", 10.995
+btrfs, "rm -rf", 10.537
+
+btrfs, rename, 0.162
+btrfs, rename, 0.146
+btrfs, rename, 0.148
+btrfs, rename, 0.163
+
+btrfs, find, 4.825
+btrfs, find, 4.576
+btrfs, find, 4.159
+btrfs, find, 5.783
+
+btrfs, grep, 12.760
+btrfs, grep, 9.913
+btrfs, grep, 14.560
+btrfs, grep, 13.866
+
+zfs, "rm -rf", 13.280
+zfs, "rm -rf", 14.137
+zfs, "rm -rf", 13.172
+zfs, "rm -rf", 12.314
+
+zfs, rename, 0.155
+zfs, rename, 0.130
+zfs, rename, 0.131
+zfs, rename, 0.139
+
+zfs, grep, 42.965
+zfs, grep, 44.938
+zfs, grep, 42.588
+zfs, grep, 42.556
+
+zfs, find, 13.907
+zfs, find, 13.083
+zfs, find, 14.415
+zfs, find, 13.441
+
+BetrFS-0.1, "rm -rf", 46.221
+BetrFS-0.1, "rm -rf", 46.693
+BetrFS-0.1, "rm -rf", 44.608
+BetrFS-0.1, "rm -rf", 46.296
+BetrFS-0.1, "rm -rf", 46.882
+
+BetrFS-0.1, rename, 21.275
+BetrFS-0.1, rename, 20.660
+BetrFS-0.1, rename, 21.070
+BetrFS-0.1, rename, 22.481
+BetrFS-0.1, rename, 20.371
+
+BetrFS-0.1, grep, 3.632
+BetrFS-0.1, grep, 3.849
+BetrFS-0.1, grep, 4.015
+BetrFS-0.1, grep, 4.016
+BetrFS-0.1, grep, 4.232
+
+BetrFS-0.1, find, 0.423
+BetrFS-0.1, find, 0.390
+BetrFS-0.1, find, 0.323
+BetrFS-0.1, find, 0.332
+BetrFS-0.1, find, 0.323
+
+# fast16 submission:
+#BetrFS-0.2, "rm -rf", 2.369
+#BetrFS-0.2, "rm -rf", 2.339
+#BetrFS-0.2, "rm -rf", 2.360
+#BetrFS-0.2, "rm -rf", 2.314
+#BetrFS-0.2, "rm -rf", 2.569
+#BetrFS-0.2, "rm -rf", 3.044
+
+#BetrFS-0.2, rename, 0.172
+#BetrFS-0.2, rename, 0.128
+#BetrFS-0.2, rename, 0.137
+#BetrFS-0.2, rename, 0.156
+#BetrFS-0.2, rename, 0.175
+
+#BetrFS-0.2, grep, 5.466
+#BetrFS-0.2, grep, 4.927
+#BetrFS-0.2, grep, 4.703
+#BetrFS-0.2, grep, 4.777
+#BetrFS-0.2, grep, 4.954
+#BetrFS-0.2, grep, 4.746
+
+#BetrFS-0.2, find, 0.418
+#BetrFS-0.2, find, 0.362
+#BetrFS-0.2, find, 0.434
+#BetrFS-0.2, find, 0.398
+#BetrFS-0.2, find, 0.453
+#BetrFS-0.2, find, 0.476
+
+# with circle merge:
+BetrFS-0.2, "rm -rf", 2.250
+BetrFS-0.2, "rm -rf", 2.592
+BetrFS-0.2, "rm -rf", 2.152
+BetrFS-0.2, "rm -rf", 2.537
+BetrFS-0.2, "rm -rf", 2.342
+
+BetrFS-0.2, rename, 0.133
+BetrFS-0.2, rename, 0.145
+BetrFS-0.2, rename, 0.133
+BetrFS-0.2, rename, 0.134
+BetrFS-0.2, rename, 0.105
+
+BetrFS-0.2, grep, 5.860
+BetrFS-0.2, grep, 6.018
+BetrFS-0.2, grep, 5.785
+BetrFS-0.2, grep, 5.718
+BetrFS-0.2, grep, 5.644
+BetrFS-0.2, grep, 5.627
+
+BetrFS-0.2, find, 0.413
+BetrFS-0.2, find, 0.370
+BetrFS-0.2, find, 0.329
+BetrFS-0.2, find, 0.330
+BetrFS-0.2, find, 0.320
+
