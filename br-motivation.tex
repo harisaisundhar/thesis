@@ -1,11 +1,9 @@
-% !TEX root =  paper.tex
-
-\section{Ball Recycling and Insertion/Update Buffers}\label{sec:motivation}
+\section{Ball Recycling and Insertion/Update Buffers}\label{sec:br-motivation}
 
 Ball recycling models insertion and update buffers, which are widely used in
 modern databases~\cite{Azure16, IBM17, Xiang12, Informix, Callaghan11, NuDB16,
 Oracle17, SAP17, Vertica17,DBLP:conf/vldb/CanimMBLR10,DBLP:journals/pvldb/BenderFJKKMMSSZ12}. These implementations are
-discussed in more detail in \Cref{sec:experiments}.
+discussed in more detail in \cref{sec:br-experiments}.
 
 For a key-value store, such as a database, an \defn{insertion buffer} is a
 cache of recently inserted items.  When the insertion buffer fills, the
@@ -68,8 +66,8 @@ It is known that:
 For $B = \omega(\log{n})$, we can subdivide $B$ into intervals of $\log{n}$
 points, each of which will satisfy the lemma. Adding together the resulting
 bounds, we have that the maximal $B$-spacing of $n$ points is $O(B/n)$ with
-probability 1. Together with \Cref{lem:leaf-b-spacing}, this implies
-\Cref{lem:uniform-leaves}.
+probability 1. Together with \cref{lem:leaf-b-spacing}, this implies
+\cref{lem:uniform-leaves}.
 
 We also note that an (almost-uniform) ball-recycling game is an imperfect model
 for an insertion buffer, because the ball-recycling game has a fixed number of

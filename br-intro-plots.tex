@@ -3,7 +3,7 @@
 \begin{figure*}
 {\centering
 \ref{intro_legend}
-\subfloat[First million insertions]{
+   \begin{subfigure}{0.49\linewidth}
 \tikzsetnextfilename{intro-buffer-initial}
 	\begin{tikzpicture}%[trim axis left, trim axis right]
 \begin{axis}[
@@ -30,7 +30,8 @@
 \end{tikzpicture}
 \label{fig:introbufferinitial}
 }
-\subfloat[All fifty million insertions] {
+   \end{subfigure}
+   \begin{subfigure}{0.49\linewidth}
 \tikzsetnextfilename{intro-buffer}
 \begin{tikzpicture}%[trim axis left, trim axis right]
 \begin{axis}[
@@ -51,6 +52,7 @@
 	\addplot [mark=pentagon*, RoyalPurple, mark size=2, each nth point={10}] table [x expr=\thisrowno{0}/1000000, y expr=\thisrowno{1} / 10000, col sep=comma] {./data/intro/buffer_on/output.txt};
 \end{axis}
 \end{tikzpicture}
+   \end{subfigure}
 \label{fig:introbuffer}
 }
 	\caption{The cost of inserting batches of rows into an empty
