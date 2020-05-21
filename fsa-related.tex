@@ -28,7 +28,7 @@ measuring aging, and for mitigating aging.
 
 \subsection{Creating Aged File Systems}
 
-The seminal work of Smith and Seltzer~\cite{SmithSe97} created a
+The seminal work of Smith and Seltzer~\cite{DBLP:conf/sigmetrics/SmithS97} created a
 methodology for 
 simulating and measuring aging on a file system---leading
 to more representative benchmark results than 
@@ -57,7 +57,7 @@ file systems with representative levels of aging.
 Other tools have been subsequently developed for
 synthetically aging a file system.
 In order to measure NFS performance,
-TBBT~\cite{ZhuChCh05} was designed 
+TBBT~\cite{DBLP:conf/fast/ZhuCC05} was designed 
 to synthetically age a disk 
 to create a initial state for NFS trace replay.
 %% initial \fixmemfc{what does ``initial'' mean in this context?},
@@ -72,7 +72,7 @@ to create a initial state for NFS trace replay.
 %namespace hierarchy, then interleaves synthetic operations so that
 %allocations are more fragmented.}
 
-The Impressions framework~\cite{AgrawalArAr09} was designed so that
+The Impressions framework~\cite{DBLP:journals/tos/AgrawalAA09} was designed so that
 users can synthetically age a 
 file system by setting a small number of parameters,
 %% Impressions~\cite{AgrawalArAr09} is a framework for creating and
@@ -98,10 +98,11 @@ workloads that induce fragmentation.
 
 
 Smith and Seltzer also introduced a \defn{layout score} for studying aging,
-which was used by subsequent studies~\cite{ahn02mascots,AgrawalArAr09}. Their
+which was used by subsequent
+studies~\cite{DBLP:conf/mascots/AhnKCP02,DBLP:journals/tos/AgrawalAA09}. Their
 layout score is the fraction of file blocks that are placed in consecutive
 physical locations on the disk. We introduce a variation of this measure, the
-\defn{dynamic layout score} in \secref{metrics}.
+\defn{dynamic layout score} in \cref{sec:fsa-metrics}.
 
 %\mfc{Don't we explain this in detail
 %  later?  If so, then we can shorten this to a forward reference, to a
@@ -113,33 +114,23 @@ physical locations on the disk. We introduce a variation of this measure, the
 %allows for the OS to perform some collalescing of requests. }
 
 The \defn{degree of fragmentation} (\defn{DoF}) is used in the study of
-fragmentation in mobile devices~\cite{JiChSh16}. DoF is the ratio of the actual
-number of extents, or ranges of contiguous physical blocks, to the ideal number
-of extents.  Both the layout score and DoF measure how one file is fragmented.
-
-\iffalse
-\fixme{BILL: do any
-  fragmentation tools report layout scores?  e2fsprogs?}\fixmeac{I
-  checked the man pages quickly for e2fsprogs, and I don't think they
-  do}\fixme{Yang: Just to mention it contains tools for reporting file
-  fragmentation, so one can probably calculate from there. Another
-  thing, there is one paper "The Effects of Filesystem Fragmentation"
-  describing some theoretic fragmentation but mainly on video files
-  (so they are big)}
-\fi
+fragmentation in mobile devices~\cite{DBLP:conf/hotstorage/JiCSWLX16}. DoF is
+the ratio of the actual number of extents, or ranges of contiguous physical
+blocks, to the ideal number of extents.  Both the layout score and DoF measure
+how one file is fragmented.
 
 Several studies have reported file system statistics
 % that can be used to reason about aging
 such as number of files, distributions of
 file sizes and types, and organization of file system
-namespaces~\cite{AgrawalBoDo07,Downey01,RoselliLoAn01}.
+namespaces~\cite{DBLP:journals/tos/AgrawalBDL07,DBLP:conf/mascots/Downey01,DBLP:conf/usenix/RoselliLA00}.
 %\fixme{BILL: validate some of these and choose:
 %  a five-year study of file system metadata,
 %  structural cause of file size distributions,
 %  a comparison of file system workloads,
 %  a study of file sizes and functional lifetimes}
 %These statistics can be used as parameters to aging frameworks like TBBT and Impressions~\cite{ZhuChCh05,AgrawalArAr09}.
-These statistics can inform parameter choices in aging frameworks like TBBT and Impressions~\cite{ZhuChCh05,AgrawalArAr09}.
+These statistics can inform parameter choices in aging frameworks like TBBT and Impressions~\cite{DBLP:conf/fast/ZhuCC05,DBLP:journals/tos/AgrawalAA09}.
 %For example, as we describe
 %later on, the file-size distribution can have an impact on fragmentation.
 

@@ -12,7 +12,7 @@ system changes, so performing a Git pull may result in the creation of new
 source files, deletion of old files, file renames, and file modifications.  Git
 also maintains its own internal data structures, which it updates during pulls.
 Thus, Git performs many operations which are similar to those shown in
-\secref{microbenchmarks} that cause file system aging.
+\cref{sec:fsa-microbenchmarks} that cause file system aging.
 
 We present a git benchmark that performs 10,000 pulls from the Linux git repository, starting
 from the initial commit. After every 100 pulls, the benchmark performs a recursive grep
@@ -61,7 +61,7 @@ than several other file systems.  We believe this is because the average file
 size decreases over the course of the test, and these file systems are not as
 well-tuned for small files.  To test this hypothesis, we constructed
 synthetic workloads similar to the interfile fragmentation microbenchmark
-(\secref{microbenchmarks}), but varied the file size (in the microbenchmark it
+(\cref{sec:fsa-microbenchmarks}), but varied the file size (in the microbenchmark it
 was uniformly 4KB). 
 Figure~\ref{fig:git:filesize} shows both the measured, average file
 size of the git workload (one point is one pull), and the microbenchmark.

@@ -239,7 +239,7 @@ to be rewritten.  Thus, B-trees are usually implemented with small
 leaves.  Consequently, we expect them to age under a wide variety of
 workloads.
 
-In~\secref{git}, we show that the aging of \btrfs is inversely
+In~\cref{sec:-fsa-git}, we show that the aging of \btrfs is inversely
 related to the size of the leaves, as predicted.  There are, in
 theory, ways to mitigate the aging due to B-tree leaf movements.  For
 example, the leaves could be stored in a packed memory
@@ -248,36 +248,6 @@ incur an unacceptable performance overhead to keep the leaves arranged
 in logical order, and we know of no examples of B-trees implemented
 with such leaf-arrangement algorithms.
 
-\iffalse
-When using blocks of NTS, small updates
-may cause very large reads and rewrites.
-%is that generally such
-%blocks will be quite large---4\mb is reasonable for hard drives for example---so
-%that when making small writes and updates, a large block must be
-%re-sequentialized and written. Thus a small logical write ends up generating a
-%large write to disk, a process known as ``write amplification.''
-In general, this creates a trade-off between read and write performance,
-which we demonstrate empirically in the \btrfs file system
-by varying the node size (\secref{btrfs_node}).
-%We
-%experimentally demonstrate the tradeoff of block size on both read performance
-%and write amplification when using \btrfs in 
-
-\fi
-
-
-\iffalse
-\tightpara{Packed Memory Arrays.}
-Another way to prevent large block sizes from leading to excessive
-write-amplification is to strategically leave spaces between the data inside
-each block. This allows for small writes, updates and deletions to occur within
-those spaces. By dynamically maintaining this structure, the data can be kept
-relatively sequentially and with room for small modifications. This is the
-basic principle behind the Packed Memory Array (PMA)~\cite{BenderDeFa05},
-a data structure
-which provides strong guarantees as to both the write-amplification incurred
-and the sequentiality of the data in the block.
-\fi
 
 \tightpara{Write-Once or Update-in-Place Filesystems.}  
 When data is written once and never moved, such as in update-in-place file
