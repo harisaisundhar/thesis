@@ -1,0 +1,108 @@
+% !TEX root =  paper.tex
+
+\begin{figure}[h!]
+{\centering
+\hspace*{33pt}\ref{full_distro_legend}\\
+\tikzsetnextfilename{insertion-sim-max}
+	\begin{tikzpicture}%[trim axis left, trim axis right]
+		\begin{axis}[
+			%title=Uniform Key Distribution,
+			xlabel=Rows inserted in millions,
+			xlabel near ticks,
+			ylabel=Ratio of maximum leaf weight to $1/n$,
+			ylabel near ticks,
+			xmin=0,
+			xmax=5,
+			ymin=1,
+			mark repeat={25},
+			legend to name=full_distro_legend,
+			legend columns=2,
+			]
+			\addplot [mark=*, Blue, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./data/simulations/noop_uni.csv};
+			\addlegendentry{Uniform}
+			\addplot [mark=triangle*, Cyan, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./data/simulations/noop_par5.csv};
+			\addlegendentry{Pareto $\alpha=0.5$}
+			\addplot [mark=square*, Plum, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./data/simulations/noop_par1.csv};
+			\addlegendentry{Pareto $\alpha=1.0$}
+			\addplot [mark=diamond*, Magenta, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./data/simulations/noop_par2.csv};
+			\addlegendentry{Pareto $\alpha=2.0$}
+			\addplot [mark=x, YellowOrange, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./data/simulations/noop_norm.csv};
+			\addlegendentry{Normal}
+			%\legend{Uniform, Zipf $\alpha = 0.5$, Zipf $\alpha = 1.0$, Zipf $\alpha = 1.5$, Zipf $\alpha = 2.0$}
+		\end{axis}
+	\end{tikzpicture}
+\caption{Deviation of the maximum weight leaf from uniform in simulation}
+\label{fig:simalpha}
+}
+\end{figure}
+
+\begin{figure}
+{\centering
+\hspace*{35pt}\ref{full_distro_legend}\\
+\subfloat[Maximum leaf weight relative to uniform]{
+\tikzsetnextfilename{insertion-inno-max}
+\begin{tikzpicture}%[trim axis left, trim axis right]
+\begin{axis}[
+	%title=Uniform Key Distribution,
+    width=0.47\textwidth,
+	xlabel=Rows inserted in millions,
+	xlabel near ticks,
+	ylabel near ticks,
+	ylabel=Ratio of maximum leaf weight to $1/n$,
+	xmin=0,
+	xmax=5,
+	ymin=1,
+	mark repeat={25},
+	legend columns=2,
+	legend to name=distro_legend
+	]
+	\addplot [mark=*, Blue, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./data/innodb/randomball_uniform_1.0.csv};
+	\addlegendentry{Uniform}
+	\addplot [mark=triangle*, Cyan, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./data/innodb/randomball_pareto_0.5.csv};
+	\addlegendentry{Pareto $\alpha=0.5$}
+	\addplot [mark=square*, Plum, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./data/innodb/randomball_pareto_1.0.csv};
+	\addlegendentry{Pareto $\alpha=1.0$}
+	\addplot [mark=diamond*, Magenta, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./data/innodb/randomball_normal_1000.0.csv};
+	\addlegendentry{Pareto $\alpha=2.0$}
+	\addplot [mark=x, YellowOrange, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./data/innodb/randomball_normal_1000.0.csv};
+	\addlegendentry{Normal}
+	%\legend{Uniform, Zipf $\alpha = 0.5$, Zipf $\alpha = 1.0$, Zipf $\alpha = 1.5$, Zipf $\alpha = 2.0$}
+\end{axis}
+\end{tikzpicture}
+\label{fig:alpha}
+}\hfill
+\subfloat[95th percentile leaf weight relative to uniform]{
+\tikzsetnextfilename{insertion-inno-95}
+\begin{tikzpicture}%[trim axis left, trim axis right]
+\begin{axis}[
+	%title=Uniform Key Distribution,
+	width=0.47\textwidth,
+	xlabel=Rows inserted in millions,
+	xlabel near ticks,
+	ylabel near ticks,
+	ylabel=Ratio of 95th percentile leaf weight to $1/n$,
+	xmin=0,
+	xmax=5,
+	ymin=1,
+	mark repeat={25}
+	]
+	\addplot [mark=*, Blue, mark size=2] table [x=insertions, y=perc, col sep=comma] {./data/innodb/randomball_uniform_1.0.csv};
+	\addplot [mark=triangle*, Cyan, mark size=2] table [x=insertions, y=perc, col sep=comma] {./data/innodb/randomball_pareto_0.5.csv};
+	\addplot [mark=square*, Plum, mark size=2] table [x=insertions, y=perc, col sep=comma] {./data/innodb/randomball_pareto_1.0.csv};
+	\addplot [mark=diamond*, Magenta, mark size=2] table [x=insertions, y=perc, col sep=comma] {./data/innodb/randomball_pareto_2.0.csv};
+	\addplot [mark=x, YellowOrange, mark size=2] table [x=insertions, y=perc, col sep=comma] {./data/innodb/randomball_normal_1000.0.csv};
+	%\legend{Uniform, Zipf $\alpha = 0.5$, Zipf $\alpha = 1.0$, Zipf $\alpha = 1.5$, Zipf $\alpha = 2.0$}
+\end{axis}
+\end{tikzpicture}
+\label{fig:perc}
+}
+	\caption{Deviation of the maximum and 95th percentile weight leaves from uniform as observed in \innodb{}.}\label{fig:deviation}
+}
+\end{figure}
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:

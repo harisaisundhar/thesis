@@ -1,0 +1,336 @@
+% !TEX root =  paper.tex
+
+\secput{uniform}{The Uniform Case}
+
+The results of \Cref{sec:nonuniform} hold for any distribution of the balls
+into the bins. In this section we consider the special case where they are
+uniformly distributed, which models insertion buffers as discussed in
+\Cref{sec:motivation}.  We then show that \GG and \FB are optimal, up to
+lower-order terms, in this setting, whereas \RB is at least $1/2$- and at most
+$(1-\epsilon)$-optimal, for some constant $\epsilon>0$.
+
+For a ball-recycling game with uniformly distributed balls,
+\Cref{lem:upperbound} implies:
+\begin{corollary}\label{cor:uniformupperbound}
+	Consider a ball-recycling game with $m$ balls, $n$ bins and uniform
+	distribution $\uni$. For any recycling strategy $A$, 
+	\[\mathcal{R}^A \leq \frac{2m+n-1}{n} < 2\frac{m}{n} + 1.\]
+\end{corollary}
+
+The average number of balls in a bin is $m/n$, so \Cref{cor:uniformupperbound}
+suggests that any ``reasonable'' strategy will be at least $1/2$-optimal in the
+uniform case.
+
+We now show that \GG and \FB are within an additive constant of optimal on strictly
+uniform distributions.
+
+\begin{lemma}\label{lem:unilowerbound}
+	\GG and \FB each recycle at least $2m/(n+1)$ balls per round in
+	expectation.
+\end{lemma}
+
+\begin{proof}
+	Let $S$ be the random variable denoting the number of balls thrown in a
+	given round with \GG. \GG will recycle the bins in order starting from the
+	next one and cycling around. Therefore, we can consider the collection of
+	bins to be a queue. After throwing the balls, the average place in the
+	queue in which a ball lands is the $\left[(n-1)/s\right]$th bin, due to
+	uniformity. Each ball thrown will therefore sit for an average of at most
+	$(n-1)/2$ rounds before it is thrown again. Therefore,
+	$m-\E{S}\leq\E{S}(n-1)/2$, and we have the result after solving for
+	$\E{S}$.
+
+	Let $T$ be the random variable denoting the number of balls thrown in a
+	given round with \FB. If after removing the balls in the \FB, we list the
+	bins in order of fullness, we can again think of the bins as a sort of
+	queue.  When we throw the balls, the average place in the queue which a
+	ball lands is the $\left[(n-1)/2\right]$th bin as above, due to uniformity.
+	Now, we reorder the bins back into fullness order.  During the reordering
+	more balls are moved up the queue than down, thus each ball thrown into the
+	system will sit for an average of less than $(n-1)/2$ rounds before it is
+	thrown again. Therefore, as above, $m-\E{S}\leq\E{S}(n-1)/2$, and we are
+	done.
+\end{proof}
+
+\Cref{cor:uniformupperbound} and \Cref{lem:unilowerbound}
+together prove \Cref{thm:fullestbin}. Despite these strong
+performance bounds, recall that \FB can perform arbitrarily badly on
+non-uniform $\p$. \RB on the other hand is always $\Theta(1)$-optimal.
+
+\subsection{\RB in the Uniform Case}
+
+However, \RB{} does not achieve this level of optimality on uniform
+distributions. In this section we will show in \Cref{thm:rbuniform} that \RB
+recycles at most $1+(2-\epsilon)m/n$ balls per round in expectation, for some
+$\epsilon > 0$.  The upper bound is given in \Cref{lem:rbuni-upper} and
+\Cref{cor:rbuni-upper-constants}, and the lower bound is given in
+\Cref{lem:rbuni-lower}.
+
+We begin with the following lemma:
+
+\begin{lemma}\label{lem:pair-flow}
+	Let $\chi^\textrm{RB}$ be the stationary distribution relative to \RB,
+	$R^\textrm{RB}(X)$ the random variable of how many balls \RB recycles from
+	ball configuration $X$, and $\mathcal{R}^\textrm{RB} =
+	\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)}$ the expected recycle rate
+	of \RB. Then,
+	\[ \frac{\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2}}{\mathcal{R}^\textrm{RB}} = \frac{2m+n-1}{n+1} \leq 1 + \frac{2m}{n}. \]
+\end{lemma}
+
+\begin{proof}
+	Consider the random variable of the number of distinct unordered pairs of
+	balls which are in the same bin in $\chi^\textrm{RB}$. In expectation, a
+	round of \RB eliminates 
+	\[\binom{\mathcal{R}^\textrm{RB}}{2}\]
+	and creates
+	\[\sum_{k=0}^{\mathcal{R} - 1} \frac{m - \mathcal{R}^\textrm{RB} + k}{n}\]
+	such pairs. In the stationary distribution, these must be equal, so
+	\begin{multline*}
+		\frac{\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2}}{2} - \frac{\mathcal{R}^\textrm{RB}}{2} \\
+		= \frac{(2m-1)\mathcal{R}^\textrm{RB}}{2n} - \frac{\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2}}{2n}.
+	\end{multline*}
+	After rearranging we have the result.
+\end{proof}
+
+\begin{lemma}\label{lem:rbuni-upper}
+	There exists a constant $\alpha > 0$ such that \RB is at most
+	$(1-\alpha)$-optimal.
+\end{lemma}
+
+\begin{proof}
+	Let $\chi^\textrm{RB}$ be the stationary distribution relative to \RB,
+	$R^\textrm{RB}(X)$ the random variable of how many balls \RB recycles from
+	ball configuration $X$, and $\mathcal{R}^\textrm{RB} =
+	\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)}$ the expected recycle rate
+	of \RB.  We will prove the result by contradiction, so assume that for all 
+	constant $\epsilon > 0$
+	\[\mathcal{R}^\textrm{RB} \geq 1 + \frac{(2-\epsilon)m}{n}.\]
+
+	Let $c\in(1,2)$ be a constant to be determined later. We say a bin is
+	\defn{light} if it contains at most $cm/n$ balls. Let $L$ be the random
+	variable of the number of balls in light bins in the stationary
+	distribution. Then the probability $q_L$ that \RB recycles a light bin in
+	the stationary distribution is $\E{L}/m$. We proceed by cases.
+
+{\bf Case 1.} Suppose $\E{L} \geq \delta m$ for some constant $\delta > 0$. Then $q_L \geq \delta$ and for $c \leq 2 - 2\epsilon$ and $\epsilon < 1/2$,
+\begin{align*}
+	\Var{R^\textrm{RB}\left(\chi^\textrm{RB}\right)} 
+	&= \E{\left(R^\textrm{RB}\left(\chi^\textrm{RB}\right) - \mathcal{R}^\textrm{RB}\right)^2}  \\
+	&\ge q_L \left(1+\frac{(2-\epsilon)m}{n}-\frac{cm}{n}\right)^2 \\
+%	&\ge \delta(2-\epsilon-c)^2 \frac{m^2}{n^2} + \\ &2\delta(2-\epsilon-c)\frac{m}{n}+\delta \\
+	&\ge \frac{\epsilon^2\delta}{4} \left(\frac{4m^2}{n^2}+\frac{4m}{n}+1\right) \\
+	&\ge \frac{\epsilon^2 \delta}{4} \left(\mathcal{R}^\textrm{RB}\right)^2. \label{eqn:varFl}
+\end{align*}
+
+Thus by the definition of variance, we have
+\begin{equation*}
+	\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2} \ge \left(1+\frac{\epsilon^2\delta}{4}\right)\left(\mathcal{R}^\textrm{RB}\right)^2. \label{eqn:expF2l}
+\end{equation*}
+	Now by \Cref{lem:pair-flow},
+\begin{equation*}
+	\mathcal{R}^\textrm{RB} \le \left(1+\frac{\epsilon^2\delta}{4}\right)^{-1}\left(1+\frac{2m}{n}\right).
+\end{equation*}
+Since $\epsilon, \delta$ are constants greater than $0$, we have our contradiction for
+	the first case. 
+
+\medskip 
+
+{\bf Case 2.} Otherwise, $\E{L} < \delta m$. Since $L \in [0, m]$, $\E{L^2} <
+	\delta m^2$. \Cref{lem:pair-flow} implies $\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2} \le (1+2m/n)^2$. Together H\"{o}lder's inequality we have
+\begin{align}
+	\E{LR^\textrm{RB}\left(\chi^\textrm{RB}\right)}
+	&\le \left(\E{L^2}\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2}\right)^{1/2} \nonumber \\
+	&< \left(\delta m^2 \left(1+\frac{2m}{n}\right)^2\right)^{1/2} \nonumber\\
+	&= \sqrt{\delta} m\left(1 + \frac{2m}{n}\right) \label{eqn:expLFu}
+\end{align}
+
+	Let $Y$ be the random variable of the number of balls in the stationary
+	distribution which start in a light bins, but end up begin among the first
+	$1 + cm/n$ balls in a heavy bin after an application of \RB.  Let $\Phi$
+	be the random variable of the number of distinct unordered pairs of balls
+	that are in the same light bin in the stationary distribution. Applying \RB
+	in expectation creates at most
+	\begin{multline*}
+          \E{\sum_{k=0}^{\mathcal{R}^\textrm{RB}-1}\frac{L + k}{n}} \\
+		  = \E{\frac{2LR^\textrm{RB}\left(\chi^\textrm{RB}\right) + R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2 - R^\textrm{RB}\left(\chi^\textrm{RB}\right)}{2n}}
+	\end{multline*}
+	such pairs, and eliminates at least
+	\[ \E{\frac{Y}{1+\frac{cm}{n}}\binom{1+\frac{cm}{n}}{2}}.\]
+	In the stationary distribution these quantities must be equal, so
+	rearranging together with Equation~\eqref{eqn:expLFu}, we have
+	
+\begin{align*}
+	\E{Y} 
+	&\le \frac{2\E{LR^\textrm{RB}\left(\chi^\textrm{RB}\right)} + \E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2} - \mathcal{R}^\textrm{RB}}{cm} \nonumber \\
+	&< \frac{2\sqrt{\delta}}{c}\left(1+\frac{2m}{n}\right) + \frac{\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2} - \mathcal{R}^\textrm{RB}}{cm} \\
+	&<\left(1+\frac{2m}{n}\right)\left(\frac{2\sqrt{\delta}}{c}+\frac{2}{cn}\right),  
+\end{align*}
+where we have used \Cref{lem:pair-flow} for the last inequality.
+
+We now compute the effect on $\E{L}$ of applying \RB to the stationary
+distribution.  By Markov's inequality, there must be more than $(1-1/c)n$ light
+bins, and so the probability that a ball is thrown into a light bin is more
+than $1-1/c$. Therefore, at least $(1-1/c)\mathcal{R}^\textrm{RB}$ balls land
+in light bins in expectation. We expect at most $\E{Y}$ balls to be in light
+bins which turn into heavy bins. Finally, we recycle at most $cm/n$ balls from
+a light bin $\E{L}/m$ of the time. Since the net change to $L$ must be $0$ in
+expectation,
+\[\left(1-\frac{1}{c}\right)\mathcal{R}^\textrm{RB} < \frac{c}{n}\E{L} + \E{Y}.\]
+
+However, this is a contradiction. Indeed, the LHS is at least 
+$$
+\left(1-\frac{1}{c}\right)\left(1+\frac{(2-\epsilon)m}{n}\right),
+$$
+but the RHS is less than
+$$
+\delta c \frac{m}{n} + \left(1+\frac{2m}{n}\right)\left(\frac{2\sqrt{\delta}}{c}+\frac{2}{cn}\right).
+$$
+Thus, if we pick a sufficiently small $\delta > 0$, $\epsilon = 0.01$, $c=1.98$
+and $n\geq 3$, we have a contradiction. For $n \le 2$, the contradiction follows
+immediately from \Cref{lem:pair-flow}.
+\end{proof}
+
+\begin{corollary}\label{cor:rbuni-upper-constants}
+	Setting
+	\begin{equation*}
+		(\epsilon, c, \delta) = (0.001, 1.456, 0.042)
+	\end{equation*}
+	in the proof of \Cref{thm:rbuniform}, we obtain 
+	\begin{equation*}
+		\mathcal{R}^\textrm{RB} < 1 + 1.994\frac{m}{n}.
+	\end{equation*}
+\end{corollary}
+
+\begin{lemma}\label{lem:rbuni-lower} For all $c > 0$, there exists a
+  $c'$ such that if $m \ge c' n\log n$, the uniform random ball policy
+  has expected recycle rate at least   
+$$
+ 	\left(1+\frac{1}{6^4} - c\right)\frac{m}{n}.
+$$
+\end{lemma}
+
+\begin{proof}
+	Let $X_{t, k}$ be the random variable denoting the number of balls in the
+	$k$th bin at the beginning of the $t$th round. Because of symmetry,
+	$X_{t, k}$ follows the same distribution as $X_{t, \ell}$ for any $k \ne
+	\ell$.  For simplicity, we let $X_t$ be a random variable that follows the
+	same distribution as $X_{t, k}$ for all $k$. 
+
+	We pick $t$ to be sufficiently large so that the system enters its
+	stationary state after $t$ rounds. Thus, $X_t$ and $X_{t'}$ follows the
+	same distribution for any $t' > t$.
+
+	Let $Y_t$ be the random variable denoting the number of balls recycled in
+	the $t$th round. By definition, we have
+	$$ \E{Y_t} = \sum_{1 \le k \le n}\frac{\E{X_{t, k}^2}}{m} =
+	\frac{n}{m} \left( \E{X_t}^2 + \Var{X_t} \right).  $$
+	Note that $\E{X_t} = m/n$, and so $\E{Y_t} \ge m/n$. 
+
+	To show $\E{Y_t}$ deviates from $m/n$, we derive a lower bound for
+	$\Var{X_t}$.
+
+	If $\Prob{X_t \le (1-\epsilon)m/n} \ge \delta$, then $\E{Y_t} \ge
+	(1+\epsilon^2\delta)m/n$.
+
+	Otherwise $\Prob{X_t > (1-\epsilon)m/n } > 1-\delta$. We will show that if
+	$\delta$ is small enough, then this case does not exist. 
+		
+	We say a bin is {\em heavy} if it has more than $(1-\epsilon)m/n$ balls.
+	Let $Z_t$ be the random variable denoting the number of heavy bins at the
+	beginning of the $t$th round. We have
+	\begin{equation*}
+		\E{Z_t} = \sum_{1 \le k \le n} \E{\ind{X_{t, k} >
+		(1-\epsilon)\frac{m}{n}}} > (1-\delta) n.
+	\end{equation*}
+	$Z_t$ is a non-negative variable in $[0, n]$ and has expected value more
+	than $(1-\delta)n$. By Markov's inequality,
+	\begin{equation*}
+		\Pr[Z_t \le (1-2\delta)n] < \frac{1}{2} \mbox{ and } \Pr[Z_t >
+		(1-2\delta)n] > \frac{1}{2}.
+	\end{equation*}
+
+	We compute $\E{Z_{t+n/2}}$ from the $Z_t$. If $Z_t > (1-2\delta)n$
+	for some constant $\delta < 1/4$, the following hold during $P$, the time
+	period between the $t$th round and the $(t+n/2)$th round:
+
+	\begin{enumerate}
+		\item At least $(1/2-2\delta)n$ bins in $H_t$ are recycled, 
+		\item At least $(1/2-2\delta)(1-\epsilon)m$ balls are recycled,
+		\item At least $(1/2-2\delta)n$ bins in $H_t$ are not recycled,
+	\end{enumerate}
+	where $H_t$ denotes the set of heavy bins at the beginning of the $t$th
+	round.
+
+	Given (c), we can find a subset $S_t \subset H_t$ that is composed of
+	$(1/2-2\delta)n$ bins in $H_t$ not recycled during $P$.  Note that which
+	bins are recycled and which are not depend on the random choices made by the
+	system. Hence, $S_t$ varies.  
+		
+	Next, we derive a lower bound on the expected number of balls in any $S_t$.
+	The balls which stay in $S_t$ come from two different sources. There are
+	those that stay in $S_t$ at the beginning of the $t$th round, of which
+	there are at least $|S_t|(1-\epsilon)m/n$.  There are also those which are
+	recycled during $P$, of which there are at least
+	$|S_t|(1-\epsilon')|B|/n$ by \Cref{lem:MinBin}, to follow.  Combining the
+	two sources, the expected number of balls in $S_t$ is at least
+	\begin{equation*}
+		\Gamma = (1-\epsilon)\left( \left(\frac{1}{2}-2\delta\right) +
+		\left(\frac{1}{2}-2\delta\right)^2(1-\epsilon')\right)m.
+	\end{equation*}
+
+	\begin{lemma}\label{lem:MinBin}
+	Let $B$ be the multiset of the first $(1/2-2\delta)(1-\epsilon)m$ balls
+	recycled during $P$. $B$ is well-defined thanks to 2.\ above. Let $L_i$ be
+	the random variable denoting the number of balls in $B$ that land on the
+	$i$th bin. For all $\epsilon' > 0$, there exists a $c'$ such
+        that if $m \ge c' n \log n$
+		\begin{equation*}
+			\E{\min\{L_1, L_2, \ldots, L_n\}} \ge (1-\epsilon')|B|/n.
+		\end{equation*}
+	\end{lemma}
+	\begin{proof}
+		For $i \in [1,n]$, $\E{L_i} = |B|/n$.
+		By Chernoff bounds, 
+		$$
+			\Pr[|L_i-\E{L_i}| \ge (\epsilon'/2) \E{L_i}] \le \frac{1}{n^2} 
+		$$
+		for some sufficiently large $c'$. Consequently, by the union bound,
+		$$
+			\Pr[\min\{L_1, L_2, \ldots, L_n\} \le (1-\epsilon'/2)|B|/n] \le \frac{1}{n}.
+		$$
+		Because the $L_i$'s are non-negative, we are done. 
+	\end{proof}
+
+	Given $\Gamma$, we obtain the following bound:
+	\begin{multline*}
+		\E{Z_{t+n/2} \given Z_t > (1-2\delta)n} \le |S_t| + \frac{m-\Gamma}{(1-\epsilon)m/n} \\
+		\begin{aligned} &= \left(\frac{1}{1-\epsilon} - \left(\frac{1}{2}-\delta\right)^2(1-\epsilon')\right) n \\
+		&\approx \left(\frac{3}{4}+\epsilon+\delta\right) n \end{aligned}
+	\end{multline*}
+	Together with the trivial bound $\E{Z_{t+n/2} \given Z_t \le (1-2\delta)n}
+	\le n$,  $\E{Z_{t+n/2}}$ equals
+	\begin{multline*}
+		\Prob{Z_t \le (1-2\delta)}\E{Z_{t+n/2} \given Z_t \le (1-2\delta)} \\
+		+ \Prob{Z_t > (1-2\delta)}\E{Z_{t+n/2} \given Z_t > (1-2\delta)} \\
+		\begin{aligned} &< \frac{1}{2} \left( 1 + \left(\frac{3}{4}+\epsilon+\delta\right) \right) n\\
+		&\approx \left(\frac{7}{8} + \frac{\epsilon+\delta}{2}\right) n \end{aligned}
+	\end{multline*}
+		
+	This leads to a contradiction if $\epsilon+\delta$ is small enough.  This
+	is because we have $\E{Z_t} > (1-\delta)n$ and $\E{Z_{t+n/2}} = \E{Z_t}$,
+	because the system is stationary.  As a result, we have a contradiction if
+	$\frac{\epsilon+3\delta}{2} < \frac{1}{8}$.
+
+	Combining the results for the two cases, we wish to maximize
+	$1+\epsilon^2\delta$ subject to $\epsilon+3\delta < \frac{1}{4}.$ Picking
+	$\epsilon = 1/6$ yields the result.
+\end{proof}
+
+\Cref{thm:rbuniform} follows from
+\Cref{cor:rbuni-upper-constants,lem:rbuni-lower,cor:uniformupperbound}.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:

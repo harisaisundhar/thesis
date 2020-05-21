@@ -1,0 +1,101 @@
+% !TEX root =  paper.tex
+
+\secput{related}{Related Work}
+
+Balls-and-bins games are one of the most studied models in all of computer
+science, so it would be impossible to do justice to the entire literature here.
+Rather, we focus on prior work on \defn{dynamic} balls-and-bins games.  In
+dynamic balls-and-bins games, balls are added and removed from bins according
+to some rules, and the goal is to understand the long-term behavior of the
+system.  Thus, ball-recycling games are instances of this general class,
+although previously studied dynamic balls-and-bins games are quite different,
+and are typically used to study load-balancing problems, rather than
+throughput.
+
+Previously studied models differ from ball-recycling games in several
+ways: 
+\begin{itemize}
+\item The process for removing balls is assumed to be random, e.g. a
+  random ball is removed, or a random bin is selected for emptying.
+  Prior research has assumed these events are determined by some
+  external process, so they have not studied algorithms for
+  controlling this process.  As a result, although the theory of
+  Markov chains has played a major role in the study of balls-and-bins
+  games, the theory of Markov decision processes, which we use
+  extensively, has not shown up at all.
+\item The balls are thrown uniformly randomly.  This is a natural
+  assumption for hashing and randomized load-balancing problems, but
+  is not appropriate when studying updates to existing keys in a
+  database.
+\item The objective is to analyze the occupancy of the fullest bin or,
+  in some models, to analyze the amount of time that balls wait in a
+  queue.  Our objective is to analyze the number of balls recycled in
+  each time step.
+\item The number of balls in the system is not fixed.  Prior models
+  were used for load balancing, in which balls correspond to tasks and
+  bins resources, so it makes sense to model new balls entering the
+  system asynchronously.  In our setting, the balls are the
+  resource (i.e. they correspond to slots in a buffer), so
+  they are fixed.
+\item The study of dynamic balls-and-bins games was introduced
+  simultaneously with the study of the power of multiple
+  choices~\cite{AzarBrKa94}, and most past work on dynamic
+  balls-and-bins games has been in the same model.  In our model,
+  balls have only a single choice (i.e. their on-disk location),
+  although it may be possible to extend our work to systems in which
+  each ball has multiple choices (e.g. for an insertion buffer for an
+  on-disk cuckoo hash table).
+\end{itemize}
+
+Azar, et al.~\cite{AzarBrKa94} introduced both the power of two
+choices and dynamic balls and bins games.  They showed that if, at
+each time step, a random ball is rethrown with $d$ uniformly random
+choices, then, in $n^3$ time steps, the fullest bin has $\ln \ln n /
+\ln d + O(1)$ balls w.h.p.
+
+In his dissertation~\cite{Mitzenmacher96}, Mitzenmacher studied several dynamic
+load-balancing problems.  This included several variants on the supermarket
+model, in which balls arrive according to a Poisson process and enqueue
+themselves in the shortest of $d$ queues that they select uniformly randomly
+from $n$ queues.  Mitzenmacher showed that $d>1$ exponentially reduced the
+average time a ball spent in a queue.  He also studied a variant in which, at
+each time step, one ball was removed from one queue and was immediately
+re-enqueued according to the above procedure.  Adler, et al.~\cite{AdlerBeSc98}
+studied a variant of the supermarket model in which balls arrived in batches of
+size $m$ and chose their queues in parallel, and showed that the average
+waiting time remains $O(\ln \ln n)$ as long as $m$ is sufficiently smaller than
+$n$.
+
+Cole, et al.~\cite{ColeFrMa98} studied a model in which balls are recycled
+one-at-a-time according to a recycling plan chosen in advance.  In their model,
+% density-dependent jump Markov processes.
+there are an infinite number of labeled balls, and the adversary specifies in
+advance two ball IDs for each time step: the first ID specifies a ball to be
+removed from the system, and the second ID specifies a ball to be inserted.
+Thus the number of balls currently in the system is always $n$.  The first time
+a ball is inserted, it chooses $d$ bins uniformly at random and picks the least
+loaded. From then on, whenever that ball reenters the system, it always goes
+into that bin.  In their model, the adversary cannot examine the state of the
+current system when deciding which ball to recycle, as in our model.  Given
+this restriction, they show that the fullest bin has roughly $\ln \ln n / \ln
+d$ balls.  V\"{o}cking~\cite{Voecking03} showed the shocking result that, by
+choosing bins non-uniformly and breaking ties asymmetrically, the max load
+could be reduced to $\ln \ln n / d\ln\phi_d+O(1)$ w.h.p.
+
+Cole, et al.~\cite{ColeMaMe98} extended their results to routing through a
+network: an adversary specified in advance the start time, end time, source,
+and destination of flows, and the system used a power of two choices variant of
+Valiant's randomized routing paradigm~\cite{ValiantBr81} to limit congestion to
+$O(\ln \ln n)$ w.h.p.
+
+Czumaj and Stemann~\cite{CzumajSt97} study a load balancing problem in which,
+at each time step, a random ball is removed from the system and a new ball is
+thrown using $d$ choices.  After the new ball is inserted, the $d$ bins
+examined during its insertion are rebalanced.  Surprisingly, the max load is
+still $O(\ln \ln n)$.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:

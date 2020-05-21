@@ -1,0 +1,41 @@
+--------------------------------------------------------------------------------
+- COMPLETED
+--------------------------------------------------------------------------------
+
+TODO:
+
+
+- In the proof of Lemma 4.4, the step from (6) to (7). I fail to see why this
+  is an inequality rather than an equality. After all, \sum_j f_j E[Z(\chi^A)
+  \mid \phi_j] = E[Z]. For the last term in (6), you say that R^A_j should be
+  the random variable of how many balls are recycled given the jth bin is
+  chosen by A. This doesn't really make sense to me, since then in the
+  calculation we would compare an expectation with a random variable, so I
+  assume you mean the conditional expectation instead of the random variable.
+  (As it was in Lemma 4.2.) But then \sum_j f_j R^A_j = R^A, so we should have
+  equality.
+
+So I think that Equation (9) should be an equality, and the inequality only
+comes in the next step (10). 
+
+- Lemma 4.2: In the text, R^A should be R^A_L.
+- Lemma 4.5: One of the p is typeset in non-bold, same in Lemma 4.6.
+- Lemma 4.6: Does the term "stateless" includes "deterministic"? Otherwise your
+  notation needs some explanation.
+- Corollary 5.1: The second = should be \leq as well.
+
+Writing is the weakest part of the paper. It seems that paper has suffered a
+lot by moving very relevant things to the appendix. 
+In particular, Appendix A
+is almost a must-read. 
+Many of the basic concepts or notations have not been
+clearly defined (stateless at page 7, the notion of (AX)_j), and there is also
+very confusing referencing back and forth which requires constant flips back
+and forth. Furthermore, some of the statements seems inconsistent. Proof of
+Lemma 4.1 is referred to the appendix but in the appendix there is no clear
+proof and it feels like a mess! Lemma A.2 certainly needs more than just one
+line for its proof and notion of “ergodic” is thrown in there without ever
+being defined!
+
+- Section 2. When you mention the work of Vöcking, you forgot to refer to the
+  paper [41].

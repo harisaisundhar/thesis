@@ -1,0 +1,284 @@
+\begin{thebibliography}{10}
+
+\bibitem{AdlerBeSc98}
+M.~Adler, P.~Berenbrink, and K.~Schr{\"o}der.
+\newblock Analyzing an infinite parallel job allocation process.
+\newblock In {\em ESA '98}.
+
+\bibitem{AdlerChMi98}
+M.~Adler, S.~Chakrabarti, M.~Mitzenmacher, and L.~Rasmussen.
+\newblock Parallel randomized load balancing.
+\newblock {\em Random Structures \& Algorithms}, 13(2):159--188, 1998.
+
+\bibitem{AzarBrKa94}
+Y.~Azar, A.~Broder, A.~Karlin, and E.~Upfal.
+\newblock Balanced allocations.
+\newblock In {\em STOC '94}, pages 593--602.
+
+\bibitem{Azure16}
+M.~Azure.
+\newblock How to use batching to improve {SQL} database application
+  performance.
+\newblock
+  \url{https://docs.microsoft.com/en-us/azure/sql-database/sql-database-use-batching-to-improve-performance},
+  2016.
+
+\bibitem{BenderFaFi07}
+M.~A. Bender, M.~Farach-Colton, J.~T. Fineman, Y.~Fogel, B.~Kuszmaul, and
+  J.~Nelson.
+\newblock Cache-oblivious streaming {B}-trees.
+\newblock In {\em SPAA}, pages 81--92, 2007.
+
+\bibitem{benderadaptivebloom}
+M.~A. Bender, M.~Farach-Colton, M.~Gowami, R.~Johnson, S.~McCauley, and
+  S.~Singh.
+\newblock Bloom filters, adaptivity, and the dictionary problem.
+\newblock In {\em FOCS '18}.
+
+\bibitem{BenderFaJo12}
+M.~A. Bender, M.~Farach-Colton, R.~Johnson, R.~Kraner, B.~C. Kuszmaul,
+  D.~Medjedovic, P.~Montes, P.~Shetty, R.~P. Spillane, and E.~Zadok.
+\newblock Don’t thrash: How to cache your hash on flash.
+\newblock {\em {PVLDB}}, 5(11):1627--1637, 2012.
+
+\bibitem{BenjaminiMa12}
+I.~Benjamini and Y.~Makarychev.
+\newblock Balanced allocation: Memory performance tradeoffs.
+\newblock {\em Ann. Appl. Probab.}, 22(4):1642--1649, 08 2012.
+
+\bibitem{BerenbrinkFrKl16}
+P.~Berenbrink, T.~Friedetzky, P.~Kling, F.~Mallmann-Trenn, L.~Nagel, and
+  C.~Wastell.
+\newblock Self-stabilizing balls \& bins in batches: The power of leaky bins
+  [extended abstract].
+\newblock In {\em PODC}, pages 83--92, 2016.
+
+\bibitem{BringmannSaSt16}
+K.~Bringmann, T.~Sauerwald, A.~Stauffer, and H.~Sun.
+\newblock Balls into bins via local search: Cover time and maximum load.
+\newblock {\em Random Structures \& Algorithms}, 48(4):681--702, 2016.
+
+\bibitem{BrodalDeFi10}
+G.~S. Brodal, E.~D. Demaine, J.~T. Fineman, J.~Iacono, S.~Langerman, and J.~I.
+  Munro.
+\newblock Cache-oblivious dynamic dictionaries with update/query tradeoffs.
+\newblock In {\em SODA '10}.
+
+\bibitem{BrodalFa03}
+G.~S. Brodal and R.~Fagerberg.
+\newblock Lower bounds for external memory dictionaries.
+\newblock In {\em SODA '03}.
+
+\bibitem{Callaghan10}
+M.~Callaghan.
+\newblock An obscure performance problem with the insert buffer.
+\newblock
+  \url{https://www.facebook.com/notes/mysql-at-facebook/an-obscure-performance-problem-with-the-insert-buffer/479735920932/},
+  2010.
+
+\bibitem{Callaghan11}
+M.~Callaghan.
+\newblock Something awesome in {InnoDB} -- the insert buffer.
+\newblock
+  \url{https://www.facebook.com/notes/mysql-at-facebook/something-awesome-in-innodb-the-insert-buffer/492969385932/},
+  2011.
+
+\bibitem{CanimLaMi10}
+M.~Canim, C.~A. Lang, G.~A. Mihaila, and K.~A. Ross.
+\newblock Buffered bloom filters on solid state storage.
+\newblock In {\em ADMS}, 2010.
+
+\bibitem{ColeFrMa98}
+R.~Cole, A.~Frieze, B.~M. Maggs, M.~Mitzenmacher, A.~W. Richa, R.~Sitaraman,
+  and E.~Upfal.
+\newblock On balls and bins with deletions.
+\newblock In {\em RANDOM '98}.
+
+\bibitem{ColeMaMe98}
+R.~Cole, B.~M. Maggs, F.~Meyer auf~der Heide, M.~Mitzenmacher, A.~W. Richa,
+  K.~Schr\"{o}der, R.~K. Sitaraman, and B.~V\"{o}cking.
+\newblock Randomized protocols for low-congestion circuit routing in multistage
+  interconnection networks.
+\newblock In {\em STOC}, pages 378--388, 1998.
+
+\bibitem{ConwayBa17}
+A.~Conway, A.~Bakshi, Y.~Jiao, W.~Jannen, Y.~Zhan, J.~Yuan, M.~A. Bender,
+  R.~Johnson, B.~C. Kuszmaul, D.~E. Porter, and M.~Farach-Colton.
+\newblock File systems fated for senescence? nonsense, says science!
+\newblock In {\em FAST '17}.
+
+\bibitem{conway_et_al:LIPIcs:2018:9043}
+A.~Conway, M.~Farach-Colton, and P.~Shilane.
+\newblock {Optimal Hashing in External Memory}.
+\newblock In {\em ICALP '18}.
+
+\bibitem{CzumajSt97}
+A.~Czumaj and V.~Stemann.
+\newblock Randomized allocation processes.
+\newblock In {\em FOCS '97}, pages 194--203.
+
+\bibitem{DeheuvelsDe84}
+P.~Deheuvels and L.~Devroye.
+\newblock Strong laws for the maximal $k$-spacing when $k \le c \log n$.
+\newblock {\em Zeitschrift f{\"u}r Wahrscheinlichkeitstheorie und Verwandte
+  Gebiete}, 66(3):315--334, 1984.
+
+\bibitem{esmet2012tokufs}
+J.~Esmet, M.~A. Bender, M.~Farach-Colton, and B.~C. Kuszmaul.
+\newblock The tokufs streaming file system.
+\newblock In {\em Hot Storage '12}.
+
+\bibitem{farach-Colton:2009}
+M.~Farach-Colton, R.~J. Fernandes, and M.~A. Mosteiro.
+\newblock Bootstrapping a hop-optimal network in the weak sensor model.
+\newblock {\em ACM Trans. Algorithms}, 5(4):37:1--37:30, Nov. 2009.
+
+\bibitem{Foundation17}
+M.~{Foundation}.
+\newblock {MariaDB Foundation}, 2017.
+\newblock \url{https://mariadb.org}.
+
+\bibitem{IBM17}
+IBM.
+\newblock Buffered inserts in partitioned database environments.
+\newblock
+  \url{https://www.ibm.com/support/knowledgecenter/SSEPGG_10.5.0/com.ibm.db2.luw.apdv.embed.doc/doc/c0061906.html},
+  2017.
+
+\bibitem{Informix}
+I.~Informix.
+\newblock Understanding {SQL} insert cursors.
+
+\bibitem{JannenYuZh15}
+W.~Jannen, J.~Yuan, Y.~Zhan, A.~Akshintala, J.~Esmet, Y.~Jiao, A.~Mittal,
+  P.~Pandey, P.~Reddy, L.~Walsh, M.~Bender, M.~Farach-Colton, R.~Johnson, B.~C.
+  Kuszmaul, and D.~E. Porter.
+\newblock {BetrFS}: A right-optimized write-optimized file system.
+\newblock In {\em FAST '15}.
+
+\bibitem{JannenYuZh15a}
+W.~Jannen, J.~Yuan, Y.~Zhan, A.~Akshintala, J.~Esmet, Y.~Jiao, A.~Mittal,
+  P.~Pandey, P.~Reddy, L.~Walsh, M.~A. Bender, M.~Farach-Colton, R.~Johnson,
+  B.~C. Kuszmaul, and D.~E. Porter.
+\newblock {BetrFS:} write-optimization in a kernel file system.
+\newblock {\em Trans. Storage}, 11(4):18:1--18:29, Nov. 2015.
+
+\bibitem{Kallenberg16}
+L.~Kallenberg.
+\newblock Markov decision processes.
+\newblock 2016.
+
+\bibitem{Mitzenmacher96a}
+M.~Mitzenmacher.
+\newblock Load balancing and density dependent jump markov processes.
+\newblock In {\em FOCS '96}.
+
+\bibitem{Mitzenmacher98}
+M.~Mitzenmacher.
+\newblock On the analysis of randomized load balancing schemes.
+\newblock In {\em SPAA '98}, pages 292--301.
+
+\bibitem{MitzenmacherRiSi00}
+M.~Mitzenmacher, A.~W. Richa, and R.~Sitaraman.
+\newblock The power of two random choices: A survey of techniques and results.
+\newblock In {\em Handbook of Randomized Computing}, pages 255--312. Kluwer,
+  2000.
+
+\bibitem{Mitzenmacher96}
+M.~D. Mitzenmacher.
+\newblock {\em The Power of Two Choices in Randomized Load Balancing}.
+\newblock PhD thesis, Citeseer, 1996.
+
+\bibitem{NuDB16}
+NuDB.
+\newblock Nudb: A fast key/value insert-only database for ssd drives in c++11.
+\newblock \url{https://github.com/vinniefalco/NuDB}, 2016.
+
+\bibitem{Oracle17}
+Oracle.
+\newblock Tuning the database buffer cache.
+\newblock
+  \url{https://docs.oracle.com/database/121/TGDBA/tune_buffer_cache.htm#TGDBA294},
+  2017.
+
+\bibitem{Oracle17a}
+{Oracle, Inc.}
+\newblock Introduction to innodb, 2017.
+\newblock
+  \url{https://dev.mysql.com/doc/refman/5.6/en/innodb-introduction.html}.
+
+\bibitem{Oracle17b}
+{Oracle, Inc.}
+\newblock {MySQL}, 2017.
+\newblock \url{https://www.mysql.com}.
+
+\bibitem{ONeilChGa96}
+P.~O’Neil, E.~Cheng, D.~Gawlick, and E.~O’Neil.
+\newblock The log-structured merge-tree (lsm-tree).
+\newblock {\em Acta Informatica}, 33(4):351--385, 1996.
+
+\bibitem{Park17}
+G.~Park.
+\newblock A generalization of multiple choice balls-into-bins: Tight bounds.
+\newblock {\em Algorithmica}, 77(4):1159--1193, Apr 2017.
+
+\bibitem{PetrovaOlMa10}
+M.~Petrova, N.~Olano, and P.~M\"{a}h\"{o}nen.
+\newblock Balls and bins distributed load balancing algorithm for channel
+  allocation.
+\newblock In {\em WONS '10}.
+
+\bibitem{SAP17}
+SAP.
+\newblock Rlv data store for write-optimized storage.
+\newblock
+  \url{http://help-legacy.sap.com/saphelp_iq1611_iqnfs/helpdata/en/a3/13783784f21015bf03c9b06ad16fc0/content.htm},
+  2017.
+
+\bibitem{Tokutek14}
+{Tokutek, Inc.}
+\newblock {TokuDB} and {TokuMX}, 2014.
+\newblock \url{http://www.tokutek.com}.
+
+\bibitem{ValiantBr81}
+L.~G. Valiant and G.~J. Brebner.
+\newblock Universal schemes for parallel communication.
+\newblock In {\em STOC '81}, pages 263--277.
+
+\bibitem{Vertica17}
+Vertica.
+\newblock Wos (write optimized store).
+\newblock
+  \url{https://my.vertica.com/docs/7.1.x/HTML/Content/Authoring/Glossary/WOSWriteOptimizedStore.htm},
+  2017.
+
+\bibitem{Voecking03}
+B.~V\"{o}cking.
+\newblock How asymmetry helps load balancing.
+\newblock {\em J. ACM}, 50(4):568--589, July 2003.
+
+\bibitem{WestZaWa16}
+R.~West, P.~Zaroo, C.~Waldspurger, X.~Zhang, and H.~Zheng.
+\newblock Online computation of cache occupancy and performance, July~19 2016.
+\newblock US Patent 9,396,024.
+
+\bibitem{Xiang12}
+J.~Xiang.
+\newblock Apache hbase write path.
+\newblock \url{http://blog.cloudera.com/blog/2012/06/hbase-write-path/}, 2012.
+
+\bibitem{YuanZhJa16}
+J.~Yuan, Y.~Zhan, W.~Jannen, P.~Pandey, A.~Akshintala, K.~Chandnani, P.~Deo,
+  Z.~Kasheff, L.~Walsh, M.~Bender, M.~Farach-Colton, R.~Johnson, B.~C.
+  Kuszmaul, and D.~E. Porter.
+\newblock Optimizing every operation in a write-optimized file system.
+\newblock In {\em FAST '16}, pages 1--14.
+
+\bibitem{YuanZhJa17}
+J.~Yuan, Y.~Zhan, W.~Jannen, P.~Pandey, A.~Akshintala, K.~Chandnani, P.~Deo,
+  Z.~Kasheff, L.~Walsh, M.~Bender, M.~Farach-Colton, R.~Johnson, B.~C.
+  Kuszmaul, and D.~E. Porter.
+\newblock Optimizing every operation in a write-optimized file system.
+\newblock {\em Trans. Storage}, 13(1), 2017.
+
+\end{thebibliography}

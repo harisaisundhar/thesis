@@ -1,0 +1,476 @@
+% !TEX root =  paper.tex
+
+\secput{nonuniform}{Random Ball is Optimal}
+
+In this section we prove \Cref{thm:random-opt}, showing that \RB{} is
+$\Theta(1)$-optimal. 
+
+\subsecput{nonuni-outline}{Outline of Proof}
+We prove \Cref{thm:random-opt} in the following steps:
+\begin{enumerate}
+	\item No recycling strategy has a recycling rate exceeding
+		$(2m+n-1)/\halfnorm{\p}$. (\secref{upper-statement})
+	\item \RB{} matches that bound when $m \geq n$, leading to case (1) of
+		\Cref{thm:random-opt}. (\secref{randomballwithmanyballs})
+	\item There is an $\Theta(1)$-optimal strategy, \AE{}, when $m < n$. The
+		recycling rate of \AE matches case (2) of \Cref{thm:random-opt}.
+		(\secref{randomballaggroempty})
+	\item By comparison to \AE{}, \RB{} is $\Theta(1)$-optimal when $m < n$.
+		(\secref{rboptproof})
+\end{enumerate}
+
+\subsecput{upper-statement}{The Upper Bound}
+We begin by proving an important lemma that will be used throughout, which we
+refer to as the \defn{flow equation}. Then we proceed to prove the upper bound.
+
+Let $A$ be a stateless strategy with stationary distribution $\chi^{A,\p}$. Let
+$\phi_i$ be the event that $A$ picks bin $i$ to recycle. Let $\mathcal{R}_i^A =
+E[R^A(\chi^{A,\p}) | \phi_i]$ be the number of balls recycled given that the
+strategy picks bin $i$, and $f_i = P(\phi_j)$, the probability of picking the
+bin $i$ in the stationary distribution. We note that $\mathcal{R}_i^A$ and
+$f_i$ could alternatively be defined as limits of repeated applications of $A$
+to any given starting state.
+
+For a given bin $i$, we can analyze the ``flow'' of balls into and out of $i$.
+When $k$ balls are thrown, $\p_ik$ of them are expected to land in $i$. For a
+ball to leave $i$, $i$ must first be picked to be emptied by $A$, at which
+point every ball in $i$ will be evicted. In the stationary distribution, the
+net flow must be zero.  We can generalize to any set of bins and get:
+
+\begin{lemma} \label{lem:gen-flow-equation}
+	Let $A$ be a statelss strategy for a ball-recycling game with $n$ bins with
+	probabilities $\p$. If $L$ is a subset of the bins, $\p_L = \sum_{\ell \in
+	L} \p_\ell$, $f_L = \sum_{\ell \in L} f_\ell$ and $\mathcal{R}_L^A$ the
+	conditional recycle rate given $A$ picks a bin in $L$, then
+	\begin{equation}
+		\p_L\mathcal{R}^A = f_L\mathcal{R}_L^A.
+	\end{equation}
+\end{lemma}
+
+We will mostly use the following special case of the
+\Cref{lem:gen-flow-equation}: 
+
+\begin{lemma}[The Flow Equation] \label{lem:flow-equation}
+	Let $A$ be a statless recycling strategy for a ball-recycling game with $n$
+	bins with probabilities $\p$.  Then, for all $0\leq i < n$,
+	\begin{equation}
+		\p_i\mathcal{R}^A = f_i\mathcal{R}_i^A.
+	\end{equation}
+\end{lemma}
+
+We now describe the main upper bound on the recycling rate of any recycling
+strategy. In order to understand the intuition behind \Cref{lem:freqbound},
+consider a given bin $i$. Intuitively, it makes sense to think that for a
+reasonable recycling strategy the recycling rate of the other bins in the
+system will go down as the number of balls $X_i$ in bin $i$ grows.  After all,
+the $X_i$ balls in bin $i$ aren't available for recycling, until bin $i$ is
+selected. If we assume this intuition as fact for the moment, this suggests
+that the expected number of balls in bin $i$ should be greater than half the
+recycling rate of bin $i$, perhaps excluding the last ball to land in the bin.
+
+By the Flow Equation, this would suggest that
+\[ \E{X_i} \geq \frac{1}{2}(\mathcal{R}_i^A - 1) =
+\frac{1}{2}\left(\frac{\p_i}{f_i}\mathcal{R}^A - 1\right), \]
+so that after summing over $i$, we obtain \Cref{lem:freqbound}.
+
+However, the following strategy does not satisfy this assumption: for a given
+bin $i$, have the strategy just pick the least full non-empty bins until $i$
+has a few balls, then pick the fullest ones, then pick $i$ and repeat. Showing
+that better strategies do not do this is non-trivial, and we prove
+\Cref{lem:freqbound} by different means.
+
+\begin{lemma}\label{lem:freqbound}
+	Consider a ball-recycling game with $m$ balls, $n$ bins and distribution
+	$\p$. If $A$ is a stateless strategy that picks bin $i$ with frequency
+	$f_i$, then its recycle rate is bounded by
+	\begin{equation}
+		\mathcal{R}^A \leq \frac{2m+n-1}{\sum_j\frac{\p_j}{f_j}}.
+	\end{equation}
+\end{lemma}
+
+Given a strategy $A$, the idea of the proof is to use the invariance of the
+statistic
+\begin{equation}
+	Z(X) = \sum_{j = 1}^n \frac{X_j^2}{\p_j},
+\end{equation}
+under the action of $A$ on its stationary distribution. The application of $A$
+to $Z$ together with the flow equation creates a factor of $\sum_j
+\mathcal{R}_j$, which when solved for proves the bound. First, we begin with
+some foundational lemmas, and then proceed to prove the main results.
+
+\begin{lemma}
+	Suppose $k$ balls are thrown into $n$ bins i.i.d.\ according to distribution
+	$\mathbf{p}$. Let $B(j,k)$ be the binomial random variable denoting how
+	many balls land in the $j$th bin.  The following hold:
+	\begin{gather}
+		\E{B(j,k)} = \p_jk \\
+		\E{(B(j,k))^2} = \p_j(1-\p_j)k + \p_j^2k^2
+	\end{gather}
+\end{lemma}
+
+\begin{proof}
+	$B(j,k)$ is a binomial random variable with parameters $\p_j$ and $k$.
+\end{proof}
+
+Next, given a state $X$, we compute the effect of recycling the $\ell$th bin on
+the $j$th component of $Z$. Note that if $A$ recycles bin $\ell$ of state $X$,
+then $X_\ell = R^A(X)$.
+\begin{lemma}
+	In a ball-recycling game with $m$ balls, $n$ bins and probability
+	distribution $\mathbf{p}$, if a strategy $A$ recycles bin $\ell$ in state
+	$X$, then for $j \neq \ell$,
+	\begin{multline}
+		\E{(AX)_j^2}=X_j^2 + 2X_j\p_jR^A(X) \\
+		+ \p_j(1-\p_j)R^A(X) + \p_j^2R^A(X)^2,
+	\end{multline}
+	where $R^A(X) = X_\ell$ is the number of balls recycled.
+\end{lemma}
+
+\begin{proof}
+	\begin{align*}
+		\E{(AX)_j^2} &= \E{(X_j+B(j,R^A(X)))^2} \\[1ex]
+					 &= \begin{multlined}[t] X_j^2 + 2X_j\E{B(j,R^A(X))}\\
+						 +\E{B(j,R^A(X))^2} \end{multlined} \\[1ex]
+					 &= \begin{multlined}[t] X_j^2 + 2X_j\p_jR^A(X)\\+\p_j(1-\p_j)R^A(X)
+						 + \p_j^2\left(R^A(X)\right)^2 \end{multlined}
+	\end{align*}
+\end{proof}
+
+We now can use this result to compute the result of applying $A$ to $Z$. 
+\begin{lemma}
+	In a ball-recycling game with $m$ balls, $n$ bins and probability
+	distribution $\mathbf{p}$, if a strategy $A$ recycles bin $\ell$ in state
+	$X$, then
+	\begin{multline}
+		\E{Z(AX)}=Z(X) - \left(1+\frac{1}{\p_\ell}\right)\left(R^A(X)\right)^2 \\
+		+ (2m+n-1)R^A(X)
+	\end{multline}
+\end{lemma}
+
+\begin{proof}
+	\begin{align*}
+		\E{Z(AX)} 
+		&= \sum_{j=1}^n \E{(AX)_j^2/\p_j} \\
+		&= \frac{\E{(AX)_\ell^2}}{\p_\ell} + \sum_{j \neq \ell} \frac{\E{(AX)_j^2}}{\p_j} \\
+		&= \begin{multlined}[t][6.25cm](1-\p_\ell)R^A(X) + \p_\ell\left(R^A(X)\right)^2 \\[0.75ex]
+			\vspace*{-1.5ex}\shoveleft[0.25cm]{+ \sum_{j \neq \ell} \left( X_j^2/\p_j + 2X_jR^A(X)} \vphantom{\left(R^A(X)\right)^2}\right.\\
+			\left.+ (1-\p_j)R^A(X) + \p_j\left(R^A(X)\right)^2 \right) \end{multlined} \\
+		&= Z(X) - \left(2 + \frac{1}{\p_\ell}\right)\left(R^A(X)\right)^2 + 2mR^A(X) \\
+		&\qquad+ \sum_j \left((1-\p_j)R^A(X) + \p_j\left(R^A(X)\right)^2\right) \\
+		&= \begin{multlined}[t]Z(X) - \left(1+\frac{1}{\p_\ell}\right)\left(R^A(X)\right)^2 \\
+			+ (2m+n-1)R^A(X) \end{multlined}
+	\end{align*}
+\end{proof}
+
+Now, we can prove \Cref{lem:freqbound}.
+
+\begin{proof}[Proof of \Cref{lem:freqbound}]
+	Let $\chi^A$ be the stationary distribution relative to $A$. Let $\phi_j$
+	be the event that $A$ recycles the $j$th bin of $\chi^A$, $R_j^A$ the
+	random variable of how many balls are recycled given the $j$th bin is
+	chosen by $A$, $\mathcal{R}_j^A=\E{R_j^A}$ and $f_j$ the probability that
+	$A$ recycles that bin.  Because $\chi^A = A\chi^A$ by definition, we must
+	have $\E{Z(A\chi^A)} = \E{Z(\chi^A)}$. Therefore:
+
+	\begin{align*}
+	\E{Z(\chi^A)} &= \E{Z(A\chi^A)}\\
+	  			  &= \sum_j f_j \E{Z(A\chi^A)|\phi_j} \\
+				  &= \begin{multlined}[t][6.5cm]\sum_j f_j \left(\E{Z(\chi^A)|\phi_j}
+					  \vphantom{\left(1+\frac{1}{\p_j}\right)} \right. \\
+					  - \left(1+\frac{1}{\p_j}\right)\E{\left(R_j^A\right)^2} \\
+					  \left. \vphantom{\left(1+\frac{1}{\p_j}\right)} + (2m+n-1)\mathcal{R}_j^A\right) \end{multlined} \\
+				  &\leq \begin{multlined}[t][6.5cm]\E{Z(\chi^A)} + (2m+n-1)\mathcal{R}^A \\
+					  - \sum_j f_j\left(1 +\frac{1}{\p_j}\right)\left(\mathcal{R}_j^A\right)^2 \end{multlined} \\
+				  &= \begin{multlined}[t][6.5cm]\E{Z(\chi^A)} + (2m+n-1)\mathcal{R}^A \\
+					  - \sum_j \frac{1}{f_j}\left(\p_j^2 +\p_j\right)\left(\mathcal{R}^A\right)^2, \end{multlined}
+	\end{align*}
+	where the inequality is due to the Cauchy-Schwartz Inequality and the last
+	line is because of the Flow Equation.
+	
+	Thus we have:
+	\begin{align*}
+		\mathcal{R}^A &\leq \frac{2m+n-1}{\sum_j \frac{1}{f_j}\left(\p_j^2 +\p_j\right)} \\
+					&\leq \frac{2m+n-1}{\sum_j \frac{\p_j}{f_j}}
+	\end{align*}
+\end{proof}
+
+\Cref{lem:freqbound} applies to the optimal deterministic strategy $\opt$
+promised by \Cref{cor:opt-unique}, and we know that $\mathcal{R}^A\leq
+\mathcal{R}^\opt$ for \textit{any} recycling strategy $A$.  Thus, by maximizing
+the RHS of \Cref{lem:freqbound}, we can get an upper bound on the recycling
+rate of any recycling strategy.
+
+\begin{lemma}\label{lem:upperbound}
+	Consider a ball-recycling game with $m$ balls, $n$ bins and distribution
+	$\p$. For any recycling strategy $A$, 
+	\[\mathcal{R}^A \leq \frac{2m+n-1}{\halfnorm{\p}}.\]
+\end{lemma}
+
+\begin{proof}
+	This follows immediately from the Cauchy-Schwartz Inequality.
+\end{proof}
+
+\subsecput{randomballwithmanyballs}{\RB with \texorpdfstring{$m \geq n$}{m >= n}}
+
+We show the following lower bound, which with \Cref{lem:upperbound}, shows
+optimality when $m = \Omega(n)$.
+
+\begin{lemma}\label{lem:random-ball-lower}
+	\RB recycles at least $\frac{m}{\halfnormp}$ balls per round in
+	expectation. 
+\end{lemma}
+
+\begin{proof}
+	Let $\chi^\mathrm{RB}=(\chi_i^\mathrm{RB})$ be the random variable of the
+	number of balls in each bin in the stationary distribution of \RB.  \RB
+	recycles bin $i$ with probability $\frac{\chi_i^\mathrm{RB}}{m}$, and
+	therefore the expected number of balls recycled from bin $i$ per round is
+	$\frac{\E{\left(\chi_i^\mathrm{RB}\right)^2}}{m}$. The number of balls that
+	land in bin $i$ per round is
+	$\p_i\sum_{j=1}^n\frac{\E{\left(\chi_j^\mathrm{RB}\right)^2}}{m}$.  Since
+	$X$ is distributed stationarily, we must have
+
+	\begin{equation*}
+		\p_i\sum_{j=1}^n\frac{\E{\left(\chi_j^\mathrm{RB}\right)^2}}{m}
+	= \frac{\E{\left(\chi_i^\mathrm{RB}\right)^2}}{m} \geq \frac{\E{\chi_i^\mathrm{RB}}^2}{m},
+	\end{equation*}
+
+	using Jensen's Inequality. Clearing denominators, taking square roots and
+	summing across $i$, we have
+	\begin{align*}
+		\left(\sum_{j=1}^n \E{\left(\chi_j^\mathrm{RB}\right)^2}\right)^{\hspace*{-0.5ex}\frac{1}{2}} \hspace*{-0.5ex}\sum_{i=1}^n \p_i^\frac{1}{2}
+		&= \sum_{i=1}^n \left( \p_i\sum_{j=1}^n {\E{\left(\chi_j^\mathrm{RB}\right)^2}} \right )^{\hspace*{-0.5ex}\frac{1}{2}} \\
+		&\geq \sum_{i=1}^n \E{\chi_i^\mathrm{RB}} = m.
+	\end{align*}
+	Therefore the expected recycle rate is
+	\[ \sum_{j=1}^n \frac{\E{\left(\chi_j^\mathrm{RB}\right)^2}}{m}
+	\geq \frac{m}{\left(\sum_{i=1}^n \sqrt{\p_i}\right)^2}
+	= \frac{m}{\halfnormp}. \]
+\end{proof}
+
+\begin{corollary}\label{cor:rboptmanyballs}
+	Consider a ball-recycling game with $m$ balls and $n$ bins.  If $m =
+	\Omega(n)$, then \RB is asymptotically optimal among recycling strategies. 
+\end{corollary}
+
+\subsecput{randomballaggroempty}{\AE is Optimal}
+
+In this section, we investigate \AE strategies, which aggressively recycle
+balls outside a given subset of bins.  An \AE strategy runs one strategy on a
+fixed subset of bins, but always chooses to recycle a bin outside of this set
+if there exists one which has any balls.  Specifically, we show that a
+$\Theta(1)$-optimal strategy on a particular $O(m)$ subset of the bins can be
+extended to an $\Theta(1)$-optimal strategy on the full ball-recycling game by
+aggressively emptying the
+rest.
+
+Consider a ball-recycling game with $m$ balls, $n$ bins, and ball distribution
+$\p$. Let $L$ be some subset of bins and $S$ be a strategy on the \defn{induced
+ball-recycling game} of $L$, which is the ball-recycling game with $m$ balls,
+$|L|$ bins, and ball distribution $\q$, where 
+\begin{equation*}
+	\q_i = \frac{\p_i}{\sum_{\ell \in L} \p_\ell}.
+\end{equation*}
+Therefore, $\q$ is $\p$'s conditional probability distribution on $L$. We
+define $L,S$-\AE to be the strategy which empties the lowest weight non-empty
+bin in the complement of $L$ if one exists and otherwise performs $S$ on $L$.
+Note that all the balls will be in $L$ whenever $S$ is performed, so this is
+well-defined.
+
+We begin by showing that there exists an $L$ and $S$ such that $|L|=O(m)$, $L$
+contains all bins with weight at least $\frac{1}{m}$, and $L,S$-\AE is
+asymptotically optimal. Note that when $m = \Omega(n)$, this is trivial,
+because we can take $L$ to be all the bins and $S$ to be a $\Theta(1)$-optimal
+strategy; however, this section provides stronger bounds when $m = o(n)$.
+Intuitively, the idea is that very low weight bins won't be able to effectively
+accumulate balls, so strategies do better to recover any balls in them than to
+wait for more balls to land there.
+
+\begin{lemma}\label{lem:aggroopt}
+	There exists an $L$ and $S$ such that $|L|=O(m)$, $L$ contains all bins of
+	weight at least $\frac{1}{m}$ and $L,S$-\AE is asymptotically optimal.
+\end{lemma}
+
+\begin{proof}
+	By \Cref{lem:deterministic-opt}, there exists an optimal deterministic
+	strategy $\opt$. Using the flow equation, \Cref{lem:freqbound} can be
+	rewritten as:
+	\[ \sum_{i=1}^n \mathcal{R}_i^\opt \leq 2m + n. \]
+	Because $\opt$ will never recycle an empty bin, each $\mathcal{R}_i^\opt
+	\geq 1$.  Therefore, there can be at most $m$ bins with average recycle
+	rates at least 3. Let $L$ be this set of bins, together with any bins of
+	weight at least $\frac{1}{m}$, and we will construct a strategy $S$ that
+	aggressively empties the remaining bins into $L$.
+	
+	$S$ aggressively empties the complement of $L$, but also keeps a virtual
+	configuration of where $\opt$ thinks the balls are, as well as a log of
+	where $S$ has moved them. So when $S$ aggressively empties a bin, it also
+	updates the log of each ball it throws, indicating where it landed. When
+	$L^c$ is empty, it asks $\opt$ which bin to recycle based on the virtual
+	configuration. If it says to recycle a bin in $L^c$, we use the logs to
+	update where those balls will land in the virtual configuration. If it says
+	to recycle a bin in $L$, we recycle those balls that are there in the
+	virtual configuration, and leaving any others behind in that same bin.
+	Thus $S$ performs $\opt$ but rushes ahead to recycle those balls outside of
+	$L$.
+
+	Now, consider $t$ rounds of $\opt$. For large enough $t$, $\opt$ will
+	recycle on average at most 3 balls at a time from $L^c$. $S$ recycles at
+	least 1 ball at a time from $L^c$ and exactly as many balls at a time from
+	$L$.  Therefore for large $t$, $t$ rounds of $\opt$ will correspond to at
+	most $3t$ rounds of $S$, and during this period $S$ will recycle the same
+	number of balls. Thus $S$ is $1/3$-optimal.
+\end{proof}
+
+Next we compute the recycle rate of $L,S$-\AE as a function of the recycle rate
+of $S$ on the induced ball-recycling game on $L$.
+
+\begin{lemma}\label{lem:aggro-empty-bounds}
+	If $\mathcal{R}^S$ is the recycle rate of $S$ (on $L$), and $q$ is the
+	probability of a ball landing in $L^c$, then the recycle rate of $L,S$-\AE
+	is
+	\[\mathcal{R}^\textrm{AE} = \Theta\left(\frac{1}{(1 - q)/\mathcal{R}^S + q}\right)\]
+\end{lemma}
+
+\begin{proof}
+	Consider a collection of recycling rounds of $L,S$-\AE where $t$ of those
+	times $L,S$-\AE recycles a bin from $L$. Say $b$ balls are thrown from bins
+	in $L$ and $a$ balls land in $L^c$. Now, if $m$ balls are thrown into bins
+	of size at most $\frac{1}{m}$, then the expected number of empty bins is at
+	most \[ m \left(1 - \frac{1}{m}\right)^m \leq \frac{m}{e}.\] Because fewer
+	thrown balls will have fewer collisions, this means the expected number of
+	non-empty bins when $k \leq m$ balls are thrown into $L^c$ is at least
+	$\left(1-\frac{1}{e}\right)k$, requiring at least as many time steps to
+	aggressively empty. Thus, for large $t$, the expected number of turns
+	required to empty the $a$ balls out of $L^c$ is at least
+	$\left(1-\frac{1}{e}\right)\frac{a}{1-q}$. Whereas even if the balls were
+	recycled from $L^c$ one at a time this expected number of turns is at most
+	$\frac{a}{1 - q}$ turns. The number of balls recycled during this period is
+	$b + \frac{a}{1 - q}$, and we have shown the number of rounds $\rho$
+	satisfies: \[\rho = \Theta\left(t + \frac{a}{1-q}\right).\]
+
+	For large enough $t$, $b = \Theta\left(t\mathcal{R}^S\right)$ and
+	$a = \Theta\left(tq\mathcal{R}^S\right)$, so the overall recycle rate
+	$\mathcal{R}^\textrm{AE}$ therefore satisfies
+	\begin{align*}
+		\mathcal{R}^\textrm{AE} &= \Theta\left(\frac{t\mathcal{R}^S + tq\mathcal{R}^S/(1 - q)}{t + tq\mathcal{R}^S/(1 - q)}\right) \\
+		&= \Theta\left(\frac{1}{(1 - q)/\mathcal{R}^S + q}\right)
+	\end{align*}
+\end{proof}
+
+\subsecput{rboptproof}{\RB is Optimal}
+
+In this section we will further examine the performance of \RB and show that it
+is asymptotically optimal. We first describe a sufficient condition for
+optimality of a strategy based on its recycle rate on $L$, then show that \RB
+satisfies this criterion.
+
+\begin{lemma}\label{lem:rl-opt}
+	Let $L$ be a set of $O(m)$ bins for which there exists a strategy $T$ such
+	that $L,T$-\AE is asymptotically optimal.  Let $\mathcal{R}^{\opt_L}$ be
+	the recycle rate of the optimal strategy on the induced ball-recycling game
+	of $L$.  For a given strategy $S$, let $\mathcal{R}_L^S$ be the conditional
+	recycle rate of $S$ in the stationary distribution given that a ball in $L$
+	is selected, and $q$ be the probability that a ball lands in $L^c$, i.e. $q
+	= \sum_{k \in L^c} \p_k$. If either
+	\[ \E{\mathcal{R}_L^S} = \Omega(\mathcal{R}^{\opt_L})
+	\quad\textrm{or}\quad\E{\mathcal{R}_L^S} =
+	\Omega\left(\frac{1}{q}\right),\]
+	then $S$ is asymptotically optimal.
+\end{lemma}
+
+\begin{proof}
+	By applying \Cref{lem:gen-flow-equation}, the subset variant of the
+	flow equation, to $L$, 
+	\[ f_L \mathcal{R}_L^S = (1-q)(f_L \mathcal{R}_L^S + (1-f_L) \mathcal{R}_{L^c}^S), \]
+	where $f_L$ is the stationary probability of $S$ picking a bin in $L$.
+	Solving for $f_L$,
+	\begin{align} 
+		f_L = \frac{\mathcal{R}_{L^c}^S}{q\mathcal{R}_L^S +
+          \mathcal{R}_{L^c}^S}. \label{eqn:fL}
+	\end{align}
+
+	Suppose $\mathcal{R}_L^S = o\left(\frac{1}{q}\right)$ and $\mathcal{R}_L^S$
+	is $\Theta(1)$-optimal on $L$. If $\mathcal{R}_L^S\leq \frac{1}{q}$, then
+	$f_L \geq \frac{1}{2}$, and so because $\mathcal{R}^S = f_L\mathcal{R}_L^S
+	+ (1-f_L)\mathcal{R}_{L^c}^S$, we must have $\mathcal{R}^S =
+	\Omega(\mathcal{R}_L^S)$.
+
+	Now, using \Cref{lem:aggroopt}, let $L$ and $T$ be such that $L,T$-\AE is
+	asymptotically optimal, and let $\mathcal{R}^\textrm{AE}$ be its expected
+	recycle rate. By \Cref{lem:aggro-empty-bounds},
+	\begin{align*} 
+		\mathcal{R}^\mathrm{AE} &= \Theta\left( \frac{1}{(1-q)/\mathcal{R}^T + q}\right) \\
+		&= O\left(\mathcal{R}^T\right) = O\left(\mathcal{R}_L^S\right) = O\left(\mathcal{R}^S\right),\label{eqn:RAE}
+	\end{align*} 
+	so $S$ must be asymptotically optimal.
+
+	If $\mathcal{R}_L^S = \Omega\left(\frac{1}{q}\right)$, then
+	$\mathcal{R}_L^S > \frac{\alpha}{q}$ for some $\alpha$. Rearranging
+	Equation~\eqref{eqn:fL} and multiplying by
+	$\mathcal{R}_L^S$ yields
+	\[ f_L \mathcal{R}_L^S = \frac{1}{\frac{q}{\mathcal{R}_{L^c}^S} + \frac{1}{\mathcal{R}_L^S}}. \]
+	Here $\frac{1}{\mathcal{R}_L^S} \leq \frac{q}{\mathcal{R}_{L^c}^S}$, so
+	$f_L\mathcal{R}_L^S = \Omega\left(\frac{1}{q}\right)$, and thus
+	$\mathcal{R}^S = \Omega\left(\frac{1}{q}\right)$ as well. Now we can
+	compare to $L,T$-\AE as above:
+	\[ 	\mathcal{R}^\mathrm{AE}
+		= \Theta\left( \frac{1}{(1-q)/\mathcal{R}^T + q}\right)
+		= O\left(\frac{1}{q}\right)
+		= O\left(\mathcal{R}^S\right)
+		\]
+	so in this case $S$ is asymptotically optimal as well.
+\end{proof}	
+
+We can now prove \Cref{thm:random-opt}.
+
+\begin{proof}[Proof of \Cref{thm:random-opt}]
+	If $m=\Omega(n)$, then by \Cref{lem:upperbound,lem:random-ball-lower} we are done.
+
+	Otherwise, let $L$ be a set of $O(m)$ bins for which there exists a
+	strategy $T$ such that $L,T$-\AE is asymptotically optimal. We will prove
+	the result for a slightly modified \RB that only recycles 1 ball outside of
+	$L$ even if more are available; that is, it moves only one of the balls in
+	the bin. Since this strategy is worse than \RB, this will be sufficient. We
+	number the bins so that the first $|L|$ bins comprise $L$.
+	
+	If $\mathcal{R}_L \geq \frac{1-q}{q}$, then we are done by
+	\Cref{lem:rl-opt}. Otherwise, in the stationary distribution, when a
+	bin in $L$ is recycled, the expected number of balls which land in $L^c$ is
+	$q\mathcal{R}_L < 1-q$. When a bin in $L^c$ is recycled, the expected
+	number of balls which land in $L$ is $1-q$. Thus \RB must pick a bin in $L$
+	more than half the time, and so the expected number of balls in $L$ must be
+	more than $\frac{m}{2}$.
+
+	Now analogously to the proof of \Cref{lem:random-ball-lower}, we have:
+	\begin{align*}
+		\p_i\left(\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} + \sum_{j=|L|+1}^n \E{\chi_j^\mathrm{RB}}\right) &= \E{\left(\chi_i^\mathrm{RB}\right)^2} \\
+		&\geq \E{\chi_i^\mathrm{RB}}^2.
+	\end{align*}
+
+	Thus,
+	\[ \E{\chi_i^\mathrm{RB}} \leq \sqrt{\p_i}\left(\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} + \frac{m}{2}\right)^{\frac{1}{2}}.\]
+	Summing over $i \leq |L|$ yields
+	\[ \E{\chi_L^\mathrm{RB}} \leq \left(\sum_{i=1}^{|L|} \sqrt{\p_i}\right)\left(\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} + \frac{m}{2}\right)^\frac{1}{2}, \]
+	where $\chi_L^\mathrm{RB}$ is the expected number of balls in $L$. Now,
+	\begin{align*}
+		\mathcal{R}_L^\mathrm{RB} &\geq \frac{1}{m}\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} \\
+								  &\geq \frac{\E{\chi_L^\mathrm{RB}}^2}{m\left(\sum_{i=1}^{|L|} \sqrt{\p_i}\right)^2} - \frac{1}{2} \\
+								  &> \frac{m}{4\halfnorm{\mathbf{p}_L}} - \frac{1}{2},
+	\end{align*}
+	where $\p_L$ is the conditional probability distribution on $L$ obtained
+	from $\mathbf{p}$. The last inequality holds because there are at least
+	$\frac{m}{2}$ balls in $L$ in expectation.
+
+	Thus by \Cref{lem:upperbound}, \RB is asymptotically optimal on the induced
+	system of $L$, and therefore \RB is asymptotically optimal by
+	\Cref{lem:rl-opt}.
+\end{proof}
+
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:

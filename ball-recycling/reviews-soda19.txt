@@ -1,0 +1,200 @@
+Optimal Ball Recycling
+
+Please note that the reviews do not necessarily include all comments that arose
+during electronic discussion of your paper (or all additional opinions from
+outside experts), and so they may not necessarily reflect the final evaluation
+of the PC.  Nevertheless, we hope that you will find the reviews useful, and
+that you will take the reviewers' suggestions into consideration as you revise
+your paper for the final proceedings version.
+
+Best regards,
+
+Timothy Chan (SODA 2019 PC Chair)
+
+
+----------------------- REVIEW 1 ---------------------
+PAPER: 38 TITLE: Optimal Ball Recycling
+AUTHORS: Michael A. Bender, Jake Christensen, Alexander Conway, Martin
+Farach-Colton, Rob Johnson and Meng-Tsung Tsai
+
+
+----------- Overall evaluation ----------- The paper introduces an interesting
+new variant of the balls-into-bins problem, which is rather orthogonal to the
+classical variants. Here, m balls are thrown into n bins according to some
+fixed distrbution p. Afterwards, in each round one bin is chosen by some
+strategy A, and the balls in this bin are rethrown randomly into the bins. The
+objective is to find a strategy A that maximizes the number of rethrown
+(recycled) balls.
+
+The authors give excellent motivation for the new problem, as a model for
+insertion and update buffers using B-trees and hash tables. In both cases, the
+number of recycled balls correspond directly to the efficiency gains obtained
+by the buffers. While for update buffers, nothing is known about the
+distribution p, the authors argue convincingly that for insertion buffers the
+distribution is close to uniform (Lemma 3.1). Thus, they study the new
+balls-into-bins problem in these two cases: either for general distributions,
+or more specifically for the uniform distribution.
+
+The authors consider three strategies: FULLEST_BIN picks the bin with the most
+balls; RANDOM_BALL picks the bin of a u.a.r. ball, and GOLDEN_GATE cycles
+through the bins, always picking the next non-empty one. For every distribution
+p, the authors show that RANDOM_BALL achieves the same asymptotic performance
+as the optimal strategy for p. Thus RANDOM_BALL is a universally good strategy.
+On the other hand, FULLEST_BIN can be surprisingly bad, losing a factor of
+\Theta(m) for some distributions. However, if p is the uniform distribution,
+then FULLEST_BIN and GOLDEN_GATE are both competitive: They achieve the optimal
+recycling rate up to a (1+o(1)) factor, while RANDOM_BALL loses a constant
+factor in [1+\eps, 2-\eps].
+
+The proofs are obtained by combining several nice tricks. By studying an
+appropriately chosen statistics of the stationary distribution of the process
+for fixed strategy A and bin distribution p, they obtain general upper bounds
+on the recycling rate for any strategy. The performance of RANDOM_BALL is then
+estimated directly if m= Omega(n), and for m=o(n) the authors introduce an
+auxilary almost-optimal strategy AGGRESSIVE_EMPTY based on the optimal strategy
+for a subset of bins. On this subset, the analysis of RANDOM_BALL can be
+reduced to the case m = Omega(n), while on the other bins it can be shown that
+RANDOM_BALL behaves similarly as AGGRESSIVE_EMPTY. 
+
+The analysis for uniform distribution is based on similar tricks, especially on
+analyzing the right statistics of the stationary distribution. This part is a
+bit less deep than the other, but adds to the nice and complete picture that
+the paper gives. In general, the proofs are very nicely written.
+
+The paper is generally well-written, and the proofs are sound. I only found a
+small number of minor bugs, listed below.
+
+Of course, the new model is only an approximation to the problem of real buffer
+handling. The largest difference might be that the authors assume the choices
+of the balls to be independent of each other, which is not true in reality
+(round i and round i+1 might be correlated). The authors do amend their work by
+some experiments, but they all include the independence assumption by design. I
+am not expert enough to assess the real-world implications of the model, but I
+do think that the model is an excellent theoretical starting point, and fits
+perfectly into SODA. 
+
+In summary, the paper has convinced me: The model is very interesting,
+well-motivated, and has the potential to serve as a basis for an important
+practical problem. The results and proofs are non-trivial, and appropriate for
+SODA. On top, the authors seem to be familiar with the practical aspects of the
+problem, and indicate that the existing code should be adapted according to
+their theoretical findings. (But I am not expert enough to judge this latter
+claim.) Thus, I recommend the paper for publication.
+
+
+
+MINOR COMMENTS:
+
+- In the proof of Lemma 4.4, the step from (6) to (7). I fail to see why this
+  is an inequality rather than an equality. After all, \sum_j f_j E[Z(\chi^A)
+  \mid \phi_j] = E[Z]. For the last term in (6), you say that R^A_j should be
+  the random variable of how many balls are recycled given the jth bin is
+  chosen by A. This doesn't really make sense to me, since then in the
+  calculation we would compare an expectation with a random variable, so I
+  assume you mean the conditional expectation instead of the random variable.
+  (As it was in Lemma 4.2.) But then \sum_j f_j R^A_j = R^A, so we should have
+  equality.
+
+So I think that Equation (9) should be an equality, and the inequality only
+comes in the next step (10). 
+
+- abstract, introduction: "wildly successful" sounds odd to me (as a non-native
+  speaker).
+- Section 2. When you mention the work of Vöcking, you forgot to refer to the
+  paper [41].
+- Lemma 4.2: In the text, R^A should be R^A_L.
+- Lemma 4.5: One of the p is typeset in non-bold, same in Lemma 4.6.
+- Lemma 4.6: Does the term "stateless" includes "deterministic"? Otherwise your
+  notation needs some explanation.
+- Corollary 5.1: The second = should be \leq as well.
+
+
+----------------------- REVIEW 2 ---------------------
+PAPER: 38 TITLE: Optimal Ball Recycling
+AUTHORS: Michael A. Bender, Jake Christensen, Alexander Conway, Martin
+Farach-Colton, Rob Johnson and Meng-Tsung Tsai
+
+
+----------- Overall evaluation ----------- The authors study a ball and bins
+problem motivated by applications in external memory data structures, namely
+B-trees. Roughly speaking, we have n bins and m balls and each time we can pick
+a bin and distribute its balls according to some distribution among the rest.
+And the goal is to maximize the number of balls distributed at each step. I
+quite like the motivation for the problem and I believe for many applications
+it actually makes a lot of sense. 
+
+The authors provide the following main results:
+
+(main result): A tight upper bound for the recycling rate of any algorithm. The
+bound is interesting in the sense that it has two branches: one for m >= n
+(many balls) and the other one for m < n (few balls). And it turns out that the
+behaviour of the problem changes significantly based on these two cases. 
+
+On top of this main result, the authors also give a number of interesting
+results that complement the above. For example, they give a bad examples that
+shows an obvious “best” strategy can actually be pretty bad (“fullest bin”).
+Then they analyze the case of uniform distribution (which from a practical
+point of view might make the most sense). Here, the authors delve into finding
+the best constants hidden in the O-notation .
+
+In terms of techniques, they look at the problem as a Markov process and use
+some toolboxes from here. However, as far as I can see, the main difficulty
+here is to nail the correct behaviour of the optimal strategy (few balls vs
+many balls cases). To do this, in fact two different arguments are required and
+thus the first challenge is to know what is needed to be proven for each case!
+In essence, the proof is interesting and it needs quite a bit of work. 
+
+Writing is the weakest part of the paper. It seems that paper has suffered a
+lot by moving very relevant things to the appendix. In particular, Appendix A
+is almost a must-read. Many of the basic concepts or notations have not been
+clearly defined (stateless at page 7, the notion of (AX)_j), and there is also
+very confusing referencing back and forth which requires constant flips back
+and forth. Furthermore, some of the statements seems inconsistent. Proof of
+Lemma 4.1 is referred to the appendix but in the appendix there is no clear
+proof and it feels like a mess! Lemma A.2 certainly needs more than just one
+line for its proof and notion of “ergodic” is thrown in there without ever
+being defined!
+
+
+----------------------- REVIEW 3 ---------------------
+PAPER: 38 TITLE: Optimal Ball Recycling
+AUTHORS: Michael A. Bender, Jake Christensen, Alexander Conway, Martin
+Farach-Colton, Rob Johnson and Meng-Tsung Tsai
+
+
+----------- Overall evaluation ----------- The paper considers an interesting
+problem in which m balls are thrown to n bins i.i.d using some distribution p.
+Then, at each step, one non empty bin in picked  and ALL is balls are recycled,
+i.e. they are re-thrown according to p. Note that the number of bins remains m
+at any time.  The goal is to maximize the recycling rate which is the expected
+number of balls recycled in the stationary distribution.
+
+This problem has some application in memory access (B trees) and databases.
+
+The authors consider several strategies for picking the recycled bin for two
+cases m>=n and n<m.  For m>= n they show that the strategy of recycle a bin of
+a random ball achieves a recycle rate which is constant away from the optimal
+rate. For the special case of uniform probability they show that the natural
+strategy of Fullest bin is optimal within additive constant. Unfortunately,
+there are no results for fullest bin for arbitrary distribution.  For m<n they
+show that the natural fullest bin strategy can be as far as m from the optimal
+recycle rate (by a simple example of very skewed distribution) where random
+strategy is only constant away from optimal. This is done by showing first that
+Aggressive empty strategy (i.e., recycle ball in every bin whose probability is
+less than 1/m) is optimal up to constant factor.
+
+The techniques are based on probabilities estimations. In retrospect that are
+all quite standard but to get them it was non trivial. For example, Lemma 4.4
+shows an upper bound on the recycle rate for strategies of stationary
+distribution. Then an upper bound of the rate follows immediately. Let the
+L_{1/2} semi norm of the probability vector p be the square of the sum of the
+square root of the coordinates. Then by they show that for m>=n the rate is at
+most m divided by the L_{1/2} semi norm of p and. It is quite easy to show that
+random ball strategy easily achieves such rate up to a constant.
+
+Overall, nice collection of results. For m>=n the results are quite expected
+(though it is somewhat disappointing that there is no analysis for fullest bin
+except for the uniform probability case). For m<=n (I am not sure how
+interesting this case) the results are some somewhat surprised though not so
+much in retrospect.
+

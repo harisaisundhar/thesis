@@ -1,0 +1,142 @@
+%!TEX root = paper.tex
+
+\section{Introduction}
+
+Balls-and-bins games have been a successful tool for modeling load balancing
+problems~\cite{Mitzenmacher96,AdlerChMi98,AdlerBeSc98,AzarBrKa94,ColeFrMa98,ColeMaMe98,CzumajSt97,Mitzenmacher96a,Mitzenmacher98,MitzenmacherRiSi00,Voecking03,BringmannSaSt16,Park17,WestZaWa16,farach-Colton:2009,conway_et_al:LIPIcs:2018:9043}.
+For example, they can be used to study the average and worst-case occupancy of
+buckets in a hash table~\cite{BenjaminiMa12}, the worst-case load on nodes in a
+distributed cluster~\cite{PetrovaOlMa10,BerenbrinkFrKl16} and even the amount
+of time customers wait in line at the grocery store~\cite{Mitzenmacher98}.  In
+all these load-balancing problems, balls-and-bins games are used to study how
+to distribute load evenly across the resource being allocated.
+
+In this paper we study a new scenario, which we refer to as the
+\defn{ball-recycling game}, defined as follows:
+\begin{displayquote}
+	Throw $m$ balls into $n$ bins i.i.d.\ according to a given probability
+	distribution $\p$.  Then, at each time step, pick a non-empty bin and
+	\defn{recycle} its balls: take the balls from the selected bin and re-throw
+	them according to $\p$.
+\end{displayquote}
+We call a bin-picking method a \defn{recycling strategy} and define its
+\defn{recycling rate} to be the expected number of balls recycled in the
+stationary distribution (when it exists).
+
+The ball-recycling game models \defn{insertion buffers} and \defn{update
+buffers}, which are widely used to speed up insertions in databases by batching
+updates to blocks on disk. The recycling rate of a recycling strategy
+corresponds to the speed-up obtained by an insertion buffer, so the goal
+studied in this paper is how to maximize the recycling rate. This relationship
+is described in \Cref{sec:motivation}, and the experiments in
+\Cref{sec:experiments} demonstrate that it holds in practice.
+
+In this paper, we present results for ball recycling for both general $\p$ and
+for the special case of uniform $\p$, which we denote by $\uni$.  As we explain
+in \Cref{sec:motivation}, these distributions correspond to update and
+insertion buffers, respectively.
+
+We focus on three natural recycling strategies:
+\begin{itemize}
+\item \FB: A greedy strategy that recycles the bin with the most balls.
+\item \RB: A strategy that picks a ball uniformly at random and recycles its
+	bin.
+\item \GG: A strategy that picks the bins in round-robin fashion; after a bin
+	is picked, the next bin picked is its non-empty successor.
+\end{itemize}
+Let $\halfnormp = (\sum \sqrt{\p_i})^2$  be the half quasi-norm of $\p$.  We
+achieve the following result for general $\p$.
+
+\begin{theorem}[\Cref{sec:nonuniform}]\label{thm:random-opt}
+	Consider a ball-recycling game with $m$ balls and $n$ bins, where the balls
+	are distributed into the bins i.i.d.\ according to distribution $\p$. Then
+	\RB{} is $\Theta(1)$-optimal.
+
+        It achieves recycling rate
+	$\mathcal{R}^\textrm{RB}$:
+	\begin{enumerate}
+		\item If $m \geq n$,
+			\[\mathcal{R}^\textrm{RB} = \Theta\left(\frac{m}{\halfnormp}\right).\]
+		\item If $m < n$, let $L$ be the $m$ lowest-weight bins, $q = \sum_{\ell\in
+			L} p_\ell$, and $\mathcal{R}_L^\textrm{RB}$ be the recycle rate of
+			\RB restricted to $L$. Then,
+			\[\mathcal{R}^\textrm{RB} =
+			\Theta\left(\min\left(\mathcal{R}_L^\textrm{RB}, 1/q\right)\right).\]
+	\end{enumerate}
+\end{theorem}
+
+In order to establish this result, we first show that no recycling strategy can
+achieve a higher recycling rate than $(2m+n)/\halfnormp$.  This directly
+establishes optimality when $m = \Omega(n)$. For $m=o(n)$, we show that \RB
+performs as well as another strategy, \AE, which takes an optimal strategy on a
+subset of high-weight bins and turns it into an optimal strategy on all the
+bins.
+
+Interestingly, the greedy strategy \FB is not generally optimal, and in
+particular:
+\begin{observation}
+There are distributions for which \FB is pessimal, that is, it
+recycles at most 2 balls per round whereas OPT recycles almost $m$
+balls per round.
+\end{observation}
+For example, consider the \defn{skyscraper distribution}, where $\p_0 =
+1-1/n+1/n^2$ and $\p_i = 1/n^2$, for $0<i\leq n-1$.  Suppose that $m=\sqrt{n}$.
+Then \FB will pick bin $0$ every time until it has at most one ball, at which
+point it will pick another bin, which will almost certainly have $1$ ball in
+it.  Thus, the recycling rate of \FB drops below $2$.  Suppose, instead, that
+we recycle the least-full non-empty bin.  In this case, every approximately
+$\sqrt{n}$ rounds, a ball lands in a low-probability bin and is promptly
+returned to bin $0$. Thus, the recycling rate of this strategy is nearly $m$.
+Thus, \FB is pessimal for this distribution.
+
+However, the uniform distribution is of particular importance to insertion
+buffers for databases based on \btrees{}. This is because (arbitrary) random
+\btree{} insertions are nearly uniformly distributed across the leaves of the
+\btree{}, as we show in \Cref{sec:motivation}. On the uniform distribution, \FB
+and \GG are optimal even up to lower order terms:
+
+\begin{theorem}[\Cref{sec:uniform}]\label{thm:fullestbin}
+  \FB and \GG are optimal to within an additive constant for the
+  ball-recycling game with distribution $\uni$ 
+  for any $n$ and $m$.  They each achieve a
+  recycling rate of at least $2m/(n+1)$, whereas no recycling strategy can
+  achieve a recycling rate greater than $2m/n + 1$.
+\end{theorem}
+
+In this case, \RB is only optimal to within a multiplicative constant
+in the following range:
+
+\begin{theorem}[\Cref{sec:uniform}]\label{thm:rbuniform}
+	On the uniform distribution $\uni$, for sufficiently large
+        $m$, \RB is at least $(1/2+1/(2^3
+	3^4))$-optimal and at most $(1-3/1000)$-optimal.
+\end{theorem}
+
+Thus, we establish some surprising results: that \FB can perform poorly for
+arbitrary $\p$ but is optimal for $\uni$, up to lower-order terms; and that \RB
+is asymptotically optimal for any $\p$ and in particular is more than
+$1/2$-optimal but not quite optimal for $\uni$.
+
+In \Cref{sec:experiments}, we present experimental results showing that our
+analytical results for the ball recycling problem closely matches performance
+results in real databases.  We describe the recycling strategies of several
+commercial and open-source database systems. In particular we focus on InnoDB,
+a \btree{} that uses a variant of \RB.
+
+Our results suggest that \FB or \GG would be a better choice than \RB for
+InnoDB. In particular, \GG requires almost no additional bookkeeping, and can
+be implemented in InnoDB with a change of only a few lines of code.
+With this implementation, we measured a 30\% improvement in its
+insertion-buffer flushing rate, which is in line with our theoretical results.
+
+We conclude that ball recycling is a natural hitherto unexplored balls-and-bins
+game that closely models a widely deployed method for improving the performance
+of databases. Moreover, this is the first application (to our knowledge) of a
+balls-and-bins game to the throughput of a system. This is in contrast to past
+balls-and-bins analyses, which modeled load balancing and latency.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:

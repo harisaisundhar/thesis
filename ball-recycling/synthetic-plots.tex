@@ -1,0 +1,170 @@
+% !TEX root =  paper.tex
+
+\begin{figure*}[p]
+{\centering
+	\ref{synth-legend}\\
+	\subfloat[Uniform key distribution]{
+		\tikzsetnextfilename{synthetic-uniform}
+		\begin{tikzpicture}%[trim axis left, trim axis right]
+		\begin{axis}[
+				width=0.47\textwidth,
+				height=0.31\textheight,
+				xlabel=Rows inserted in millions,
+				xlabel near ticks,
+				ylabel near ticks,
+				ylabel style={align=center, text width=0.27\textheight},
+				ylabel=Recycle rate (last {50,000} insertions),
+				xmin=0.05,
+				xmax=5,
+				ymin=0,
+				ymax=50,
+				mark repeat={50},
+				restrict y to domain=0:50,
+				legend to name=synth-legend,
+				legend columns = 3,
+				]
+				\addplot [mark=*, blue, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/gg_uni.csv};
+				\addlegendentry{Golden Gate}
+				\addplot [mark=square*, red, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/rb_uni.csv};
+				\addlegendentry{Random Ball}
+				\addplot [mark=triangle*, green, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/fb_uni.csv};
+				\addlegendentry{Fullest Bin}
+			\end{axis}
+		\end{tikzpicture}
+		\label{fig:synth-uni}
+	}\hfill
+	\subfloat[Pareto-0.5 key distribution]{
+		\tikzsetnextfilename{synthetic-pareto-5}
+		\begin{tikzpicture}%[trim axis left, trim axis right]
+			\begin{axis}[
+				width=0.47\textwidth,
+				height=0.31\textheight,
+				xlabel=Rows inserted in millions,
+				xlabel near ticks,
+				ylabel near ticks,
+				ylabel style={align=center, text width=0.27\textheight},
+				ylabel=Recycle rate (last {50,000} insertions),
+				xmin=0.05,
+				xmax=5,
+				ymin=0,
+				ymax=50,
+				mark repeat={50},
+				restrict y to domain=0:50,
+				]
+				\addplot [mark=*, blue, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/gg_par5.csv};
+				\addplot [mark=square*, red, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/rb_par5.csv};
+				\addplot [mark=triangle*, green, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/fb_par5.csv};
+			\end{axis}
+		\end{tikzpicture}
+		\label{fig:synth-par5}
+	}\\
+	\subfloat[Pareto-1 key distribution]{
+		\tikzsetnextfilename{synthetic-pareto-1}
+		\begin{tikzpicture}%[trim axis left, trim axis right]
+			\begin{axis}[
+				width=0.47\textwidth,
+				height=0.31\textheight,
+				xlabel=Rows inserted in millions,
+				xlabel near ticks,
+				ylabel near ticks,
+				ylabel style={align=center, text width=0.27\textheight},
+				ylabel=Recycle rate (last {50,000} insertions),
+				xmin=0.05,
+				xmax=5,
+				ymin=0,
+				ymax=50,
+				mark repeat={50},
+				restrict y to domain=0:50,
+				]
+				\addplot [mark=*, blue, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/gg_par1.csv};
+				\addplot [mark=square*, red, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/rb_par1.csv};
+				\addplot [mark=triangle*, green, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/fb_par1.csv};
+			\end{axis}
+		\end{tikzpicture}
+	}\hfill
+	\subfloat[Pareto-2 key distribution]{
+		\tikzsetnextfilename{synthetic-pareto-2}
+		\begin{tikzpicture}%[trim axis left, trim axis right]
+			\begin{axis}[
+				width=0.47\textwidth,
+				height=0.31\textheight,
+				xlabel=Rows inserted in millions,
+				xlabel near ticks,
+				ylabel near ticks,
+				ylabel style={align=center, text width=0.27\textheight},
+				ylabel=Recycle rate (last {50,000} insertions),
+				xmin=0.05,
+				xmax=5,
+				ymin=0,
+				ymax=50,
+				mark repeat={50},
+				restrict y to domain=0:50,
+				]
+				\addplot [mark=*, blue, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/gg_par2.csv};
+				\addplot [mark=square*, red, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/rb_par2.csv};
+				\addplot [mark=triangle*, green, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/fb_par2.csv};
+			\end{axis}
+		\end{tikzpicture}
+		\label{fig:synth-par2}
+	}\\
+	\vspace*{-0.015\textheight}
+	\subfloat[Normal key distribution]{
+		\tikzsetnextfilename{synthetic-normal}
+		\begin{tikzpicture}%[trim axis left, trim axis right]
+			\begin{axis}[
+				width=0.47\textwidth,
+				height=0.31\textheight,
+				xlabel=Rows inserted in millions,
+				xlabel near ticks,
+				ylabel near ticks,
+				ylabel style={align=center, text width=0.27\textheight},
+				ylabel=Recycle rate (last {50,000} insertions),
+				xmin=0.05,
+				xmax=5,
+				ymin=0,
+				ymax=50,
+				mark repeat={50},
+				restrict y to domain=0:50,
+				]
+				\addplot [mark=*, blue, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/gg_norm.csv};
+				\addplot [mark=square*, red, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/rb_norm.csv};
+				\addplot [mark=triangle*, green, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./data/simulations/fb_norm.csv};
+			\end{axis}
+		\end{tikzpicture}
+		\label{fig:synth-norm}
+	}\hfill
+	\subfloat[Ratio of golden gate to random ball (normally distributed keys)]{
+		\tikzsetnextfilename{synthetic-norm-ratio}
+		\pgfplotstableread[col sep = comma]{./data/simulations/gg_norm.csv}\goldengate
+		\pgfplotstableread[col sep = comma]{./data/simulations/rb_norm.csv}\randomball
+		\pgfplotstablecreatecol[copy column from table={\randomball}{flushes}] {rb_flushes} {\goldengate}
+		\begin{tikzpicture}%[trim axis left, trim axis right]
+			\begin{axis}[
+				width=0.47\textwidth,
+				height=0.31\textheight,
+				xlabel=Rows inserted in millions,
+				xlabel near ticks,
+				ylabel near ticks,
+				ylabel style={align=center, text width=0.30\textheight},
+				ylabel=Recycle rate ratio (last {5,000} insertions),
+				xmin=0.05,
+				xmax=5,
+				ymin=0.8,
+				ymax=2,
+				mark repeat={50},
+				]
+				\addplot [mark=*, Plum, no marks] table [x=insertions, y expr=\thisrow{rb_flushes}/\thisrow{flushes}] \goldengate;
+			\end{axis}
+		\end{tikzpicture}
+		\label{fig:synth-ratio}
+	}
+	\caption{\label{fig:synth}Simulated results with various key distributions and recycling strategies. (Higher is better)}
+}
+\end{figure*}
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:

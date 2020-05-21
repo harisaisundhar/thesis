@@ -1,0 +1,237 @@
+% !TEX root =  paper.tex
+
+\section{Database Experiments}\label{sec:experiments}
+In this section, we consider insertion buffers as they are used in practice. We
+demonstrate through simulations as well as experiments on real-world systems,
+that the theoretical results in the prior sections hold and can be used to
+improve performance.
+
+\subsection{Insertion Buffers in Database Systems}
+Many databases cache recently inserted items in RAM so that they can write
+items to disk in batches.  Examples include
+Azure~\cite{Azure16}, 
+DB2~\cite{IBM17},  
+Hbase~\cite{Xiang12}, 
+Informix~\cite{Informix}, 
+InnoDB~\cite{Callaghan11},  
+NuDB~\cite{NuDB16},  
+Oracle~\cite{Oracle17},  
+SAP~\cite{SAP17},  and 
+Vertica~\cite{Vertica17}.
+They are also used to accelerate inserts in several research prototypes, such
+as the buffered Bloom
+filter~\cite{CanimLaMi10} and buffered quotient
+filter~\cite{BenderFaJo12}.  
+By batching updates to disk, these insertion buffers reduce the amortized
+number of I/Os per insert, which can substantially improve insertion
+throughput.  Facebook claims that the insertion buffer in InnoDB speeds up some
+production workloads by a factor of $5$ to $16$, and accelerates some synthetic
+benchmarks by up to a factor of $80$~\cite{Callaghan11}.
+
+A motivating factor for the use of insertion buffers is that they can
+significantly mitigate the precipitous performance drop that databases can
+experience when the data set grows too large to fit in RAM.
+\Cref{fig:introbufferinitial} shows the time per 1,000 insertions into a MySQL
+database using the InnoDB backend, with and without InnoDB's insertion buffer
+enabled.  For the first $200,000$ insertions, the entire database fits in RAM,
+and so insertions are fast, even without the insertion buffer.
+
+Once the database grows larger than RAM, insertion performance without the
+insertion buffer falls off a cliff.  In fact, once the database reaches 1M
+rows, it can perform only about 200 insertions per second, suggesting that the
+throughput is limited by the random-I/O performance of the underlying disk.  In
+the benchmark with the insertion buffer enabled, on the other hand, performance
+degrades by only a small amount.
+
+Based on the performance of the first 1M insertions, it appears that InnoDB's
+insertion buffer effectively eliminates the performance cliff that can occur
+when the database grows larger than RAM.  This improvement explains the
+popularity of insertion buffers in database design.
+
+However, in our experiment, as the database continues to grow, the efficacy of
+the insertion buffer declines.  \Cref{fig:introbuffer} shows the time per
+10,000 insertions as the database grows to 50M rows.  Although the performance
+without the insertion buffer drops more quickly early on, it remains relatively
+stable thereafter.  Performance with the insertion buffer, on the other hand,
+slowly declines over the course of the benchmark until it is only about a third
+faster than without the insertion buffer.  This is well below the $5-80\times$
+speedups reported above.
+
+\input{intro-plots}
+
+As these experiments show, it can be difficult to extrapolate from small
+examples the performance gains that insertion buffers can provide for large
+databases. Therefore, it is no wonder that reported speedups from insertion
+buffers vary wildly from as little as $2\times$ to as high as
+$80\times$~\cite{Callaghan11}.  Some have even suggested that insertion buffers
+may provide many of the benefits of write-optimization~\cite{Callaghan10},
+i.e., that insertion buffers can bring the performance of \btrees{} up to that
+of LSM-trees~\cite{ONeilChGa96}, COLAs~\cite{BenderFaFi07}, Fractal
+Trees~\cite{Tokutek14}, xDicts~\cite{BrodalDeFi10}, or
+\betrees{}~\cite{BrodalFa03}.
+
+\subsection{Experimental Validation}
+Here we validate our theoretical study of insertion buffers by showing that our
+analysis above can have a material impact on the performance of databases with
+insertions buffers.  We simulated workloads of random insertions to a \btree{},
+with varying distributions on the inserted keys.  We found that, as predicted,
+the performance was independent of the input distribution and closely matched
+the performance predicted by our theorems.
+
+We then ran workloads of random insertions into InnoDB and measured the average
+batch size of flushes from its insertion buffer.  InnoDB implements a variant
+of the random-item flushing strategy.  We modified it to implement the
+golden-gate flushing strategy.  Despite the additional complexities of InnoDB's
+insertion buffer implementation, we found that performance closely tracked our
+theoretical predictions and was independent of the distribution of inserted
+keys.  We also found that the golden-gate flushing strategy improved InnoDB's
+flushing rate by about 30\% over the course of our benchmark.
+
+Our analysis explains why insertion buffers can provide dramatic speedups for
+small databases, but only small gains are available as the database grows.  Our
+results also provide useful guidance to implementers about which flushing
+strategy will provide the most performance improvement.
+
+Our results also show that insertion buffers cannot deliver the same asymptotic
+performance improvements that are possible with write-optimized data
+structures, such as LSM-trees and B$^\epsilon$-trees.
+
+\subsecput{exp-deployed}{Insertion-Buffer Background}
+
+This section describes insertion buffers are actually implemented and used in
+deployed systems and recent research prototypes.
+
+\paragraph{SAP:} The SAP IQ database supports an in-memory row-level versioning
+(RLV) store, and insertions are performed to the RLV store and later merged
+into the main on-disk store~\cite{SAP17}.  
+
+\paragraph{NuDB:}  The NuDB SSD-based key-value store buffers all insertions in
+memory, and later flushes it to SSD~\cite{NuDB16}.  Flushes occur at least once
+per second, or more often if insertion activity causes the in-memory buffer to
+fill.
+
+\paragraph{Buffered Bloom and quotient filters:}  Bloom filters are known to
+have poor locality for both inserts and lookups.  The buffered Bloom
+filter~\cite{CanimLaMi10} improves the performance of insertions to a Bloom
+filter on SSD by buffering the updates in RAM.  The on-disk Bloom filter is
+divided into pages, and each page has a buffer of updates in RAM.  When a
+page's buffer fills, the buffered changes are written to the page.  
+
+The buffered quotient filter stores newly inserted items in an in-memory
+quotient filter~\cite{BenderFaJo12,benderadaptivebloom}.  When the in-memory
+quotient filter fills, its entire contents are flushed to the on-disk quotient
+filter.
+
+\paragraph{InnoDB:}  The InnoDB~\cite{Oracle17a} \btree{} implementation used
+in the MySQL~\cite{Oracle17b} and MariaDB~\cite{Foundation17} relational
+database systems includes an insertion buffer.
+
+Our experiments in this paper focus on InnoDB as an archetypal and open-source
+implementation of an insertion buffer, so we describe it in detail.
+
+InnoDB structures its insertion buffer as a \btree{}.  When the insertion
+buffer becomes full, it selects the items to be flushed by performing a random
+walk from the root to a leaf.  The random walk is performed by selecting, at
+each step, uniformly randomly from among the children of the current node.
+Once it gets to a leaf, it it picks a single item to insert into the on-disk
+\btree{}.  This item, along with any other items in the insertion buffer that
+belong in that leaf, are inserted into the leaf and removed from the insertion
+buffer.
+
+InnoDB's insertion buffer is complicated in several ways.  First, the size of
+the insertion buffer changes over time, as InnoDB allocates more or less space
+to other buffers and caches.
+
+InnoDB also has a leaf cache.  Whenever a leaf is brought into cache for any
+reason, all inserts to that leaf that are currently in the insertion buffer are
+immediately applied to the leaf, and any future inserts to that leaf also skip
+the insertion buffer as long as the leaf remains in cache.
+
+Finally, it performs some flushing when the buffer is not full. Roughly every
+second, InnoDB performs a small amount of background flushing. Moreover, it
+prematurely flushes its buffer to a leaf when it calculates that such a flush
+will cause the leaf to split. We hypothesize that this feature exists to
+simplify the transactional system.
+
+\subsecput{exp-insertion}{Leaf Probabilities in \btrees{}}
+In \Cref{sec:uniform}, we established that, on insertion, the leaf
+probabilities are nearly uniform.  We empirically verify this uniformity
+property by simulating insertions into the leaves of a \btree{}. We insert
+real-valued keys i.i.d.\ according to uniform, Pareto (real-valued Zipfian) and
+normal distributions; the leaves of the \btree{} split when they are full, and
+we measure the ratio of the maximal weight leaf to $1/n$.
+\Cref{lem:uniform-leaves} tells us that this ratio should be asymptotically at
+most constant, but as \Cref{fig:simalpha} shows, our experimental analysis
+shows further that this constant is generally less than 2. Because leaves
+generally split in 2, this makes some intuitive sense.
+
+\input{insertion-plots}
+
+We also verify the these results using the \innodb{} storage engine. We insert
+5 million rows into a database using uniform, Pareto and normal distributions
+on the keys. the results are summarized in \cref{fig:alpha}. The maximum ratio
+does not exceed 2.3, and the 95th percentile ratio does exceed 1.6. Thus the
+distribution of the keys to the leaves is in fact almost uniform.
+
+\subsecput{exp-synthetic}{Simulating Insertion Buffers}
+
+The ball-and-bins models described above are based on a static leaf structure.
+However, in practice inserting into a database causes the leaf structure (the
+number and probability distribution of bins in the model) to change. However,
+we can still perform the same strategies, and by simulating an insertion buffer
+in front of a database, we can compare their efficiency as well as verify that
+much of the static analysis empirically applies to the dynamic system.
+
+We insert real-valued keys into the simulation according to one of several
+distributions of varying skewness: uniform on $[0,1000]$, Pareto with parameter
+$\alpha=\{0.5,1.0,2.0\}$, and uniform centered at 0, with standard deviation
+$1000$. We have a buffer which stores 2,500 keys; when it fills we choose a
+leaf according to the chosen strategy and flush all the buffered keys destined
+to it. Initially we have one leaf, and the leaves split when they exceed 160
+keys, as uniformly as possible. 
+
+As shown in \Cref{fig:synth}, the key distribution doesn't affect the recycle
+rate of the insertion buffer, and as the number of leaves gets larger, the
+recycle rate decreases. Generally fullest bin does better than golden gate, and
+golden gate does better than random ball. Demonstrated with the normal
+distribution (all distributions perform very similarly), \Cref{fig:synth-ratio}
+shows that golden gate initially outperforms random ball by about 30\%, which
+then decreases as the number of bins grows.
+
+\input{synthetic-plots}
+
+\subsecput{exp-innodb}{Real-World Performance (InnoDB)}
+
+In this section, we empirically the performance of insertion buffers in
+\innodb{}, the default storage engine in \mysql{}.
+
+Analogously to the experiments in \secref{exp-synthetic}, we insert rows into
+the \mysql{} database, and after every 10000 insertions, we check the ``merge
+ratio'' reported by \innodb{}.  This is the number of rows merged into the
+database from the buffer during each buffer flush, and corresponds to the
+recycling rate in the balls and bins model. We also check the reported memory
+allocated to the buffer, which allows us to control for memory usage. 
+
+\input{innodb-plots}
+
+The keys of the rows are i.i.d.\ according to the same real-valued probability
+distributions as in \secref{exp-synthetic}: uniform on $[0,1000000]$, Pareto
+with parameter $\alpha = \{0.5,1,2\}$, and normal centered at 0 with standard
+deviation $1000$. The results for the different distributions are shown in
+\Cref{fig:innodbuni,fig:innodbpar0.5,fig:innodbpar1,fig:innodbpar2,fig:innodbnorm}.
+The structure of the plot generally does not depend on the key distribution,
+and while there is more noise, the overall picture is similar to the plots in
+\Cref{fig:synth}. 
+
+If we were to hold the number of leaves roughly constant and change the buffer
+size, \Cref{lem:unilowerbound} suggests that the relationship with recycle rate
+would be roughly linear. To test this, we ran the above experiment with buffer
+sizes from 8mb to 128mb in 2mb increments. We performed 11 million insertions
+with uniformly distributed keys each time, and then took the average recycle
+rate for the last million rows. As demonstrated in \Cref{fig:innodbbuffer}, the
+resulting plot is approximately linear.
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: "paper"
+%%% End: 

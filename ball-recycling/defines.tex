@@ -1,0 +1,91 @@
+% !TEX root =  paper.tex
+
+% Comments
+% Uncomment the line below to mute all comments
+%\def \shutupcomments{}
+
+\newcommand{\defn}[1]{\emph{\textbf{\boldmath #1}}}
+
+
+\ifx \shutupcomments \undefined
+\newcommand{\alex}[1]{{\textcolor{Magenta}{ [ Alex: #1 ] }}}
+\newcommand{\mfc}[1]{{\textcolor{Red}{ [ Martin: #1 ] }}}
+\newcommand{\michael}[1]{{\textcolor{Blue}{ [ Michael: #1 ] }}}
+\newcommand{\rob}[1]{{\textcolor{purple}{ [ Rob: #1 ] }}}
+\newcommand{\mt}[1]{{\textcolor{NavyBlue}{ [ Meng-Tsung: #1 ] }}}
+\else
+\newcommand{\alex}[1]{{}}
+\newcommand{\mfc}[1]{{}}
+\newcommand{\michael}[1]{{}}
+\newcommand{\rob}[1]{{}}
+\newcommand{\mt}[1]{{}}
+\fi
+
+
+% Auto labelling / references
+\newcommand{\secput}[2]{\section{#2}\label{sec:#1}}
+\newcommand{\secref}[1]{\Cref{sec:#1}}     
+\newcommand{\subsecput}[2]{\subsection{#2}\label{sec:#1}}
+\newcommand{\figput}[2]{%
+ \begin{figure}[t]%
+ \begin{center}%
+  \input{#1.pdf_tex}%
+ \end{center}%
+ \caption{#2}%
+ \label{fig:#1}%
+ \end{figure}%
+}
+\newcommand{\figlabel}[1]{\label{fig:#1}}
+\newcommand{\figref}[1]{\Cref{fig:#1}}
+\newcommand{\thmput}[1]{\begin{theorem}\label{thm:#1}}
+\newcommand{\lemput}[1]{\begin{lemma}\label{lem:#1}}
+\newcommand{\lemref}[1]{\Cref{lem:#1}}
+\newcommand{\thmref}[1]{\Cref{thm:#1}}
+
+% Notation
+\newcommand{\E}[1]{\mathrm{E}\left[#1\right]}
+\newcommand{\Var}[1]{\mathrm{Var}\left[#1\right]}
+\newcommand{\Prob}[1]{\mathrm{P}\left(#1\right)}
+\newcommand{\halfnorm}[1]{\|#1\|_{\frac{1}{2}}}
+\newcommand{\halfnormp}{\|\mathbf{p}\|_{\frac{1}{2}}}
+\newcommand{\opt}{\mathrm{OPT}}
+\newcommand{\ind}[1]{\mathrm{I}\left[#1\right]}
+\newcommand{\given}{\:\middle|\:}
+
+\newcommand{\btree}{B-tree}
+\newcommand{\btrees}{B-trees}
+\newcommand{\betree}{$\textrm{B}^\varepsilon$-tree}
+\newcommand{\betrees}{$\textrm{B}^\varepsilon$-trees}
+
+\newcommand{\innodb}{InnoDB}
+\newcommand{\mysql}{MySQL}
+\newcommand{\sqlite}{SQLite}
+\newcommand{\tokudb}{TokuDB}
+\newcommand{\leveldb}{LevelDB}
+
+\newproof{observation}{Observation}
+
+\newcommand{\FB}{\textsc{Fullest Bin}\xspace}
+\newcommand{\WFB}{\textsc{Weighted Fullest Bin}\xspace}
+\newcommand{\RB}{\texorpdfstring{\textsc{Random Ball}}{Random Ball}\xspace}
+\newcommand{\GG}{\textsc{Golden Gate}\xspace}
+\newcommand{\WRB}{\textsc{Weighted Random Bin}\xspace}
+\newcommand{\WGG}{\textsc{Weighted Golden Gate}\xspace}
+\renewcommand{\AE}{\textsc{Aggressive Empty}\xspace}
+\newcommand{\p}{\mathbf{p}}
+\newcommand{\uni}{\mathbf{u}}
+\newcommand{\key}{\mathbf{k}}
+\newcommand{\q}{\mathbf{q}}
+\newcommand{\x}{\mathbf{x}}
+
+\renewcommand{\topfraction}{0.85}
+\renewcommand{\bottomfraction}{0.85}
+\renewcommand{\textfraction}{0.15}
+\renewcommand{\floatpagefraction}{0.8}
+\renewcommand{\textfraction}{0.1}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:
+

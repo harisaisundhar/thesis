@@ -1,0 +1,104 @@
+% !TEX root =  paper.tex
+
+\section{Ball Recycling and Insertion/Update Buffers}\label{sec:motivation}
+
+Ball recycling models insertion and update buffers, which are widely used in
+modern databases~\cite{Azure16, IBM17, Xiang12, Informix, Callaghan11, NuDB16,
+Oracle17, SAP17, Vertica17,CanimLaMi10,BenderFaJo12}. These implementations are
+discussed in more detail in \Cref{sec:experiments}.
+
+For a key-value store, such as a database, an \defn{insertion buffer} is a
+cache of recently inserted items.  When the insertion buffer fills, the
+database selects a disk block and all the cached items going to that block are
+evicted in bulk.  If $k$ elements are flushed in bulk, then there is a speedup
+of $k$, compared to writing the elements to the destination block as soon as
+they arrive. After evicting $k$ items, there is room for $k$ new elements in
+the buffer.  An \defn{update buffer} caches changes to existing key-value pairs
+but is otherwise like an insertion buffer.  Although these types of buffers
+seem quite similar, we show that they have important differences in how they
+are modeled as a ball-recycling game.
+
+The mapping to ball recycling is direct: disk blocks are bins and elements in
+the insertion/update buffer are balls.  The probability distribution $\p$ is
+based on the distribution of items inserted  or updated.  Evicting all the
+items going to a disk block corresponds to emptying the bin associated with
+that disk block.  After an eviction of $k$ items, we have room for $k$ new
+insertions/updates, i.e., we have $k$ new balls to throw.  The policy for
+selecting the target disk block of an eviction corresponds to the policy for
+selecting a bin to recycle, and the speedup induced by an eviction policy is
+its recycling rate.  
+
+For \btrees{}, insertion buffers and update buffers differ in an important way:
+updates do not change the structure of leaves of a \btree{}. In contrast,
+insertions can change the range of keys associated with a leaf (due to leaf
+splits), which yields the following result:
+
+\begin{lemma}\label{lem:uniform-leaves}
+	If $N$ keys are inserted into a \btree{} i.i.d.\ according to some key
+	distribution $\q$, then provided $B = \Omega(\log{N})$, the maximum
+	probability that a leaf has of receiving the next insertion is $O(B/N)$
+	with probability 1.  Thus the corresponding recycling game is
+	asymptotically \defn{almost uniform}: no bin has probability more than a
+	constant multiple of $\frac{1}{n}$.
+\end{lemma}
+
+We prove the uniformity bound as follows.  Let $F(\kappa)$ be the cumulative
+density function (CDF) of $\q$, which is the probability that an item sampled
+from $\q$ is less than $\kappa$.  If $\kappa$ is distributed according to $\q$,
+then $F(\kappa)$ will be uniformly distributed on $[0,1]$.
+
+If $n$ points are sampled from $[0,1]$ uniformly and sorted so that $x_1
+\leq x_2 \leq \cdots \leq x_n$, then $\max{x_{i+B}-x_i}$ is known as the
+\defn{maximal $B$-spacing}. It follows that:
+
+\begin{lemma}\label{lem:leaf-b-spacing}
+	Having inserted $n$ keys into a \btree{} i.i.d.\ according to a distribution
+	$\q$, the maximum probability that any leaf has of receiving the next
+	insertion is less than the maximum $B$-spacing of the CDFs of those points.
+\end{lemma}
+
+It is known that:
+
+\begin{lemma}[\cite{DeheuvelsDe84}]
+	If $B = \Theta(\log{n})$, then the maximum $B$-spacing of $n$ points
+	distributed uniformly on the unit interval is $\Theta(B/n)$ with
+	probability 1.
+\end{lemma}
+
+For $B = \omega(\log{n})$, we can subdivide $B$ into intervals of $\log{n}$
+points, each of which will satisfy the lemma. Adding together the resulting
+bounds, we have that the maximal $B$-spacing of $n$ points is $O(B/n)$ with
+probability 1. Together with \Cref{lem:leaf-b-spacing}, this implies
+\Cref{lem:uniform-leaves}.
+
+We also note that an (almost-uniform) ball-recycling game is an imperfect model
+for an insertion buffer, because the ball-recycling game has a fixed number of
+bins, whereas in the insertion buffer, the number of disk blocks will increase.
+Furthermore, insertions may not be independently distributed.
+
+Finally, the implementation of these strategies is a point of departure between
+insertion/update buffers and ball recycling.  In ball recycling, it is obvious
+which bin each ball is in.  In insertion/update buffers for a \btree{},
+elements have a key, but we don't necessarily know what the buckets are, since
+the mapping from keys to buckets depends on the pivots used to define the
+\btree{} leaves.  \FB needs to know what the buckets are, whereas \RB and \GG
+do not.  For \RB this is because the key of the randomly selected item can be
+used to fetch its target \btree{} leaf, after which we know the max and min
+keys in that leaf, and \GG can be implemented by remembering the upper bound of
+the last leaf to which we flushed and then flushing the item with the successor
+of that key, along with all the other keys going to that leaf.  None of these
+strategies require knowledge of $\p$. 
+
+Our results on general $\p$ have an interesting implication for \betrees{},
+which are known to be asymptotically optimal for insertions, in the worst case.
+\betrees{} can also handle updates by propagating messages to the leaves.  For
+some update distributions, flushing according to \RB can achieve an update rate
+that is $B^\varepsilon$ faster than \FB.  We expect to try \RB flushing in our
+\betree{}-based file system,
+B$\varepsilon$trFS~\cite{JannenYuZh15a,YuanZhJa16,YuanZhJa17,ConwayBa17,JannenYuZh15,esmet2012tokufs}.
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:
