@@ -1,0 +1,34 @@
+\documentclass[twoside,leqno,twocolumn]{article}
+
+\input{packages}
+\input{defines}
+
+\begin{document}
+
+%don't want date printed
+\date{}
+
+\input{titleauth}
+% Use the following at camera-ready time to suppress page numbers.
+% Comment it out when you first submit the paper for review.
+%\thispagestyle{empty}
+
+\maketitle
+\fancyfoot[R]{\scriptsize{Copyright \textcopyright\ 2019 by SIAM\\
+Unauthorized reproduction of this article is prohibited}}
+\input{abstract}
+
+\input{intro}
+\input{motivation}
+\input{prelim}
+\input{nonuniform}
+\input{uniform}
+\input{experiments}
+\input{related}
+
+% icalp recommends plainurl
+% \bibliographystyle{plain-url}% the recommended bibstyle
+\bibliographystyle{abbrv}
+\bibliography{bibliography}
+
+\end{document}

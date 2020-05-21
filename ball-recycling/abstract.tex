@@ -1,0 +1,32 @@
+% !TEX root =  paper.tex
+
+\begin{abstract}
+
+	Balls-and-bins games have been a successful tool for modeling load
+	balancing problems.  In this paper, we study a new scenario, which we call
+	the \defn{ball-recycling game}, defined as follows:
+	\begin{displayquote}
+		Throw $m$ balls into $n$ bins i.i.d.\ according to a given probability
+		distribution $\p$.  Then, at each time step, pick a non-empty bin and
+		\defn{recycle} its balls: take the balls from the selected bin and
+		re-throw them according to $\p$.  
+	\end{displayquote}
+	This balls-and-bins game closely models memory-access heuristics in
+	databases.  The goal is to have a bin-picking method that maximizes the
+	\defn{recycling rate}, defined to be the expected number of balls recycled
+	per step in the stationary distribution.
+
+	We study two natural strategies for ball recycling: \FB, which greedily
+	picks the bin with the maximum number of balls, and \RB, which picks a ball
+	at random and recycles its bin.  We show that for general $\p$, \RB is
+	$\Theta(1)$-optimal, whereas \FB can be pessimal. However, when $\p =
+	\uni$, the uniform distribution, \FB is optimal to within an additive
+	constant.
+
+\end{abstract}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:
+

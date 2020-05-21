@@ -1,0 +1,33 @@
+% !TEX root =  paper.tex
+
+\usepackage{xspace}
+
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{csquotes}
+\usepackage{mathtools}
+\usepackage{cuted}
+
+\usepackage[noadjust]{cite}
+\PassOptionsToPackage{hyphens}{url}
+\usepackage{hyperref}
+\usepackage[capitalize]{cleveref}
+
+\usepackage[usenames, dvipsnames]{color}
+
+\usepackage{pgfplots}
+\usepackage{subfig}
+\captionsetup[subfloat]{farskip=0pt, captionskip=1pt}
+\usepackage{pgfplotstable}
+\usepackage{url}
+\usepackage{ltexpprt}
+
+\usepgfplotslibrary{external}
+\tikzexternalize[prefix=pgfplots/]
+\pgfplotsset{invoke before crossref tikzpicture={\tikzexternaldisable},invoke after crossref tikzpicture={\tikzexternalenable}}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:

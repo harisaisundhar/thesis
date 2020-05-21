@@ -1,0 +1,168 @@
+% !TEX root =  paper.tex
+
+\begin{figure*}
+{\centering
+~\ref{innodb-legend}~\\
+\subfloat[Uniform key distribution]{
+\tikzsetnextfilename{innodb-uniform}
+\begin{tikzpicture}%[trim axis left, trim axis right]
+\begin{axis}[
+	width=0.48\textwidth,
+	height=0.31\textheight,
+	xlabel=Rows inserted in millions,
+	xlabel near ticks,
+	ylabel near ticks,
+	ylabel style={align=center, text width=0.27\textheight},
+	ylabel=Recycle rate (last {10,000} insertions),
+	xmin=0,
+	xmax=5,
+	ymin=0,
+	ymax=50,
+	mark repeat={50},
+	legend to name=innodb-legend,
+	legend columns=3,
+	]
+	%\addplot [mark=*, blue, mark size=2] table [x=insertions, y=lower bound, col sep=comma] {./data/innodb/goldengate_uniform_1.0.csv};
+	%\addplot [mark=square*, red, mark size=2] table [x=insertions, y=upper bound, col sep=comma] {./data/innodb/goldengate_uniform_1.0.csv};
+	\addplot [mark=*, blue, mark size=2] table [x=insertions, y=observed, col sep=comma] {./data/innodb/goldengate_uniform_1.0.csv};
+	\addlegendentry{Golden Gate}
+	\addplot [mark=square*, red, mark size=2] table [x=insertions, y=observed, col sep=comma] {./data/innodb/randomball_uniform_1.0.csv};
+	\addlegendentry{Random Ball (default)}
+\end{axis}
+\end{tikzpicture}
+\label{fig:innodbuni}
+}\hfill
+\subfloat[Pareto $\alpha=0.5$ key distribution]{
+\tikzsetnextfilename{innodb-pareto5}
+\begin{tikzpicture}%[trim axis left, trim axis right]
+\begin{axis}[
+	%title=Uniform Key Distribution,
+	width=0.48\textwidth,
+	height=0.31\textheight,
+	xlabel=Rows inserted in millions,
+	xlabel near ticks,
+	ylabel near ticks,
+	ylabel style={align=center, text width=0.27\textheight},
+	ylabel=Recycle rate (last {10,000} insertions),
+	xmin=0,
+	xmax=5,
+	ymin=0,
+	ymax=50,
+	mark repeat={50},
+	]
+	%\addplot [mark=*, blue, mark size=2] table [x=insertions, y=lower bound, col sep=comma] {./data/innodb/goldengate_pareto_0.5.csv};
+	%\addplot [mark=square*, red, mark size=2] table [x=insertions, y=upper bound, col sep=comma] {./data/innodb/goldengate_pareto_0.5.csv};
+	\addplot [mark=*, blue, mark size=2] table [x=insertions, y=observed, col sep=comma] {./data/innodb/goldengate_pareto_0.5.csv};
+	\addplot [mark=square*, red, mark size=2] table [x=insertions, y=observed, col sep=comma] {./data/innodb/randomball_pareto_0.5.csv};
+\end{axis}
+\end{tikzpicture}
+\label{fig:innodbpar0.5}
+}\\
+\subfloat[Pareto $\alpha=1$ key distribution]{
+\tikzsetnextfilename{innodb-pareto1}
+\begin{tikzpicture}%[trim axis left, trim axis right]
+\begin{axis}[
+	%title=Uniform Key Distribution,
+	width=0.48\textwidth,
+	height=0.31\textheight,
+	xlabel=Rows inserted in millions,
+	xlabel near ticks,
+	ylabel near ticks,
+	ylabel style={align=center, text width=0.27\textheight},
+	ylabel=Recycle rate (last {10,000} insertions),
+	xmin=0,
+	xmax=5,
+	ymin=0,
+	ymax=50,
+	mark repeat={50},
+	]
+	%\addplot [mark=*, blue, mark size=2] table [x=insertions, y=lower bound, col sep=comma] {./data/innodb/goldengate_pareto_1.0.csv};
+	%\addplot [mark=square*, red, mark size=2] table [x=insertions, y=upper bound, col sep=comma] {./data/innodb/goldengate_pareto_1.0.csv};
+	\addplot [mark=*, blue, mark size=2] table [x=insertions, y=observed, col sep=comma] {./data/innodb/goldengate_pareto_1.0.csv};
+	\addplot [mark=square*, red, mark size=2] table [x=insertions, y=observed, col sep=comma] {./data/innodb/randomball_pareto_1.0.csv};
+\end{axis}
+\end{tikzpicture}
+\label{fig:innodbpar1}
+}\hfill
+\subfloat[Pareto $\alpha=2$ key distribution]{
+\tikzsetnextfilename{innodb-pareto2}
+\begin{tikzpicture}%[trim axis left, trim axis right]
+\begin{axis}[
+	%title=Uniform Key Distribution,
+	width=0.48\textwidth,
+	height=0.31\textheight,
+	xlabel=Rows inserted in millions,
+	xlabel near ticks,
+	ylabel near ticks,
+	ylabel style={align=center, text width=0.27\textheight},
+	ylabel=Recycle rate (last {10,000} insertions),
+	xmin=0,
+	xmax=5,
+	ymin=0,
+	ymax=50,
+	mark repeat={50},
+	]
+	%\addplot [mark=*, blue, mark size=2] table [x=insertions, y=lower bound, col sep=comma] {./data/innodb/goldengate_pareto_2.0.csv};
+	%\addplot [mark=square*, red, mark size=2] table [x=insertions, y=upper bound, col sep=comma] {./data/innodb/goldengate_pareto_2.0.csv};
+	\addplot [mark=*, blue, mark size=2] table [x=insertions, y=observed, col sep=comma] {./data/innodb/goldengate_pareto_2.0.csv};
+	\addplot [mark=square*, red, mark size=2] table [x=insertions, y=observed, col sep=comma] {./data/innodb/randomball_pareto_2.0.csv};
+\end{axis}
+\end{tikzpicture}
+\label{fig:innodbpar2}
+}\\
+\subfloat[Normal key distribution]{
+\tikzsetnextfilename{innodb-normal}
+\begin{tikzpicture}%[trim axis left, trim axis right]
+\begin{axis}[
+	width=0.48\textwidth,
+	height=0.31\textheight,
+	xlabel=Rows inserted in millions,
+	xlabel near ticks,
+	ylabel near ticks,
+	ylabel style={align=center, text width=0.27\textheight},
+	ylabel=Recycle rate (last {10,000} insertions),
+	xmin=0,
+	xmax=5,
+	ymin=0,
+	ymax=50,
+	mark repeat={50},
+	]
+	%\addplot [mark=*, blue, mark size=2] table [x=insertions, y=lower bound, col sep=comma] {./data/innodb/goldengate_uniform_1.0.csv};
+	%\addplot [mark=square*, red, mark size=2] table [x=insertions, y=upper bound, col sep=comma] {./data/innodb/goldengate_uniform_1.0.csv};
+	\addplot [mark=*, blue, mark size=2] table [x=insertions, y=observed, col sep=comma] {./data/innodb/goldengate_normal_1000.0.csv};
+	\addplot [mark=square*, red, mark size=2] table [x=insertions, y=observed, col sep=comma] {./data/innodb/randomball_normal_1000.0.csv};
+\end{axis}
+\end{tikzpicture}
+\label{fig:innodbnorm}
+}\hfill
+\subfloat[Buffer size and recycle rate]{
+\tikzsetnextfilename{innodb-buffer-size}
+\begin{tikzpicture}%[trim axis left, trim axis right]
+\begin{axis}[
+	%title=Uniform Key Distribution,
+	width=0.48\textwidth,
+	height=0.31\textheight,
+	xlabel=Buffer size in MiB,
+	xlabel near ticks,
+	ylabel near ticks,
+	ylabel style={align=center, text width=0.27\textheight},
+	ylabel=Recycle rate (last million insertions),
+	xmin=0,
+	xmax=128,
+	ymin=0,
+	]
+	\addplot [mark=*, Plum, mark size=2] table [x=Buffer, y=Rate, col sep=comma] {./data/innodb_buffer_size.csv};
+\end{axis}
+\end{tikzpicture}
+\label{fig:innodbbuffer}
+}
+
+\caption{\innodb{} Insertion buffer recycle rates for various key distributions and memory sizes. (Higher is better)}}
+\end{figure*}
+
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:

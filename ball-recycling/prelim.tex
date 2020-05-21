@@ -1,0 +1,143 @@
+% !TEX root =  paper.tex
+
+\secput{prelim}{Ball Recycling and Markov Theory}
+
+We begin our analysis of ball-recycing games with some preliminary results.  In
+particular, we show that all finite-state ball-recycling strategies have
+stationary distributions.
+
+\subsecput{mdps}{Ball-recycling games are Markov decision processes.}
+
+This section makes use of the standard theory of Markov chains and Markov
+decision processes; for an introduction see {\it e.g.}
+Kallenberg~\cite{Kallenberg16}.
+
+In a ball-recycling game, we represent the configuration of the balls as a
+vector $X=(X_i)$ of length $n$, where $X_i$ is the number of balls in the $i$th
+bin.  Since the number of balls is finite, there are only a finite number of bin
+configurations.
+
+A recycling strategy $A$ takes as input the current bin configuration $X$
+together with an internal state $S$, and selects a non-empty bin to recycle;
+the next state is obtained by removing all the balls from the selected bin and
+re-throwing them according to $\p$. The bin selection may be randomized.  We
+write $A^iX$ for the state obtained after $i$ rounds of recycling using
+strategy $A$.  In each round, the recycling algorithm earns a reward equal to
+the number of balls recycled in that round.
+
+In this way, the ball-recycling game is a Markov decision process, and we are
+interested in policies that maximize the expected average recycling rate,
+defined for a policy $A$ as
+\begin{equation*}
+	\mathcal{R}^A = \lim_{T\rightarrow\infty} \frac{1}{T}\sum_{t=0}^{T} R(A^tX_0).
+\end{equation*}
+
+Note that Markov decision processes are very general.  For example, in a Markov
+decision process the policy may vary over time, and may even take the entire
+history of the process and its own past decisions into account when deciding on
+its next action.  Thus, for some strategies $A$, the limit $\mathcal{R}^A$ may
+not exist.  In the literature of Markov decision processes, this is often
+handled by taking the $\limsup$ instead of the limit. However, for any Markov
+decision process, any strategy that maximizes the limit also maximizes the
+$\limsup$~\cite{Kallenberg16}.  Therefore, for simplicity, we will focus only
+on strategies for which the limit is well-defined, and the results will
+generally hold for the $\limsup$ of arbitrary strategies.
+
+A Markov decision process policy is \defn{deterministic} if it decides on its
+next action based solely on the current state, \textit{i.e.}\ without looking at
+history, the number of time steps that have passed or by flipping random
+coins.  A deterministic policy can be represented as a simple table mapping
+each state to a single action to be taken whenever the system is in that state.
+
+The specific strategies we analyze are \defn{finite-state} strategies, where
+the internal state has only finitely many configurations.  When we prove our
+lower bounds, we will further restrict ourselves to \defn{stateless}
+strategies, where there is a unique internal state. In order to do so, we make
+use of the following lemma.
+
+\begin{lemma}[\cite{Kallenberg16}]\label{lem:deterministic-opt}
+	There exists a stateless deterministic recycling strategy $\opt$ that
+	achieves the optimal expected average recycling rate.
+\end{lemma}
+\begin{proof}
+	This follows from Kallenberg's Corollary 5.4.
+\end{proof}
+
+\subsecput{markov}{Stationary distributions of recycling strategies}
+
+A ball-recycling game and a recycling strategy together define a Markov
+process on the state space; the space of pairs comprising a balls-and-bins
+configuration and an internal state. If the strategy is stateless, this is a
+Markov process on the balls and bins space.
+
+There are a finite number of balls-and-bins configurations. Therefore, a
+ball-recycling game with a finite-state recycling strategy defines a finite
+Markov process, and so has at least one stationary distribution.
+
+We now show that stateless recycling strategies result in Markov processes with
+unique stationary distributions.  The following lemma shows that, when we look
+only at the bin configurations, recycling games have properties analogous to
+irreducibility and aperiodicity in Markov chains. 
+
+\begin{lemma}\label{lem:ergodic}
+	For any ball-recycling game with $m$ balls and $n$ bins there is an
+	$\epsilon>0$ such that, for all bin configurations $X$ and $Y$, and for all
+	recycling strategies, the probability that $X$ reaches $Y$ within
+	$\min(m,n)$ steps is at least $\epsilon$.  Furthermore, every bin
+	configuration can transition to itself in one time step.
+\end{lemma}
+\begin{proof}
+	We just need to show a sequence of outcomes for ball tosses that transform
+	$X$ into $Y$, no matter which bins the recycling strategy chooses to empty.
+	So, imagine that, at each step, all the recycling balls land in occupied
+	bins, so that at each step, the number of occupied bins goes down by 1.
+	After at most $\min(m,n)-1$ steps, all the balls will be in a single bin.
+	On the next round, the recycling strategy must choose that bin, causing all
+	the balls to be rethrown.  There is some non-zero probability that they
+	land in configuration $Y$.
+
+	For the second observation, simply note that all the recycled balls may
+	happen to land in the bin from whence they came.
+\end{proof}
+
+\begin{lemma} \label{lem:stationary}
+	\leavevmode
+	\begin{enumerate}
+	\item All ball-recycling games using stateless recycling strategies have
+		unique stationary distributions which are equal to their limiting
+		distributions.
+  \end{enumerate}
+\end{lemma}
+\begin{proof}
+	Having fixed a stateless recycling strategy, the ball-recycling game is a
+	Markov process on the balls-and-bins configuration. By
+	\Cref{lem:ergodic}, this process is irreducible and aperiodic, and so
+	has a unique stationary distribution equal to its limiting distribution.
+\end{proof}
+
+Together with \Cref{lem:deterministic-opt}, we have:
+\begin{corollary} \label{cor:opt-unique}
+	For any ball-recycling game, there exists an optimal strategy with a unique
+	stationary distribution.
+\end{corollary}
+
+We now show that two of the three main recycling strategies studied in this
+paper yield unique stationary distributions.  The strategies are:
+\begin{itemize}
+\item \FB: selects the bin that has the most balls;
+\item \RB: selects a ball uniformly at random and recycles whichever bin it is in;
+\item \GG: selects the bins in a round robin sequence.
+\end{itemize}
+
+\FB is a deterministic strategy, \RB is a stateless strategy and \GG is a
+finite-state strategy. By \Cref{lem:stationary} we have:
+
+\begin{lemma} \label{lem:fb-gg-rb-ergodic}
+  \FB and \RB have unique stationary distributions.
+\end{lemma}
+
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "paper.tex"
+%%% End:
