@@ -33,14 +33,14 @@ index, a limitation also acknowledged by its authors.
 \begin{figure}
       \centering
       \ref{highlights-legend} \\
-      \begin{subfigure}{0.45\linewidth}
+      \begin{subfigure}{0.49\columnwidth}
          \begin{tikzpicture}
             \begin{axis}[
-                  ybar=1pt,
-                  bar width=18pt,
+                  ybar=8pt,
+                  bar width=40pt,
                   enlarge x limits=0.1,
-                  width = \columnwidth,
-                  height = 1\columnwidth,
+                  width = \hsize,
+                  height = \hsize, 
                   symbolic x coords = {Load, A, B, C, D, E, F},
                   xtick = data,
                   major x tick style = transparent,
@@ -51,10 +51,10 @@ index, a limitation also acknowledged by its authors.
                   ylabel near ticks,
                   /pgf/number format/1000 sep={},
                   nodes near coords,
-                  every node near coord/.append style={font=\small},
-                  ylabel={Ops/Sec \\ (Thousands)},
-                  xlabel={},
-                  label style={align=center, font=\small},
+                  %every node near coord/.append style={font=\small},
+                  ylabel={Operationss/Second (Thousands)},
+                  xlabel={Insertion Throughput},
+                  label style={align=center},%, font=\small},
                   legend columns=5,
                   legend style={at={(0.98, 0.98)}, anchor=north east},
                   legend to name={highlights-legend},
@@ -73,40 +73,42 @@ index, a limitation also acknowledged by its authors.
          %% operations, E consists of 20M operations and all other workloads
          %% consist of 160M operations. Higher is better.}\label{fig:ycsb-100b}
       \end{subfigure}
-      %\hspace{0.075\linewidth}
-      \begin{subfigure}{0.45\linewidth}
+      %\hspace{0.075\columnwidth}
+      \begin{subfigure}{0.49\columnwidth}
          \begin{tikzpicture}
             \begin{axis}[
-                  ybar=1pt,
-                  bar width=18pt,
-                  enlarge x limits=0.3,
-                  width = \columnwidth,
-                  height = 1\columnwidth,
-                  symbolic x coords = {load-write, load-total, c-read},
-                  xticklabel style = {align=center},
-                  xticklabels = {}, %{Load:\\Write Amp, Load:\\Total I/O Amp, Run C:\\Read Amp},
+                  ybar=8pt,
+                  bar width=40pt,
+                  enlarge x limits=0.1,
+                  width = \hsize,
+                  height = \hsize, 
+                  symbolic x coords = {load-write},
+                  %xticklabel style = {align=center},
+                  %xticklabels = {Write Amp, Total I/O Amp},
+                  xticklabels = {},
                   xtick = data,
-                  yticklabel style = {rotate=90, font=\small},
+                  yticklabel style = {rotate=90},%, font=\small},
                   major x tick style = transparent,
                   ymin = 0,
                   ymax=11.5,
-                  ylabel={Write Amp.},
+                  ylabel={Write Amplification},
                   ylabel near ticks,
-                  label style = {font=\small},
-                  %xlabel={YCSB I/O Amplification (24b keys, 100b values)},
+                  %label style = {font=\small},
+                  %xlabel={YCSB Write Amplification (24b keys, 100b values)},
+                  xlabel={Write Amplification},
                   nodes near coords,
-                  every node near coord/.append style={font=\small},
+                  %every node near coord/.append style={font=\small},
                   nodes near coords style={/pgf/number format/.cd, fixed zerofill, precision=1},
                   %legend columns=1,
                   %legend style={font=\scriptsize, at={(0.02, 0.98)}, anchor=north west},
-                  skip coords between index={1}{3}
+                  %skip coords between index={1}{3}
                ]
                \addplot[style={Plum,fill=Plum,mark=none}]
-               table [col sep=space] {data/ycsb-amp-100b/splinterdb.csv};
+               table [col sep=space] {data/intro-amp/splinterdb.csv};
                \addplot[style={RoyalBlue,fill=RoyalBlue,mark=none}]
-               table [col sep=space] {data/ycsb-amp-100b/rocksdb.csv};
+               table [col sep=space] {data/intro-amp/rocksdb.csv};
                \addplot[style={ForestGreen,fill=ForestGreen,mark=none}]
-               table [col sep=space] {data/ycsb-amp-100b/pebblesdb.csv};
+               table [col sep=space] {data/intro-amp/pebblesdb.csv};
                %\legend{\sysname, \sysname (12 threads), RocksDB, PebblesDB};
             \end{axis}
          \end{tikzpicture}
