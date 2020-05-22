@@ -188,14 +188,14 @@ delta encoded to become runs in the series $\sigma_{j_q}$ for $q =
 [0,\rho(i+1)]$. The runs in the remaining series of level $i$ becomes runs of
 their respective series on level $i+1$.
 
-Note that for the lower levels, some runs in may be shorter than $B$ due to the
+Note that for the lower levels, some runs may be shorter than $B$ due to the
 delta encoding. For a run in a series $\sigma_q$, this is handled by buffering
 them with the runs $\sigma_q$ of higher levels and writing them out once they
 are of size $B$. Note that this requires $O(B\log\log N)$ memory.
 
 This leads to the following merging pattern: $\sigma_j$ batches $2^{\rho(j)}$
 sketches, and has delta encoded prefixes of $2^{\rho(j)}$ characters on average,
-by \Cref{lem:delta-encoding}.  Therefore,
+by \Cref{lem:delta-encoding}. Therefore,
 
 \begin{lemma}\label[lemma]{lem:character-queue-size}
 	A series $\sigma_j$ in a character queue contains $O(2^{\rho(j)})$

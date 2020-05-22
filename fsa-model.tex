@@ -45,7 +45,9 @@ challenges each file system type encounters in achieving these two goals.
 	\tikzsetnextfilename{seq-read_bandwidth}
     \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
       \begin{axis}[
-        width=1.21\columnwidth,
+        width=\hsize,
+        height=0.6\hsize,
+        enlargelimits=0.05,
         % scale only axis,
         % title=Insertion per second against Load Factor, 
 		  xlabel style={at={(axis description cs:0.5,-0.05)},anchor=north},
@@ -83,9 +85,9 @@ challenges each file system type encounters in achieving these two goals.
         \addlegendentry{HDD}
       \end{axis}
     \end{tikzpicture}
-  \caption{\label{fig:alpha-plot}Effective bandwidth vs.\ read size (higher is
-	better).  Even on SSDs, large I/Os can yield an order of magnitude more
-	bandwidth than small I/Os.}
+  \caption{\label{fig:alpha-plot}Effective bandwidth vs.\ read size (log-log
+   scale, higher is better).  Even on SSDs, large I/Os can yield an order of
+   magnitude more bandwidth than small I/Os.}
   }
 \end{figure}
 

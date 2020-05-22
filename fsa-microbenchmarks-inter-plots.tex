@@ -17,10 +17,10 @@
 
 \newcommandx{\startsfplot}[2] %\startsfplot{hdd/ssd/ssd_raoff}{maxy}
 {
-  \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+  \begin{tikzpicture}
     \begin{axis}[
-      width=1.21\columnwidth,
-	  height=0.95\columnwidth,
+      width=\hsize,
+      height=0.28\textheight,
       % scale only axis,
       % title=Insertion per second against Load Factor, 
       ylabel style={at={(axis description cs:0.075,0.5)},anchor=south},
@@ -35,7 +35,7 @@
       grid=major, 
       scaled x ticks=false,
       scaled y ticks=false,
-      legend columns=3,
+      legend columns=6,
       legend cell align=center,
       legend pos=north west,
       legend to name=sfplotslegend_#1,
@@ -51,10 +51,10 @@
 % args are: hardware 
 \newcommandx{\startsflayoutplot}[1]
 {
-  \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+  \begin{tikzpicture}
     \begin{axis}[
-      width=1.21\columnwidth,
-	  height=0.95\columnwidth,
+      width=\hsize,
+      height=0.28\textheight,
       % scale only axis,
       % title=Insertion per second against Load Factor, 
       ylabel style={at={(axis description cs:0.075,0.5)},anchor=south},
@@ -69,7 +69,7 @@
       grid=major, 
       scaled x ticks=false,
       scaled y ticks=false,
-      legend columns=3,
+      legend columns=6,
       legend cell align=center,
       legend pos=north west,
       legend to name=sflayoutplotslegend_#1,

@@ -7,15 +7,15 @@ routing filter, which is also checked during queries and thus eliminates most
 false positives.  To support this, we will need to refine the routing filter so
 it can maintain check characters even when there are collisions.
 
-The $i$th check character $C_i(K)$ of a fingerprint $K$ is the $i$th
-character from the end of the string representation of $K$. As
-described in \Cref{sec:hashing}, we assume that the fingerprints are
-taken from a universe of size at least $N^2$ so that the check
-characters do not overlap with the characters used in the prefixes of
-the routing filters, and by $\Theta(\log N)$-wise independence, the
-check characters of $O(1)$ fingerprints are independent. Now each
-fingerprint in the filter has a check character and a array pointer,
-and we refer to this data as the \defn{sketch} of the fingerprint.
+The $i$th check character $C_i(K)$ of a fingerprint $K$ is the $i$th character
+from the end of the string representation of $K$. As described in
+\Cref{sec:hashing}, we assume that the fingerprints are taken from a universe
+of size at least $N^2$ so that the check characters do not overlap with the
+characters used in the prefixes of the routing filters, and by $\Theta(\log
+N)$-wise independence, the check characters of $O(1)$ fingerprints are
+independent. Now each fingerprint in the filter has a check character and a
+array pointer, and we refer to this data as the \defn{sketch} of the
+fingerprint.
 
 When level $i$ of the BOA is queried for a fingerprint $K$, the refined routing
 filter (described below) returns a list of sketches, one for each fingerprint
@@ -26,7 +26,7 @@ false positives by a factor of $\lambda$.
 \paragraph{Refined Routing Filter}
 The routing filter described in \Cref{sec:boa-routing-filter} handles prefix
 collisions by returning only the last run containing the queried fingerprint
-and then chaining in the runs. Whereas, to support check characters, we need to
+and then chaining in the runs. Whereas, to support check characters we need to
 return a list instead, while having the same performance guarantees.
 
 The idea behind the refined routing filter is to keep the prefix-sketch pairs

@@ -13,22 +13,23 @@
 	\addplot[color=black, mark=|, only marks] table [x=block, y=round] {fsa-data/camera_ready_layout/#1/layout_rr_#2_9};
 }
 
-\begin{figure}[t]
+\begin{figure}[p]
 { \centering
 	\begin{subfigure}{\columnwidth}
 		\centering
 		\tikzsetnextfilename{layout-intra_ext4}
-		\begin{tikzpicture}[xscale=0.825, yscale=0.825, trim axis left, trim axis right]
+		\begin{tikzpicture}
 			\begin{axis}[
 				%xlabel={relative LBA},
 				ylabel style={align=center},
-				ylabel={(a) \ext\\round\vspace*{-1.5em}},
+				ylabel={(a) \ext\\round},
 				xmin=0,
 				xmax=1200,
-				ymin=0,
-				ymax=100,
-				width=1.21\columnwidth,
-				height=0.44\linewidth,
+				ymin=-5,
+				ymax=105,
+                                ytick distance=20,
+				width=0.95\hsize,
+				height=0.20\textheight,
 				]
 				\addnewlayoutplot{ext4}{0}
 				\addnewlayoutplot{ext4}{10}
@@ -50,17 +51,18 @@
 	\begin{subfigure}{\columnwidth}
 		\centering
 		\tikzsetnextfilename{layout-intra_btrfs}
-		\begin{tikzpicture}[xscale=0.825, yscale=0.825, trim axis left, trim axis right]
+		\begin{tikzpicture}
 			\begin{axis}[
 				%xlabel={relative LBA},
 				ylabel style={align=center},
-				ylabel={(b) \btrfs\\round\vspace*{-1.5em}},
+				ylabel={(b) \btrfs\\round},
 				xmin=0,
 				xmax=1200,
-				ymin=0,
-				ymax=100,
-				width=1.21\columnwidth,
-				height=0.44\linewidth,
+				ymin=-5,
+				ymax=105,
+                                ytick distance=20,
+				width=0.95\hsize,
+				height=0.20\textheight,
 				]
 				\addnewlayoutplot{btrfs}{0}
 				\addnewlayoutplot{btrfs}{10}
@@ -83,17 +85,18 @@
 	\begin{subfigure}{\columnwidth}
 		\centering
 		\tikzsetnextfilename{layout-intra_xfs}
-		\begin{tikzpicture}[xscale=0.825, yscale=0.825, trim axis left, trim axis right]
+		\begin{tikzpicture}
 			\begin{axis}[
 				%xlabel={relative LBA},
 				ylabel style={align=center},
-				ylabel={(c) \xfs\\round\vspace*{-1.5em}},
+				ylabel={(c) \xfs\\round},
 				xmin=0,
 				xmax=1200,
-				ymin=0,
-				ymax=100,
-				width=1.21\columnwidth,
-				height=0.44\linewidth,
+				ymin=-5,
+				ymax=105,
+                                ytick distance=20,
+				width=0.95\hsize,
+				height=0.20\textheight,
 				]
 				\addnewlayoutplot{xfs}{0}
 				\addnewlayoutplot{xfs}{10}
@@ -116,17 +119,18 @@
 	\begin{subfigure}{\columnwidth}
 		\centering
 		\tikzsetnextfilename{layout-intra_zfs}
-		\begin{tikzpicture}[xscale=0.825, yscale=0.825, trim axis left, trim axis right]
+		\begin{tikzpicture}
 			\begin{axis}[
 				%xlabel={relative LBA},
 				ylabel style={align=center},
-				ylabel={(d) \zfs\\round\vspace*{-1.5em}},
+				ylabel={(d) \zfs\\round},
 				xmin=0,
 				xmax=1200,
-				ymin=0,
-				ymax=100,
-				width=1.21\columnwidth,
-				height=0.44\linewidth,
+				ymin=-5,
+				ymax=105,
+                                ytick distance=20,
+				width=0.95\hsize,
+				height=0.20\textheight,
 				]
 				\addnewlayoutplot{zfs}{0}
 				\addnewlayoutplot{zfs}{10}
@@ -149,17 +153,18 @@
 	\begin{subfigure}{\columnwidth}
 		\centering
 		\tikzsetnextfilename{layout-intra_f2fs}
-		\begin{tikzpicture}[xscale=0.825, yscale=0.825, trim axis left, trim axis right]
+		\begin{tikzpicture}
 			\begin{axis}[
 				xlabel={Relative LBA},
 				ylabel style={align=center},
-				ylabel={(e) \ftwofs\\round\vspace*{-1.5em}},
+				ylabel={(e) \ftwofs\\round},
 				xmin=0,
 				xmax=1200,
-				ymin=0,
-				ymax=100,
-				width=1.21\columnwidth,
-				height=0.44\linewidth,
+				ymin=-5,
+				ymax=105,
+                                ytick distance=20,
+				width=0.95\hsize,
+				height=0.20\textheight,
 				]
 				\addnewlayoutplot{f2fs}{0}
 				\addnewlayoutplot{f2fs}{10}

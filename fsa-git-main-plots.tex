@@ -39,7 +39,6 @@
   table[x=#3, y=#4] #5;
 }
 
-
 % args are: FS agedness hardware partition-size git-gc-mode
 \newcommand{\addgitplot}[5]
 {
@@ -54,13 +53,16 @@
 % args are: hardware partition-size git-gc-mode
 \newcommandx{\startgitplot}[3]
 {
-  \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+  \begin{tikzpicture}
     \begin{axis}[
-      width=1.21\columnwidth,
+      width=\hsize,
+      height=0.6\hsize,
       % scale only axis,
       % title=Insertion per second against Load Factor, 
       xlabel={Pulls accrued}, 
+      xlabel near ticks,
       ylabel={Grep cost (sec/GB)}, 
+      yticklabel style={rotate=90, anchor=south},
       xmin=0,
       xmax=10000, 
       ymin=0, 
@@ -72,7 +74,8 @@
       scaled y ticks=false,
       legend columns=2,
       legend cell align=left,
-      legend pos=north west,
+       legend style={font=\small},
+      %legend pos=north west,
       legend to name=gitplotslegend_#1_#2_#3,
       transpose legend,
       ]
@@ -171,28 +174,30 @@
   \end{subfigure}
 }
 
-% arg: partition-size
-\newcommand{\buildgitplot}[1]{
-  \begin{figure*}[p]
+  \begin{figure}[p]
     {\centering
-      ~\ref{gitplotslegend_hdd_#1_on}~\\
-       \buildgitsubplot{hdd}{#1}{on}
-	   \hfill
-       \buildgitsubplot{hdd}{#1}{off}
-	   \\
-       \buildgitsubplot{ssd}{#1}{on}
-	   \hfill
-       \buildgitsubplot{ssd}{#1}{off}
-	   \\
-       \buildlayoutsubplot{ssd}{#1}{on}
-	   \hfill
-       \buildlayoutsubplot{ssd}{#1}{off}
-      \caption{\label{fig:git-#1} Git read-aging experimental results: On-disk layout as measured by dynamic layout score generally is predictive of read performance.}
-    }
-  \end{figure*}
-}
+      ~\ref{gitplotslegend_hdd_20gb_on}~\\
+       \buildgitsubplot{hdd}{20gb}{on} \\
+       \buildgitsubplot{hdd}{20gb}{off}
+       }
+      \caption{\label{fig:git-hdd} Git read-aging experimental results on HDD: On-disk layout as measured by dynamic layout score generally is predictive of read performance.}
+  \end{figure}
+	 
+  \begin{figure}[p]
+    {\centering
+      ~\ref{gitplotslegend_ssd_20gb_on}~\\
+       \buildgitsubplot{ssd}{20gb}{on} \\
+       \buildgitsubplot{ssd}{20gb}{off}
+       }
+      \caption{\label{fig:git-ssd} Git read-aging experimental results on SDD: On-disk layout as measured by dynamic layout score generally is predictive of read performance.}
+  \end{figure}
 
-\foreach \ps in {20gb} {
-  \buildgitplot{\ps}
-}
+  \begin{figure}[p]
+    {\centering
+      ~\ref{gitplotslegend_hdd_20gb_on}~\\
+       \buildlayoutsubplot{ssd}{20gb}{on} \\
+       \buildlayoutsubplot{ssd}{20gb}{off}
+       }
+      \caption{\label{fig:git-layout} Git read-aging layout scores.}
+  \end{figure}
 
