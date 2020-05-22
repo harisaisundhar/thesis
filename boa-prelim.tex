@@ -77,7 +77,7 @@ on the level beneath it.  When $\grow$ runs are present at a level,
 they are merged into one run and placed at the next level.  There are
 therefore $O(\log_{\grow} N)$ levels.  Insertions are faster than in
 LT-LSMs because each item is only merged once on each level.  Queries
-are slower because each query must be perform $O(\grow)$ times at each
+are slower because each query must be performed $O(\grow)$ times at each
 level.
 
 In LSMs, deletions can be implemented by the use of \defn{upsert

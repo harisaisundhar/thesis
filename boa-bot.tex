@@ -2,12 +2,12 @@
 
 In order for a BOA to be an optimal dictionary, its growth factor $\grow{}$
 must be $\Omega(\log{N}/\log\log{N})$. Otherwise, the cost of insertion is
-dominated by the cost of merging, which in slow because it effectively sorts
+dominated by the cost of merging, which is slow because it effectively sorts
 the fingerprints using a $\lambda$-ary merge sort. In this section, we present
 the \defn{Bundle of Trees Hash Table} (BOT), which is a BOA-like structure. A
 BOT stores the fingerprints in a log in the order in which they arrive. Each
 level of the BOT is like a level of a BOA, where the bundle of arrays on each
-level is replaced by an search structure on the log (the \defn{routing tree})
+level is replaced by a search structure on the log (the \defn{routing tree})
 and a data structure needed to merge routing trees (the \defn{character
 queue}).  The character queue performs a delayed sort on the characters needed
 at each level, thus increasing the arity of the sort and decreasing the IOs.
@@ -22,7 +22,7 @@ a child, a check character and some auxiliary information discussed below.
 
 Each leaf points to a block of $B$ fingerprints in the log. The deepest level
 $s$ uses a height-$s$ tree to index the beginning of the fingerprint log, the
-next level then indexes the next section and so forth, as shown in
+next level then indexes the next section, and so forth, as shown in
 \Cref{fig:routing_tree}. Insertions and deletions (as upsert messages) are
 appended to the log until they form a block, at which point they are added to
 the tree in the 1st level of the BOT.
@@ -58,13 +58,13 @@ the prefix-sketch pairs of the fingerprints from level $i$ to the routing
 filter of the root on level $i+1$. The child pointers of these pairs will point
 to the root of the formerly level-$i$ routing tree, so it becomes a child of
 the root of the level $i+1$ routing tree, although it isn't moved or copied.
-See \Cref{fig:routing_tree_merge}. In this way, a BOT resembles an LT-LSM,
+See \Cref{fig:routing_tree_merge}. In this way, a BOT resembles an LT-LSM, as
 described in \Cref{sec:lsm}.
 
 In order to add a fingerprint $K$ from level $i$ to the root routing filter on
 level $i+1$, the prefix $P_{i+1}(K)$ must be known. However, the root routing
 filter on level $i$ only stores the prefix $P_i(K)$ for each fingerprint $K$ it
-contains, so that in particular the last character of $P_{i+1}(K)$ is missing.
+contains, so that in particular, the last character of $P_{i+1}(K)$ is missing.
 As described in \Cref{sec:character-queue}, each level has a character queue,
 which provides this character, as well as the check characters, in order to
 merge the routing trees efficiently.
@@ -83,7 +83,7 @@ positives which are likewise routed down towards the log.
 
 In this section, we refine routing trees so that they offer two guarantees
 about false positives. The first is that at each level, the probability that a
-given false positive is not elinimated is at most $\frac{1}{\lambda}$. The
+given false positive is not eliminated is at most $\frac{1}{\lambda}$. The
 second is that false positives can only be created in the root, so that as the
 query descends the tree, the number of false positives cannot increase.
 
@@ -94,7 +94,7 @@ also match the check character $C_h(K)$. Since the characters of the
 fingerprint are uniformly distributed and $\Theta(\log N)$-wise independent,
 the check character of each false positive matches with probability
 $\frac{1}{\lambda}$.  Moreover, the characters of each level are
-non-overlapping, so for fingerprints $K$, $K'$ the event that $V_h(K)=V_h(K')$
+non-overlapping, so for fingerprints $K$, $K'$, the event that $V_h(K)=V_h(K')$
 is independent of the event that $V_{h-1}(K)=V_{h-1}(K')$.
 
 To prevent new false positives from being generated when a query passes from a
@@ -151,7 +151,7 @@ The character queue effectively performs a merge sort on the sketches. If it
 were to merge all the sketches as soon as they are available, this would
 consist of $\lambda$-ary merges.  In order to increase the arity of the merges,
 it defers merging sketches which are not needed immediately. The sketches are stored
-collection of \defn{series}, by which we mean a collection of sorted runs. Each
+as a collection of \defn{series}, by which we mean a collection of sorted runs. Each
 series stores a continuous range of sketches
 $S_i(K),S_{i+1}(K),\ldots,S_{i+j}(K)$ for each fingerprint $K$, together with
 the prefix up to the first sketch, $P_{i-1}(K)$. These prefixes are delta
@@ -173,7 +173,7 @@ fingerprint $K$ in the level. These characters are stored in a collection of
 series $\{\sigma_{j_q}\}$, where $j_q$ is the smallest multiple of $2^q$
 greater than $i$. Series $\sigma_{j_q}$ contains the sketches
 $S_{j_q}(K),\ldots,S_{j_{q+1}-1}(K)$. Each series consists of a collection of
-sorted runs each of which stores the delta encoded prefix of each fingerprint
+sorted runs, each of which stores the delta encoded prefix of each fingerprint
 together with its sketches.
 
 Initially, when a block of the log is written, all the series $\sigma_{2^q}$
@@ -185,10 +185,10 @@ $i+1$ ($\rho$ is sometimes referred to as the \defn{ruler
 function}~\cite{wiki:Thomae's_function}), then $\sigma_{i+1}$ also contains the
 next $2^{\rho(i+1)}-1$ sketches of each fingerprint. These are batched and
 delta encoded to become runs in the series $\sigma_{j_q}$ for $q =
-[0,\rho(i+1)]$. The runs in the remaining series of level $i$ becomes runs of
+[0,\rho(i+1)]$. The runs in the remaining series of level $i$ become runs of
 their respective series on level $i+1$.
 
-Note that for the lower levels, some runs in may be shorter than $B$ due to the
+Note that for the lower levels, some runs in may \hanna{runs in what?} be shorter than $B$ due to the
 delta encoding. For a run in a series $\sigma_q$, this is handled by buffering
 them with the runs $\sigma_q$ of higher levels and writing them out once they
 are of size $B$. Note that this requires $O(B\log\log N)$ memory.
@@ -245,7 +245,7 @@ We can now prove Theorem 3:
 \begin{proof}
 	By \Cref{lem:refined-routing-filter}, the cost of updating the routing
 	filters is $O\left(\frac{\grow}{B}\right)$, since there are $O(\log_\grow
-	N)$ levels. This, together with the cost of updating the character queues,
+	N)$ levels. This, together with the cost of updating the character queues
 	given by \Cref{lem:character-queue-update}, is the insertion cost.
 
 	By \Cref{lem:routing-tree-guarantee}, a query for fingerprint $K$ on level

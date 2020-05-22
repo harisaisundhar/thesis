@@ -14,7 +14,7 @@ taken from a universe of size at least $N^2$ so that the check
 characters do not overlap with the characters used in the prefixes of
 the routing filters, and by $\Theta(\log N)$-wise independence, the
 check characters of $O(1)$ fingerprints are independent. Now each
-fingerprint in the filter has a check character and a array pointer,
+fingerprint in the filter has a check character and an array pointer,
 and we refer to this data as the \defn{sketch} of the fingerprint.
 
 When level $i$ of the BOA is queried for a fingerprint $K$, the refined routing
@@ -40,7 +40,7 @@ are $\log_\lambda\log_\lambda N$ characters shorter, which we refer to as
 
 The list delta encodes the prefix for each fingerprint $K$, together with its
 sketch. In addition, the first entry following each pivot prefix contains the
-full prefix, rather then just the difference. Otherwise, when the hash table
+full prefix, rather than just the difference. Otherwise, when the hash table
 routes a query to that place in the list, the full prefix wouldn't be
 immediately computable.
 
@@ -107,3 +107,5 @@ Thus, a BOA is optimal for large enough $\lambda$:
 	\frac{\log{N}}{\log\log{N}}\right),$ then $\mathcal{B}$ is an optimal
 	unsorted dictionary.
 \end{corollary}
+
+\hanna{does one do a qed box here?}

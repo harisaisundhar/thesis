@@ -4,11 +4,11 @@ A \defn{Bundle of Arrays Hash Table} (\boa{}) is an external-memory dictionary
 based on ST-LSMs. In this section, we describe a simple version which is
 optimal in the sense of \Cref{thm:ip-lower-bound}, but where the query cost
 meets the bound only in expectation, not w.h.p. In \Cref{sec:boa-refined}, we
-give a version that satifies \Cref{thm:boa-cost}.
+give a version that satisfies \Cref{thm:boa-cost}.
 
 As a first step, we show that runs with uniformly distributed, $\Theta(\log
-N)$-wise independent fingerprints can be searched more quickly than in an
-ST-LSMs. In this section 
+N)$-wise independent fingerprints can be searched more quickly than in 
+ST-LSMs. In this section \hanna{incomplete}
 
 \begin{lemma}\label[lemma]{lem:interpolation-search}
 	Let $A$ be a sorted array of $N$ uniformly distributed $\Theta(\log
@@ -47,9 +47,9 @@ ST-LSMs. In this section
 \end{corollary} 
 
 While the query performance improves by a factor of $\log{N}$, the ST-LSM
-is still off the optimal tradeoff curve of \Cref{thm:ip-lower-bound}. In
+is still off of the optimal tradeoff curve of \Cref{thm:ip-lower-bound}. In
 particular, queries can be at least exponentially slower than optimal. The
-\boa{} use additional structure in order to reduce this query cost.
+\boa{} uses additional structure in order to reduce this query cost.
 
 \subsection{Routing Filters}\label{sec:boa-routing-filter}
 The main result of this section is an auxiliary data structure, the
@@ -72,8 +72,8 @@ a fingerprint.
 We also modify each run $R_{\ell, j}$ during the merge so that each
 fingerprint-value pair contains a \defn{previous field} of 1 additional
 character used to specify the previous run containing a fingerprint with the
-same prefix, or $j$ to indicate no such run exists. Thus these fingerprint-value
-pairs now form a singly linked list whose fingerprint share the same prefix,
+same prefix, or $j$, to indicate no such run exists. Thus these fingerprint-value
+pairs now form a singly linked list whose fingerprints share the same prefix,
 and the routing filter points to the run containing the head.
 
 During a query for a fingerprint $K$, first $F_\ell[P_\ell(K)]$ is checked to
@@ -128,7 +128,7 @@ positives in order to analyze the overall query cost.
 \begin{proof}
 	Given some enumeration of the fingerprints in level $\ell$, which are not
 	equal to $K$, denote the $i$th such fingerprint by $K_i$. Some of these may
-	be the duplicates. Let $X_i$ be the indicator random variable, which is 1
+	be duplicates. Let $X_i$ be the indicator random variable, which is 1
 	if $P_\ell(K)=P_\ell(K_i)$ and 0 otherwise. $K$ and $K_i$ are
 	uniformly distributed and their bits are pairwise independent.  Thus
 	$\E{X_i} \leq \frac{1}{\lambda^{h_\ell}}$. The expected number of
