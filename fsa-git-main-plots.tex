@@ -105,12 +105,14 @@
 % args are: hardware partition-size git-gc-mode
 \newcommandx{\startlayoutplot}[3]
 {
-  \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+  \begin{tikzpicture}
     \begin{axis}[
-      width=1.21\columnwidth,
+      width=\hsize,
+      height=0.7\hsize,
       % scale only axis,
       % title=Insertion per second against Load Factor, 
       xlabel={Pulls Accrued}, 
+      xlabel near ticks,
       ylabel={Dynamic layout score}, 
       xmin=0,
       xmax=10000, 
@@ -134,7 +136,7 @@
 \end{tikzpicture}
 }
 
-\newcommand{\layoutplotsubcaption}[2]{\label{subfig:git:layout:#1:#2} Dynamic layout score: git garbage collection \pgfkeysvalueof{/git-gc-mode-names/#2} (Higher is better).}
+\newcommand{\layoutplotsubcaption}[2]{\label{fig:git:layout:#1:#2} Dynamic layout score: git garbage collection \pgfkeysvalueof{/git-gc-mode-names/#2} (Higher is better).}
 
 %
 % git figures

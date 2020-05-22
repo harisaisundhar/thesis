@@ -21,17 +21,18 @@ This score is compared to the same contents copied to a freshly formatted partit
 
 \input{fsa-git-main-plots}
 
-On a hard disk (Figure~\ref{fig:git:results:hdd:20gb:on}), there is a clear
-aging trend in all file systems except \betrfs.  By the end of the experiment,
-all the file systems except \betrfs show performance drops under aging on the
-order of at least 3x and as much as 15x relative to their unaged versions. All
-are at least 15x worse than \betrfs. In all of the experiments in this section,
+On a hard disk (\cref{fig:git-hdd}), there is a clear aging trend in all
+file systems except \betrfs.  By the end of the experiment, all the file
+systems except \betrfs show performance drops under aging on the order of at
+least 3x and as much as 15x relative to their unaged versions. All are at least
+15x worse than \betrfs. The dynamic layout scores througout the benchmark are
+shown in \cref{fig:git-layout}. In all of the experiments in this section,
 \ftwofs ages considerably more than all other file systems, commensurate with
 significantly lower layout scores than the other file systems---indicating less
 effective locality in data placement. The overall correlation between grep
 performance and dynamic layout score is moderate, at $-0.41$. 
 
-On an SSD (Figure~\ref{fig:git:results:ssd:20gb:on}), \btrfs and \xfs show
+On an SSD (\cref{fig:git-ssd}), \btrfs and \xfs show
 clear signs of aging, although they converge to a fully aged configuration
 after only about 1,000 pulls. While the effect is not as drastic as on HDD, in
 all the traditional file systems we see slowdowns of 2x-4x over \betrfs, which
@@ -46,7 +47,7 @@ size decreases over the course of the test, and these file systems are not as
 well-tuned for small files.  To test this hypothesis, we constructed synthetic
 workloads similar to the interfile fragmentation microbenchmark
 (\cref{sec:fsa-microbenchmarks}), but varied the file size (in the
-microbenchmark it was uniformly 4KB).  Figure~\ref{fig:git:filesize} shows both
+microbenchmark it was uniformly 4KB).\cref{fig:git:filesize} shows both
 the measured, average file size of the git workload (one point is one pull),
 and the microbenchmark.  Overall, there is a clear relationship between the
 average file size and grep cost. 
@@ -60,9 +61,9 @@ file system level, this corresponds to merging numerous small files into a
 single large file.  According to the Git manual, this process is designed to
 ``reduce disk space and increase performance,'' so this is an example of an
 application-level attempt to mitigate file system aging. If we turn off the git
-garbage collection, as show in Figures~\ref{fig:git:results:hdd:20gb:off},
-\ref{fig:git:results:ssd:20gb:off} and \ref{subfig:git:layout:20gb:off}, the
-effect of aging is even more pronounced, and the zig-zags essentially
+garbage collection, as show in
+\cref{fig:git:results:hdd:20gb:off,fig:git:results:ssd:20gb:off,fig:git:layout:20gb:off},
+the effect of aging is even more pronounced, and the zig-zags essentially
 disappear.
 
 On both the HDD and SSD, the same patterns emerge as with garbage collection
@@ -106,12 +107,13 @@ longer sufficient memory, the performance of the aged file system with a warm
 cache is generally worse than unaged with a cold cache.  In general, unless all
 data fits into DRAM, a good layout matters more than a having a warm cache.
 
+\paragraph{Git Workload on BTRFS with Different Node Sizes}
 We present the git test with a 4KiB node size, the default setting, as well as
 8KiB, 16KiB, 32KiB, and 64KiB (the maximum).
-\cref{fig:btrfsGrepTime:results:hdd:20gb:off} shows similar performance graphs to
-\cref{fig:git-20gb}, one line for each node size.  The 4KiB node size has the
-worst read performance by the end of the test, and the performance consistently
-improves as we increase the node size all the way to 64KiB.
+\cref{fig:btrfsGrepTime:results:hdd:20gb:off} shows similar performance graphs
+to \cref{fig:git-hdd}, one line for each node size.  The 4KiB node size has
+the worst read performance by the end of the test, and the performance
+consistently improves as we increase the node size all the way to 64KiB.
 \cref{fig:btrfsBlocksWritten:results:hdd:20gb:off} plots the number of 4KiB
 blocks written to disk between each test (within the 100 pulls).  As expected,
 the 64KiB node size writes the maximum number of blocks and the 4KiB node

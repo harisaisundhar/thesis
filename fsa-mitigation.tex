@@ -21,7 +21,7 @@ Batching writes to reduce amplification & & & \checkmark & & & \checkmark \\
 \caption{\label{tab:heuristics} \small
 Principal anti-aging features of the file systems measured in this paper.
 The top portion of the table are commonly-deployed features, and the bottom portion
-indicates features our model (\S\ref{sec:seq}) indicates are essential;
+indicates features our model (\cref{sec:seq}) indicates are essential;
 an ideal node size should match the natural transfer size, which is roughly 4 MiB for 
 modern HDDs and SSDs. OID in \btrfs is an object identifier, roughly corresponding to an inode number, which is assigned at creation time.}
 \end{table}
@@ -38,7 +38,7 @@ initial block allocation decisions determine
 % ``determine''}
 performance over the life of the file system. Here we outline a few of the
 strategies use in modern file systems to address aging, primarily at
-allocation-time (also in the top of Table~\ref{tab:heuristics}).
+allocation-time (also in the top of \cref{tab:heuristics}).
 
 \paragraph{Cylinder or Block Groups.}
 FFS~\cite{DBLP:journals/tocs/McKusickJLF84} introduced the idea of \defn{cylinder groups},

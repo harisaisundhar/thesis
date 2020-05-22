@@ -36,13 +36,13 @@ systems are able to delay allocation, rendering a more contiguous layout.
 \input{fsa-microbenchmarks-intra-plots}
 
 The performance of these file systems on an HDD and SSD are summarized in
-Figures~\ref{fig:micro:intra}. On HDD, the layout scores generally correlate
+\cref{fig:micro:intra}. On HDD, the layout scores generally correlate
 ($-0.93$) with the performance of the file systems.  On SSD, the file systems
 all perform similarly (note the scale of the y-axis).  In some cases, such as
 \xfs, \ext, and \zfs, there is a correlation, albeit at a small scale.  For
 \btrfs, \ext, \xfs, and \ftwofs, the performance is hidden by read-ahead in the
 OS or in the case of \btrfs also in the file system itself. If we disable
-read-ahead, shown in Figure~\ref{subfig:rr:ssd_raoff}, the performance is more
+read-ahead, shown in \cref{subfig:rr:ssd_raoff}, the performance is more
 clearly correlated ($-.67$) with layout score.  We do note that this
 relationship on an SSD is still not precise; SSDs are sufficiently fast that
 factors such as CPU time can also have a significant effect on performance.
@@ -51,7 +51,7 @@ factors such as CPU time can also have a significant effect on performance.
 
 Because of the small amount of data and number of files involved in this
 microbenchmark, we can visualize the layout of the various file systems, shown
-in Figure~\ref{fig:mb-intra-layout}. Each block of a file is represented by a
+in \cref{fig:mb-intra-layout}. Each block of a file is represented by a
 small vertical bar, and each bar is colored uniquely to one of the ten files.
 Contiguous regions form a colored rectangle.  The visualization suggests, for
 example, that \ext both tries to keep files and eventually larger file
@@ -93,7 +93,7 @@ round will be an in-order copy, and subsequent rounds will be copied in a
 progressively more random order until the last round is a fully random-order
 copy.
 
-The results of this test are shown in Figure~\ref{fig:micro:inter}.  On hard
+The results of this test are shown \cref{fig:micro:inter}.  On hard
 drive, all the file systems except \betrfs and \xfs show a precipitous
 performance decline even if only a small percentage of the files are copied out
 of order. \ftwofs's performance is poor enough to be out of scale for this
