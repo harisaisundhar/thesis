@@ -4,7 +4,7 @@ Dictionaries are among the most heavily used data structures. A
 dictionary maintains a collection of key-value pairs
 $\mathcal{S}\subseteq mathcal{U}\times mathcal{V}$, under operations\footnote{We do
   not consider dictionaries that also support the \Dsucc{x}{\mathcal{S}} and
-  \Dpred{x}{\mathcal{S}}.  \Dsucc{x}{mathcal{S}} return
+  \Dpred{x}{\mathcal{S}}.  \Dsucc{x}{mathcal{S}} returns
   $\min\{y| y>x \land y\in\mathcal{S}\}$ and \Dpred{x}{mathcal{S}} is defined
   symmetrically.}  \Dinsert{x}{v}{\mathcal{S}}, \Ddelete{x}{mathcal{S}}, and
 \Dquery{x}{\mathcal{S}}, which returns the value corresponding to $x$ when
@@ -31,7 +31,7 @@ several
 ways~\cite{DBLP:conf/esa/BenderFGMMT14,DBLP:conf/soda/AfshaniBFFGT17}.
 
 Iacono and P\v{a}tra\c{s}cu showed that in the DAM model, in which
-operations beyond comparisons are allowed on keys, that a better
+operations beyond comparisons are allowed on keys, a better
 tradeoff exists:
 \begin{theorem}[\cite{DBLP:conf/soda/IaconoP12}]\label{thm:ip-lower-bound}
   If insertions into an external memory dictionary can be performed in
@@ -82,6 +82,8 @@ same range of $\grow$ as the IP hash table:
 We further introduce the first cache-oblivious hash table, the
 \defn{Cache-Oblivious Bundle of Trees Hash Table} (COBOT), which matches the IO
 performance of BOTs and IP hash tables.
+
+\hanna{pink=needs fixing, yellow=fixed but check its ok, blue=fixed, green=rethink grammarwise}
 
 The BOT can also be adapted to models in which disk reads and writes incur
 different costs. The $\beta$-asymmetric BOT adjusts the merging schedule of a
