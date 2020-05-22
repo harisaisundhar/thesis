@@ -18,15 +18,15 @@
 			legend to name=full_distro_legend,
 			legend columns=2,
 			]
-			\addplot [mark=*, Blue, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./data/simulations/noop_uni.csv};
+			\addplot [mark=*, Blue, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./br-data/simulations/noop_uni.csv};
 			\addlegendentry{Uniform}
-			\addplot [mark=triangle*, Cyan, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./data/simulations/noop_par5.csv};
+			\addplot [mark=triangle*, Cyan, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./br-data/simulations/noop_par5.csv};
 			\addlegendentry{Pareto $\alpha=0.5$}
-			\addplot [mark=square*, Plum, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./data/simulations/noop_par1.csv};
+			\addplot [mark=square*, Plum, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./br-data/simulations/noop_par1.csv};
 			\addlegendentry{Pareto $\alpha=1.0$}
-			\addplot [mark=diamond*, Magenta, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./data/simulations/noop_par2.csv};
+			\addplot [mark=diamond*, Magenta, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./br-data/simulations/noop_par2.csv};
 			\addlegendentry{Pareto $\alpha=2.0$}
-			\addplot [mark=x, YellowOrange, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./data/simulations/noop_norm.csv};
+			\addplot [mark=x, YellowOrange, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./br-data/simulations/noop_norm.csv};
 			\addlegendentry{Normal}
 			%\legend{Uniform, Zipf $\alpha = 0.5$, Zipf $\alpha = 1.0$, Zipf $\alpha = 1.5$, Zipf $\alpha = 2.0$}
 		\end{axis}
@@ -37,9 +37,10 @@
 \end{figure}
 
 \begin{figure}
-{\centering
+\centering
 \hspace*{35pt}\ref{full_distro_legend}\\
-\subfloat[Maximum leaf weight relative to uniform]{
+   \begin{subfigure}{0.49\linewidth}
+%\subfloat[Maximum leaf weight relative to uniform]{
 \tikzsetnextfilename{insertion-inno-max}
 \begin{tikzpicture}%[trim axis left, trim axis right]
 \begin{axis}[
@@ -56,22 +57,23 @@
 	legend columns=2,
 	legend to name=distro_legend
 	]
-	\addplot [mark=*, Blue, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./data/innodb/randomball_uniform_1.0.csv};
+	\addplot [mark=*, Blue, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./br-data/innodb/randomball_uniform_1.0.csv};
 	\addlegendentry{Uniform}
-	\addplot [mark=triangle*, Cyan, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./data/innodb/randomball_pareto_0.5.csv};
+	\addplot [mark=triangle*, Cyan, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./br-data/innodb/randomball_pareto_0.5.csv};
 	\addlegendentry{Pareto $\alpha=0.5$}
-	\addplot [mark=square*, Plum, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./data/innodb/randomball_pareto_1.0.csv};
+	\addplot [mark=square*, Plum, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./br-data/innodb/randomball_pareto_1.0.csv};
 	\addlegendentry{Pareto $\alpha=1.0$}
-	\addplot [mark=diamond*, Magenta, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./data/innodb/randomball_normal_1000.0.csv};
+	\addplot [mark=diamond*, Magenta, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./br-data/innodb/randomball_normal_1000.0.csv};
 	\addlegendentry{Pareto $\alpha=2.0$}
-	\addplot [mark=x, YellowOrange, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./data/innodb/randomball_normal_1000.0.csv};
+	\addplot [mark=x, YellowOrange, mark size=2] table [x=insertions, y=alpha, col sep=comma] {./br-data/innodb/randomball_normal_1000.0.csv};
 	\addlegendentry{Normal}
 	%\legend{Uniform, Zipf $\alpha = 0.5$, Zipf $\alpha = 1.0$, Zipf $\alpha = 1.5$, Zipf $\alpha = 2.0$}
 \end{axis}
 \end{tikzpicture}
 \label{fig:alpha}
-}\hfill
-\subfloat[95th percentile leaf weight relative to uniform]{
+\end{subfigure}
+\hfill
+\begin{subfigure}{0.49\linewidth}
 \tikzsetnextfilename{insertion-inno-95}
 \begin{tikzpicture}%[trim axis left, trim axis right]
 \begin{axis}[
@@ -86,18 +88,17 @@
 	ymin=1,
 	mark repeat={25}
 	]
-	\addplot [mark=*, Blue, mark size=2] table [x=insertions, y=perc, col sep=comma] {./data/innodb/randomball_uniform_1.0.csv};
-	\addplot [mark=triangle*, Cyan, mark size=2] table [x=insertions, y=perc, col sep=comma] {./data/innodb/randomball_pareto_0.5.csv};
-	\addplot [mark=square*, Plum, mark size=2] table [x=insertions, y=perc, col sep=comma] {./data/innodb/randomball_pareto_1.0.csv};
-	\addplot [mark=diamond*, Magenta, mark size=2] table [x=insertions, y=perc, col sep=comma] {./data/innodb/randomball_pareto_2.0.csv};
-	\addplot [mark=x, YellowOrange, mark size=2] table [x=insertions, y=perc, col sep=comma] {./data/innodb/randomball_normal_1000.0.csv};
+	\addplot [mark=*, Blue, mark size=2] table [x=insertions, y=perc, col sep=comma] {./br-data/innodb/randomball_uniform_1.0.csv};
+	\addplot [mark=triangle*, Cyan, mark size=2] table [x=insertions, y=perc, col sep=comma] {./br-data/innodb/randomball_pareto_0.5.csv};
+	\addplot [mark=square*, Plum, mark size=2] table [x=insertions, y=perc, col sep=comma] {./br-data/innodb/randomball_pareto_1.0.csv};
+	\addplot [mark=diamond*, Magenta, mark size=2] table [x=insertions, y=perc, col sep=comma] {./br-data/innodb/randomball_pareto_2.0.csv};
+	\addplot [mark=x, YellowOrange, mark size=2] table [x=insertions, y=perc, col sep=comma] {./br-data/innodb/randomball_normal_1000.0.csv};
 	%\legend{Uniform, Zipf $\alpha = 0.5$, Zipf $\alpha = 1.0$, Zipf $\alpha = 1.5$, Zipf $\alpha = 2.0$}
 \end{axis}
 \end{tikzpicture}
 \label{fig:perc}
-}
 	\caption{Deviation of the maximum and 95th percentile weight leaves from uniform as observed in \innodb{}.}\label{fig:deviation}
-}
+\end{subfigure}
 \end{figure}
 
 

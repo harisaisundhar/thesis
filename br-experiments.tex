@@ -18,8 +18,8 @@ SAP~\cite{SAP17},  and
 Vertica~\cite{Vertica17}.
 They are also used to accelerate inserts in several research prototypes, such
 as the buffered Bloom
-filter~\cite{CanimLaMi10} and buffered quotient
-filter~\cite{BenderFaJo12}.  
+filter~\cite{DBLP:conf/vldb/CanimMBLR10} and buffered quotient
+filter~\cite{DBLP:journals/pvldb/BenderFJKKMMSSZ12}.  
 By batching updates to disk, these insertion buffers reduce the amortized
 number of I/Os per insert, which can substantially improve insertion
 throughput.  Facebook claims that the insertion buffer in InnoDB speeds up some
@@ -64,9 +64,9 @@ buffers vary wildly from as little as $2\times$ to as high as
 $80\times$~\cite{Callaghan11}.  Some have even suggested that insertion buffers
 may provide many of the benefits of write-optimization~\cite{Callaghan10},
 i.e., that insertion buffers can bring the performance of \btrees{} up to that
-of LSM-trees~\cite{ONeilChGa96}, COLAs~\cite{BenderFaFi07}, Fractal
-Trees~\cite{Tokutek14}, xDicts~\cite{BrodalDeFi10}, or
-\betrees{}~\cite{BrodalFa03}.
+of LSM-trees~\cite{DBLP:journals/acta/ONeilCGO96}, COLAs~\cite{DBLP:conf/spaa/BenderFFFKN07}, Fractal
+Trees~\cite{Tokutek14}, xDicts~\cite{DBLP:conf/soda/BrodalDFILM10}, or
+\betrees{}~\cite{DBLP:conf/soda/BrodalF03}.
 
 \subsection{Experimental Validation}
 Here we validate our theoretical study of insertion buffers by showing that our
@@ -110,13 +110,13 @@ fill.
 
 \paragraph{Buffered Bloom and quotient filters:}  Bloom filters are known to
 have poor locality for both inserts and lookups.  The buffered Bloom
-filter~\cite{CanimLaMi10} improves the performance of insertions to a Bloom
+filter~\cite{DBLP:conf/vldb/CanimMBLR10} improves the performance of insertions to a Bloom
 filter on SSD by buffering the updates in RAM.  The on-disk Bloom filter is
 divided into pages, and each page has a buffer of updates in RAM.  When a
 page's buffer fills, the buffered changes are written to the page.  
 
 The buffered quotient filter stores newly inserted items in an in-memory
-quotient filter~\cite{BenderFaJo12,benderadaptivebloom}.  When the in-memory
+quotient filter~\cite{DBLP:journals/pvldb/BenderFJKKMMSSZ12,DBLP:conf/focs/BenderFGJM018}.  When the in-memory
 quotient filter fills, its entire contents are flushed to the on-disk quotient
 filter.
 
@@ -163,7 +163,7 @@ most constant, but as \cref{fig:simalpha} shows, our experimental analysis
 shows further that this constant is generally less than 2. Because leaves
 generally split in 2, this makes some intuitive sense.
 
-\input{insertion-plots}
+\input{br-insertion-plots}
 
 We also verify the these results using the \innodb{} storage engine. We insert
 5 million rows into a database using uniform, Pareto and normal distributions
@@ -196,7 +196,7 @@ distribution (all distributions perform very similarly), \cref{fig:synth-ratio}
 shows that golden gate initially outperforms random ball by about 30\%, which
 then decreases as the number of bins grows.
 
-\input{synthetic-plots}
+\input{br-synthetic-plots}
 
 \subsection{Real-World Performance (InnoDB)}\label{sec:br-exp-innodb}
 
@@ -210,7 +210,7 @@ database from the buffer during each buffer flush, and corresponds to the
 recycling rate in the balls and bins model. We also check the reported memory
 allocated to the buffer, which allows us to control for memory usage. 
 
-\input{innodb-plots}
+\input{br-innodb-plots}
 
 The keys of the rows are i.i.d.\ according to the same real-valued probability
 distributions as in \cref{sec:br-exp-synthetic}: uniform on $[0,1000000]$, Pareto
