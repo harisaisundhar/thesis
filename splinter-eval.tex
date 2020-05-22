@@ -70,31 +70,17 @@ updates), workload C is 100\% reads, workload D is read latest (95\%
 reads, 5\% insertions), workload E is short range scans (95\% scans, 5\% insertions)
 and workload F is read-modify-writes (50\% reads, 50\% RMWs).
 
-The results with 100B values is shown in 
- \Cref{fig:ycsb-100B,fig:ycsb-amp-100B}, and we also use a version
-with 24B keys and 1kib values \alex{need this figure}.  
-
-On the load phase, \sysname is faster by almost an order of magnitude.  Because
-of size-tiering and its compaction/flushing policy \sysname has about $1/2$ the
-write amplification of the other systems. Note PebblesDB performs almost no
-reads because it was given unlimited memory.  Surprisingly PebblesDB does not
-show substantially lower write amplification than RocksDB.
-
-On the run phases, which the exception of E, \sysname is 40--150\% faster than
-RocksDB, the next fastest system. On E, \sysname is roughly half as fast as
-RocksDB.
-
 \begin{figure*}
       \centering
       \ref{ycsb-legend} \\
-      \begin{subfigure}{0.52\linewidth}
+      \begin{subfigure}{0.54\linewidth}
          \begin{tikzpicture}
             \begin{axis}[
                   ybar=1pt,
                   bar width=5.5pt,
                   enlarge x limits=0.1,
-                  width = \columnwidth,
-                  height = 1.75in,
+                  width = \hsize,
+                  height = 2.5in,
                   symbolic x coords = {Load, A, B, C, D, E, F},
                   xtick = data,
                   major x tick style = transparent,
@@ -105,7 +91,7 @@ RocksDB.
                   /pgf/number format/1000 sep={},
                   nodes near coords,
                   every node near coord/.append style={rotate=90, anchor=west, font=\tiny},
-                  ylabel={Operations/Second \\ (Thousands)},
+                  ylabel={Operations/Second (Thousands)},
                   xlabel={YCSB Workload (24B keys, 100B values)},
                   label style={font=\small, align=center},
                   legend columns=5,
@@ -125,16 +111,16 @@ RocksDB.
          Load is 673M operations, E is 20M operations and others are 160M
          operations. Higher is better.}\label{fig:ycsb-100B}
       \end{subfigure}
-      \hspace{0.0\linewidth}
-      \begin{subfigure}{0.40\linewidth}
+      \hfill
+      \begin{subfigure}{0.44\linewidth}
          \centering
             \begin{tikzpicture}
                \begin{axis}[
                      ybar=1pt,
                      bar width=5.5pt,
                      enlarge x limits=0.1,
-                     width = \columnwidth,
-                     height = 1.75in,
+                     width = \hsize,
+                     height = 2.5in,
                      symbolic x coords = {Load, A, B, C, D, E, F},
                      xtick = data,
                      major x tick style = transparent,
@@ -145,7 +131,7 @@ RocksDB.
                      /pgf/number format/1000 sep={},
                      nodes near coords,
                      every node near coord/.append style={rotate=90, anchor=west, font=\tiny},
-                     ylabel={Operations/Second \\ (Thousands)},
+                     ylabel={Operations/Second (Thousands)},
                      xlabel={YCSB Workload (24B keys, 1KiB values)},
                      label style={font=\small, align=center},
                      legend columns=1,
@@ -163,24 +149,25 @@ RocksDB.
          \end{tikzpicture}
          \caption{Throughput on YCSB workload with 24B keys and 1KiB values.
          Load is 84M operations, E is 1.3M operations and others are 10M
-         operations. Higher is better.}\label{fig:ycsb-1kib}
+         operations. Higher is better.}\label{fig:ycsb-1KiB}
       \end{subfigure}
       \caption{YCSB throughput and I/O benchmark results.}
 \end{figure*}
 
 \begin{figure}
+   \centering
    \begin{tikzpicture}
       \begin{axis}[
-            ybar=1pt,
-            bar width=10pt,
-            enlarge x limits=0.3,
-            width = \columnwidth,
-            height = 1.35in,
+            ybar=3pt,
+            bar width=24pt,
+            enlarge x limits=0.25,
+            width = \hsize,
+            height = 2in,
             symbolic x coords = {load-write, load-total, c-read},
             xticklabel style = {align=center},
             xticklabels = {Load:\\Write Amp, Load:\\Total I/O Amp, Run C:\\Read Amp},
             xtick = data,
-            xticklabel style = {font=\small},
+            %xticklabel style = {font=\small},
             major x tick style = transparent,
             ymin = 0,
             ymax = 37,
@@ -189,7 +176,7 @@ RocksDB.
             xlabel={YCSB IO Amplification (24B keys, 100B values)},
             label style = {font=\small},
             nodes near coords,
-            every node near coord/.append style={font=\scriptsize},
+            %every node near coord/.append style={font=\scriptsize},
             nodes near coords style={/pgf/number format/.cd, fixed zerofill, precision=1},
             %legend columns=1,
             %legend style={font=\scriptsize, at={(0.02, 0.98)}, anchor=north west},
@@ -206,6 +193,22 @@ RocksDB.
    \caption{IO amplification on YCSB load and Run C workloads, as
    measured with iostat. Lower is better.}\label{fig:ycsb-amp-100B}
 \end{figure}
+
+We perform the benchmark with 24B keys and two different value sizes
+configurations: one with small 100B values, shown in
+\cref{fig:ycsb-100B,fig:ycsb-amp-100B} and one with large 1KiB values, shown in
+\cref{fig:ycsb-1KiB}.
+
+On the load phase, \sysname is faster by almost an order of magnitude.  Because
+of size-tiering and its compaction/flushing policy \sysname has about $1/2$ the
+write amplification of the other systems. Note PebblesDB performs almost no
+reads because it was given unlimited memory.  Surprisingly PebblesDB does not
+show substantially lower write amplification than RocksDB.
+
+On the run phases, which the exception of E, \sysname is 40--150\% faster than
+RocksDB, the next fastest system. On E, \sysname is roughly half as fast as
+RocksDB.
+
 
 \subsection{KVell}\label{sec:kvell}
 
@@ -225,10 +228,10 @@ sizes that \sysname targets.
    \begin{tikzpicture}
       \begin{axis}[
             ybar=1pt,
-            bar width=3.5pt,
+            bar width=8pt,
             enlarge x limits=0.1,
-            width = \columnwidth,
-            height = 1.85in,
+            width = \hsize,
+            height = 3in,
             symbolic x coords = {Load, A, B, C, D, E, F},
             xtick = data,
             major x tick style = transparent,
@@ -238,12 +241,12 @@ sizes that \sysname targets.
             ylabel near ticks,
             /pgf/number format/1000 sep={},
             nodes near coords,
-            every node near coord/.append style={/pgf/number format/fixed, rotate=90, anchor=west, font=\tiny},
-            ylabel={Operations/Second \\ (Thousands)},
+            every node near coord/.append style={/pgf/number format/fixed, rotate=90, anchor=west, font=\small},
+            ylabel={Operations/Second (Thousands)},
             xlabel={YCSB Workload (24B keys, 100B values)},
-            label style = {font=\small, align=center},
-            legend columns=2,
-            legend style={at={(0.98, 0.98)}, anchor=north east, font=\scriptsize}
+            %label style = {font=\small, align=center},
+            legend columns=5,
+            legend style={at={(0.98, 0.98)}, anchor=north east}
             %legend to name={ycsb-legend}
          ]
          \addplot[style={Red,fill=Red!25!white,mark=none} ]
@@ -300,14 +303,11 @@ sequential. It is only when the workload becomes 100\% sequential that the
 write amplification becomes close to 1 (because of caching it even falls below
 1).
 
-\begin{figure*}
-  \centering
-  \ref{seq-legend} \\
-  \begin{subfigure}{0.45\linewidth}
+\begin{figure}
    \begin{tikzpicture}
       \begin{axis} [
-            width = \columnwidth,
-            height = 1.75in,
+            width = \hsize,
+            height = 2.75in,
             xtick = data,
             ytick distance = 500,
             minor y tick num = 4,
@@ -315,19 +315,19 @@ write amplification becomes close to 1 (because of caching it even falls below
             symbolic x coords = {0, 50, 90, 99, 100},
             %major x tick style = transparent,
             ymin = 0,
-            ymax = 999,
-            ylabel={Operations/Second \\ (Thousands)},
+            ymax = 1000,
+            ylabel={Operations/Second (Thousands)},
             yticklabel style = {rotate=90},
             ylabel near ticks,
-            label style = {font=\small, align=center},
+            %label style = {font=\small, align=center},
             xmin = 0,
             xmax = 100,
             nodes near coords,
             xlabel={Percentage Sequential Insertions},
             %legend cell align={left},
-            legend to name=seq-legend,
-            legend columns=3,
-            %legend style={at={(0.02, 0.98)}, anchor=north west}
+            %legend to name=seq-legend,
+            legend columns=1,
+            legend style={at={(0.02, 0.98)}, anchor=north west}
          ]
       \addplot [
          style={Plum},
@@ -335,7 +335,7 @@ write amplification becomes close to 1 (because of caching it even falls below
          mark=*,
          visualization depends on=\thisrow{Alignment} \as \alignment,
          %visualization depends on=\thisrow{YShift} \as \yshift,
-         every node near coord/.append style={font=\scriptsize, anchor=north}
+         every node near coord/.append style={anchor=north}
       ]
          table [
             col sep=space,
@@ -346,7 +346,7 @@ write amplification becomes close to 1 (because of caching it even falls below
          mark=*,
          %visualization depends on=\thisrow{Alignment} \as \alignment,
          %visualization depends on=\thisrow{YShift} \as \yshift,
-         every node near coord/.append style={font=\scriptsize, anchor = south},
+         every node near coord/.append style={anchor = south},
       ]
          table [
             col sep=space,
@@ -357,7 +357,7 @@ write amplification becomes close to 1 (because of caching it even falls below
          mark=square*,
          visualization depends on=\thisrow{Alignment} \as \alignment,
          %visualization depends on=\thisrow{YShift} \as \yshift,
-         every node near coord/.append style={font=\scriptsize, anchor=south}
+         every node near coord/.append style={anchor=south}
       ]
          table [
             col sep=space,
@@ -368,30 +368,30 @@ write amplification becomes close to 1 (because of caching it even falls below
    \caption{Single-threaded insertion throughput by locality. X-axis indicates
    the percentage of sequential keys.  X-axis not to scale. Higher is
    better.}\label{fig:sequential}
-\end{subfigure}
-\hspace{0.075\linewidth}
-\begin{subfigure}{0.45\linewidth}
+\end{figure}
+
+\begin{figure}
    \begin{tikzpicture}
       \begin{axis} [
-            width = \columnwidth,
-            height = 1.75in,
+            width = \hsize,
+            height = 2.75in,
             xtick = data,
             minor y tick num = 4,
             symbolic x coords = {0, 50, 90, 99, 100},
             enlarge x limits = 0.05,
             %major x tick style = transparent,
             ymin = 0,
-            ymax = 14.9,
+            ymax = 15,
             ylabel={I/O Amplification},
             yticklabel style = {rotate=90},
             ylabel near ticks,
-            label style = {font=\small},
+            %label style = {font=\small},
             xmin = 0,
             xmax = 100,
             xlabel={Percentage Sequential Insertions},
             %legend cell align={left},
-            %legend style={at={(0.98, 0.98)}, anchor=north east},
-            %legend columns = 1
+            legend style={at={(0.98, 0.98)}, anchor=north east},
+            legend columns = 1
          ]
       \addplot [
          style={Plum},
@@ -400,7 +400,7 @@ write amplification becomes close to 1 (because of caching it even falls below
          nodes near coords,
          %visualization depends on=\thisrow{WriteAlignment} \as \alignment,
          %visualization depends on=\thisrow{WriteOpacity} \as \opacity,
-         every node near coord/.append style={font=\scriptsize, anchor=south, rotate = 0},
+         every node near coord/.append style={anchor=south, rotate = 0},
       ]
          table [
             col sep=space,
@@ -428,7 +428,7 @@ write amplification becomes close to 1 (because of caching it even falls below
          nodes near coords,
          %visualization depends on=\thisrow{WriteAlignment} \as \alignment,
          %visualization depends on=\thisrow{WriteOpacity} \as \opacity,
-         every node near coord/.append style={font=\scriptsize, anchor=north, rotate = 0},
+         every node near coord/.append style={anchor=north, rotate = 0},
       ]
          table [
             col sep=space,
@@ -456,7 +456,7 @@ write amplification becomes close to 1 (because of caching it even falls below
          nodes near coords,
          %visualization depends on=\thisrow{WriteAlignment} \as \alignment,
          %visualization depends on=\thisrow{WriteOpacity} \as \opacity,
-         every node near coord/.append style={font=\scriptsize, anchor=south, rotate = 0},
+         every node near coord/.append style={anchor=south, rotate = 0},
       ]
          table [
             col sep=space,
@@ -477,7 +477,7 @@ write amplification becomes close to 1 (because of caching it even falls below
             col sep=space,
             y=Total
          ] {data/sequential-amp/rocksdb.csv};
-         %\legend{\sysname, \sysname (no log), RocksDB};
+         \legend{\sysname, \sysname (no log), RocksDB};
       \end{axis}
    \end{tikzpicture}
    \caption{I/O amplification of mixed sequential/random insertion
@@ -485,9 +485,7 @@ write amplification becomes close to 1 (because of caching it even falls below
      total IO amplification (dashed) as measured with
      \texttt{iostat}. X-axis not to scale. Lower is
      better.}\label{fig:sequential-amp}
-\end{subfigure}
-\caption{Insertion throughput and I/O amplification as a function of workload locality.}
-\end{figure*}
+\end{figure}
 
 
 \subsection{Concurrency Scaling}\label{sec:scaling}
@@ -543,17 +541,18 @@ during this benchmark.
       \begin{axis} [
             width = \columnwidth,
             height = 0.7\columnwidth,
+            enlarge x limits = {upper, value=0.05},
             xtick distance = 4,
             major x tick style = transparent,
             ymin = 0,
-            ymax = 950,
+            ymax = 1000,
             yticklabel style = {rotate=90},
             ylabel={Operations/Second (Thousands)},
             xlabel={Number of Concurrent Threads},
-            label style = {font=\small},
+            %label style = {font=\small},
             xmin = 0,
             xmax = 32,
-            legend style={at={(0.02, 0.98)}, anchor=north west, font=\small}
+            legend style={at={(0.02, 0.98)}, anchor=north west}%, font=\small}
          ]
       %\draw[dotted, very thick] (axis cs: 0,669) -- (axis cs: 33,669)
       %   node[pos=.65, above] {relative device limit};
@@ -565,7 +564,7 @@ during this benchmark.
          visualization depends on=\thisrow{Alignment} \as \alignment,
          visualization depends on=\thisrow{YShift} \as \yshift,
          %visualization depends on=\thisrow{Opacity} \as \opacity,
-         every node near coord/.append style={font=\scriptsize, anchor=west, rotate=90}
+         every node near coord/.append style={anchor=west, rotate=90}
       ]
          table [
             col sep=space,
@@ -578,7 +577,7 @@ during this benchmark.
          visualization depends on=\thisrow{Alignment} \as \alignment,
          visualization depends on=\thisrow{YShift} \as \yshift,
          visualization depends on=\thisrow{Opacity} \as \opacity,
-         every node near coord/.append style={font=\scriptsize, anchor=west, rotate = 330}
+         every node near coord/.append style={anchor=west, rotate = 330}
       ]
          table [
             col sep=space,
@@ -591,7 +590,7 @@ during this benchmark.
          visualization depends on=\thisrow{Alignment} \as \alignment,
          visualization depends on=\thisrow{YShift} \as \yshift,
          visualization depends on=\thisrow{Opacity} \as \opacity,
-         every node near coord/.append style={font=\scriptsize, anchor=north west, rotate = 330}
+         every node near coord/.append style={anchor=north west, rotate = 330}
       ]
          table [
             col sep=space,
@@ -610,16 +609,17 @@ during this benchmark.
             width = \columnwidth,
             height = 0.6\columnwidth,
             xtick distance = 4,
+            enlarge x limits = {upper, value=0.05},
             major x tick style = transparent,
             ymin = 0,
-            ymax = 2499,
+            ymax = 2500,
             yticklabel style = {rotate=90},
-            ylabel={Operations/Second \\ (Thousands)},
+            ylabel={Operations/Second (Thousands)},
             xlabel={Number of Concurrent Threads},
-            label style = {font=\small, align=center},
+            %label style = {font=\small, align=center},
             xmin = 0,
             xmax = 32,
-            legend style={at={(0.95, 0.5)}, anchor=east, font=\small}
+            legend style={at={(0.95, 0.5)}, anchor=east}
          ]
       %\draw[dotted, very thick] (axis cs: 0,669) -- (axis cs: 33,669)
       %   node[pos=.65, above] {relative device limit};
@@ -630,7 +630,7 @@ during this benchmark.
          nodes near coords,
          visualization depends on=\thisrow{Alignment} \as \alignment,
          visualization depends on=\thisrow{YShift} \as \yshift,
-         every node near coord/.append style={font=\scriptsize, anchor=west,yshift=-1,rotate=-45}
+         every node near coord/.append style={anchor=west,yshift=-1,rotate=-45}
       ]
          table [
             col sep=space,
@@ -642,7 +642,7 @@ during this benchmark.
          nodes near coords,
          visualization depends on=\thisrow{Alignment} \as \alignment,
          visualization depends on=\thisrow{YShift} \as \yshift,
-         every node near coord/.append style={font=\scriptsize, anchor=west,rotate=90}
+         every node near coord/.append style={anchor=west,rotate=90}
       ]
          table [
             col sep=space,
@@ -655,7 +655,7 @@ during this benchmark.
          nodes near coords,
          visualization depends on=\thisrow{Alignment} \as \alignment,
          visualization depends on=\thisrow{YShift} \as \yshift,
-         every node near coord/.append style={font=\scriptsize, anchor=south east,rotate=0}
+         every node near coord/.append style={anchor=south east,rotate=0}
       ]
          table [
             col sep=space,
@@ -680,17 +680,17 @@ during this benchmark.
             major x tick style = transparent,
             /pgf/number format/1000 sep={},
             ylabel near ticks,
-            label style = {font=\small, align=center},
+            %label style = {font=\small, align=center},
             xmin = 1,
             xmax = 100000,
-            enlarge x limits=0.1,
+            enlarge x limits=0.05,
             ymin = 0,
-            ymax = 2990,
+            ymax = 3000,
             yticklabel style = {rotate=90},
-            ylabel={Effective Throughput \\ (MiB/sec)},
+            ylabel={Effective Throughput (MiB/sec)},
             xlabel={Scan Length in Number of Key-Value Pairs},
-            legend style={at={(0.02, 0.99)}, anchor=north west, font=\small},
-            every node near coord/.append style={font=\scriptsize},
+            legend style={at={(0.02, 0.99)}, anchor=north west}%, font=\small},
+            %every node near coord/.append style={font=\scriptsize},
          ]
       \draw[dotted, very thick] (axis cs: 0,2600) -- (axis cs: 400000,2600)
          node[pos=.6, above] {device read throughput};
