@@ -1,8 +1,17 @@
-\newcommand{\alex}[1]{\textcolor{red}{[ Alex: #1 ]}}
+% Comments
+% Uncomment the line below to mute all comments
+%\def \shutupcomments{}
 
-\newcommand{\defn}[1]{\emph{\textbf{\boldmath #1}}}
+\ifx \shutupcomments \undefined
+\newcommand{\alex}[1]{\textcolor{red}{[ Alex: #1 ]}}
+\newcommand{\hanna}[1]{\textcolor{magenta}{[ Hanna: #1 ]}}
+\else
+\newcommand{\alex}{{}}
+\newcommand{\hanna}{{}}
+\fi
 
 % Notation
+\newcommand{\defn}[1]{\emph{\textbf{\boldmath #1}}}
 \newcommand{\E}[1]{\mathrm{E}\left[#1\right]}
 \newcommand{\Var}[1]{\mathrm{Var}\left[#1\right]}
 \newcommand{\Prob}[1]{\mathrm{P}\left(#1\right)}
