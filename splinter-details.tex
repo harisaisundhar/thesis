@@ -93,12 +93,6 @@ demand as nodes split, we do not try to guarantee that successive nodes
 reside in the same extent.  Furthermore, since memtables are almost always
 in RAM, we do not perform prefetching during memtable traversals.
 
-%% and in particular not in key order, the prefetching design of the
-%% branch trees does not carry over. Therefore the memtables do not support
-%% prefetching. In practice they are rarely written to disk, and overhead of
-%% reading them without prefetching is only about 2--3$\times$.  \alex{probably
-%% include some sort of statistic here.}
-
 The memtable uses hand-over-hand locking, together with preemptive
 splitting. At each index node, first a read lock is obtained, which is
 upgraded only if a split is required. If an index node is full, the

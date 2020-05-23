@@ -24,7 +24,7 @@ ensures the file system has quiesced.
 
 The aging process this microbenchmark emulates is multiple files growing in
 length. The file system must allocate space for these files somewhere, but
-eventually the file must either be moved or fragment. \hanna{fragmented or will fragment?}
+eventually the file must either be moved or will fragment.
 
 Given that the data set size is small and the test is designed to run in a
 short time, an fsync is performed after each file is written in order to defeat
@@ -36,7 +36,7 @@ systems are able to delay allocation, rendering a more contiguous layout.
 \input{fsa-microbenchmarks-intra-plots}
 
 The performance of these file systems on an HDD and SSD are summarized in
-\cref{fig:micro:intra}. \hanna{why figures plural}On HDD, the layout scores generally correlate
+\cref{fig:micro:intra}. On HDD, the layout scores generally correlate
 ($-0.93$) with the performance of the file systems.  On SSD, the file systems
 all perform similarly (note the scale of the y-axis).  In some cases, such as
 \xfs, \ext, and \zfs, there is a correlation, albeit at a small scale.  For

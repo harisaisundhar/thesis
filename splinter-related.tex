@@ -53,21 +53,21 @@ bandwidth.  HashKV~\cite{DBLP:conf/usenix/ChanLLX18} builds on Wisckey by
 introducing hash-based data-grouping to further reduce write amplification, but
 inherits Wisckey's range query performance limitations.
 
-\alex{Going to have to fix this.} Other systems improve write amplification by
-sacrificing range queries altogether.  Conway et
-al.~\cite{DBLP:conf/icalp/ConwayFS18} describe a write-optimized hash table,
-called the BOA, that also uses size-tiering with an LSM.  In a BOA, SSTables of
-sorted runs are replaced with hash tables.  They also introduce the concept of
-a routing filter, which extends the functionality of Bloom filters, in order to
-speed up queries.  The principle advantage of routing filters is that
-performance does not degrade as much when they don't fit in RAM.  The BOA meets
-a provable lower bound on the I/O costs of insertions and
-queries~\cite{DBLP:conf/soda/IaconoP12}.  Thus the BOA is essentially the best
-possible on-disk data structure for random insertions and point queries.  The
-downside is that the BOA does not support range queries, which are crucial to
-many \kv-store applications.  LSM-tries~\cite{DBLP:conf/usenix/WuXSJ15}
-organize the LSM tree using tries, resulting in reduced write amplification.
-However, LSM-tries do not support range queries.
+Other systems improve write amplification by sacrificing range queries
+altogether.  Conway et al.~\cite{DBLP:conf/icalp/ConwayFS18} describe a
+write-optimized hash table, called the BOA, that also uses size-tiering with an
+LSM.  In a BOA, SSTables of sorted runs are replaced with hash tables.  They
+also introduce the concept of a routing filter, which extends the functionality
+of Bloom filters, in order to speed up queries.  The principle advantage of
+routing filters is that performance does not degrade as much when they don't
+fit in RAM.  The BOA meets a provable lower bound on the I/O costs of
+insertions and queries~\cite{DBLP:conf/soda/IaconoP12}.  Thus the BOA is
+essentially the best possible on-disk data structure for random insertions and
+point queries.  The downside is that the BOA does not support range queries,
+which are crucial to many \kv-store applications.
+LSM-tries~\cite{DBLP:conf/usenix/WuXSJ15} organize the LSM tree using tries,
+resulting in reduced write amplification.  However, LSM-tries do not support
+range queries.
 
 \textbf{Other approaches.}  Researchers have also attempted to reduce write
 amplification by exploiting special hardware features such as flash translation
