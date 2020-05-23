@@ -180,7 +180,7 @@ as described below.
 
 An off-the-shelf LSM is typically
 asymptotically much faster than a B-tree for insertions but, for some
-insertion workloads that have high locality can be asymptotically slower.  Queries can also be
+insertion workloads that have high locality, can be asymptotically slower.  Queries can also be
 asymptotically slower than in a B-tree, but this can largely be
 mitigated with filters.
 
@@ -207,7 +207,7 @@ the \bet.\footnote{Historically $F = B^\epsilon$, where $0\leq
   ease the comparison with LSMs.}  Thus pivots and child pointers
 consume $O(F)$ space in each node.  The remaining $B-O(F)\approx B$
 space in each node is used for buffering.  Thus the height of the tree
-is $\approx\log_{F}N$.  Thus the cold-cache query cost is
+is $\approx\log_{F}N$ and the cold-cache query cost is
 $\approx\log_F N$ I/Os.  
 
 Each flush costs $O(1)$ I/Os and moves at least $B/F$ elements one
@@ -221,12 +221,12 @@ reducing query costs to $O(\log_F B)$ I/Os.  Insertions become
 $O((F\log_F B)/B)$ I/Os, and write amplification reduces to
 $O(F\log_F B)$, which are both the same as an LSM with the same size cache.
 
-One advantage of \bets is that they can naturally exploit locality in
-the insertion workload to improve insertion performance, much as a
-B-tree can.  This is because flushes are not done on a level-wide
-basis, but node by node.  Thus, for example, if the insertion workload
-is entirely to a small sub-tree, a \bet can cache that sub-tree to
-reduce write amplification and improve insertion throughput.
+One advantage of \bets is that they can naturally exploit locality in the
+insertion workload to improve insertion performance, much as a B-tree can.
+This is because flushes are not done on a level-wide basis, but node by node.
+Thus, for example, if a workload consists of insertions all destined for a
+small sub-tree, a \bet can cache that sub-tree to reduce write amplification
+and improve insertion throughput.
 
 \paragraph{Filters.} Many LSM implementations mitigate the high
 query cost of a generic LSM by using \defn{filters}; bloom filters~\cite{DBLP:journals/cacm/Bloom70} are the most well
@@ -302,7 +302,7 @@ of $F$ from that of a generic LSM to $O(\log_F
 \frac{N}{M})$, while queries increase by a factor of $F$ to
 $O(F \log_F \frac{N}{M} \log_B N)$ IOs.  Even if we assume
 that the cache has size $M=N/B$, size tiering still trades off a
-factor of $F$ reduction in write amplification for a
+factor of $F$ reduction in write amplification for an
 $F$-fold increase in query costs.  However, by maintaining a
 filter for each SSTable on every level, the point query costs can be
 kept at $O(1)$ IO per positive query and no IOs per negative query.

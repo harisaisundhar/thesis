@@ -9,7 +9,7 @@ devices.
 \textbf{Size-Tiering.}  Cassandra~\cite{cassandra}, Scylla~\cite{scylla}
 PebblesDB~\cite{DBLP:conf/sosp/RajuKCA17}, and
 RocksDB~\cite{facebook-rocksdb2018} (in ``universal compaction'' mode) use
-size-tiering to reduce write amplification.  Size tiering delays compaction of
+size-tiering to reduce write amplification.  Size-tiering delays compaction of
 sorted runs in order to reduce write amplification.  This can harm query
 performance because queries must search in more runs to find the queried item.
 Fluid LSMs~\cite{DBLP:conf/sigmod/DayanI18},

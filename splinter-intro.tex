@@ -1,8 +1,8 @@
 \section{Introduction}\label{Introduction}
 
 Key-value stores form an integral part of system infrastructure.  Google's
-LevelDB and Facebook's RocksDB are widely used both within their companies and
-outside. Their importance has spurred research into several aspects of
+LevelDB and Facebook's RocksDB are widely used, both within and outside of
+their companies. Their importance has spurred research into several aspects of
 key-value store design, such as increasing write throughput, reducing write
 amplification, and increasing
 concurrency~\cite{DBLP:conf/usenix/PapagiannisSGB16,cassandra,scylla,DBLP:conf/sosp/RajuKCA17,facebook-rocksdb2018,DBLP:conf/sigmod/DayanI18,DBLP:conf/sigmod/DayanI19,DBLP:conf/sigmod/DayanAI17,DBLP:conf/spaa/BenderFFFKN07,DBLP:conf/soda/BrodalF03,DBLP:conf/pods/BenderBJKMPSSZ16:set,DBLP:conf/pods/BenderFJMMPX17,DBLP:journals/tos/LuPGAA17,DBLP:conf/usenix/ChanLLX18,DBLP:conf/icalp/ConwayFS18,DBLP:conf/soda/IaconoP12,DBLP:conf/usenix/WuXSJ15,DBLP:conf/usenix/MarmolSTR15,DBLP:conf/cloud/VasudevanKA12,DBLP:conf/fast/ShettySMASZ13,DBLP:conf/eurosys/Golan-GuetaBHK15,DBLP:journals/tos/ZuoHW19,DBLP:conf/fast/YaoWHZLXH19,DBLP:conf/fast/KourtisIK19,DBLP:conf/fast/KaiyrakhmetLNNC19,leveldb,bradleywhitepaper,DBLP:conf/usenix/BalmauDGZYAGK17}.
@@ -121,7 +121,7 @@ SSDs. For example, on small key-value pairs, \sysname is able to fully utilize
 the device bandwidth and achieves almost $2\times$ lower write amplification
 than RocksDB (see \cref{fig:eval-highlights}).  We show that compared to
 state-of-the-art key-value stores such as RocksDB and PebblesDB, \sysname is
-able to ingest new data 6 to 28$\times$ faster (see \cref{fig:eval-highlights})
+able to ingest new data 6--28$\times$ faster (see \cref{fig:eval-highlights})
 while using the same or less memory.  For queries, \sysname is 1.5-3$\times$
 faster than RocksDB and PebblesDB.
 
@@ -139,9 +139,9 @@ write amplification by reducing the number of times a data item is re-written
 during compaction.  The \datastruct also enables localized, fine-grained
 compactions that increase compaction concurrency across the entire tree.  By
 enabling fine-grained, localized compactions, \datastructs push ideas from
-PebblesDB to their logical cocnclusion.
+PebblesDB to their logical conclusion.
 
-In key-value stores like RocksDB, all inserted data is first stored in an
+In key-value stores such as RocksDB, all inserted data is first stored in an
 in-memory component called the memtable. We find that the memtable in RocksDB
 provides low concurrency and becomes the bottleneck when used on top of the
 highly-concurrent \datastruct on NVMe devices. We redesigned the memtable for

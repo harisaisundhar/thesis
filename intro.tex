@@ -69,19 +69,20 @@ Filters are commonly only used in memory (although cuckoo and quotient filters
 have good performance characteristics in external memory as well), and across
 the dataset consume at least $\Omega{N/\log{N}}$ space---implying that $M =
 \Omega{N/\log{N}}$. This part of the parameter space is less theoretically
-interesting, because reasons \alex{fix}. However, as a result, the application
-of filters to common data structures which asymptotically dominate LSMs, such
-as COLAs and \bets, has been overlooked, and these data structures have
-received much less exposure to the systems community.
+interesting, because the principle lower bounds do not hold. However, as a
+result, the application of filters to common data structures which
+asymptotically dominate LSMs, such as COLAs and \bets, has been overlooked, and
+these data structures have received much less exposure to the systems
+community.
 
-Thus filters have sterred systems both towards LSMs, by ``fixing'' their
+Thus filters have steered systems both towards LSMs, by ``fixing'' their
 lookups, and towards hardware configurations with a relatively large amount of
 cache, to enable their use.
 
 \section{This Work}
 
-This work studies a collection of dictionary problems each of which lies
-somewhere in between theory and practice. The themes above---models and their
+This work studies a collection of dictionary problems, each of which lies
+somewhere between theory and practice. The themes above---models and their
 limitations, changing hardware and the use of filters---frequently recur.
 However, rather than dividing the theoretic and practical study of
 dictionaries, these themes reflect the flow of ideas back and forth between
@@ -95,8 +96,8 @@ systems.
 This is evident in \textit{Optimal Hashing in External Memory}, in which
 LSMs---commonly used in practice, but theoretically suboptimal---are modified
 using a new type of filter, the routing filter, to create a simple optimal
-external memory dictionary, the BOA. Pusing these ideas further yields the BOT,
-which is optimal over a larger parameter ranges, and the COBOT, which is the
+external memory dictionary, the BOA. Pushing these ideas further yields the BOT,
+which is optimal over larger parameter ranges, and the COBOT, which is the
 first optimal cache-oblivious dictionary.
 
 \paragraph{Chapter 3: SplinterDB}

@@ -67,7 +67,7 @@ in advance, enabling our \datastruct to take advantage of the I/O
 parallelism of NVMe devices.
 
 Each branch also has an associated \defn{quotient filter}. Quotient filters
-serve the same role as a Bloom filters in many LSM implementations.  However,
+serve the same role as Bloom filters in many LSM implementations.  However,
 we choose quotient filters because they have substantially greater insert and
 query performance than Bloom
 filters~\cite{DBLP:journals/pvldb/BenderFJKKMMSSZ12}, reducing the CPU costs of
