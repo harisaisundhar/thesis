@@ -53,9 +53,10 @@ cost.
 % args are: hardware partition-size
 \newcommandx{\startmsplot}[2]
 {
-	\begin{tikzpicture}[xscale = 0.825, yscale = 0.825, trim axis left, trim axis right]
-    \begin{axis}[
-      width=1.21\columnwidth,
+   \begin{tikzpicture}
+      \begin{axis}[
+            width=\hsize,
+            height=0.45\textheight,
       % scale only axis,
       % title=Insertion per second against Load Factor, 
       xlabel={Operations performed}, 
@@ -66,18 +67,12 @@ cost.
       % ymax=50, 
       % xtick={0,20,40,60,80,100},
       % ytick={0,5,10,15,20,25,30,35,40,45,50},
+      yticklabel style={rotate=90, anchor=south},
       grid=major, 
       scaled x ticks=false,
       scaled y ticks=false,
-	  legend entries = { \btrfs,
-						 \betrfs,
-                         \ext,
-						 \ftwofs,
-						 \xfs,
-						 \zfs,
-						 aged,
-						 unaged},
-      legend columns=3,
+         legend entries = { \btrfs, \betrfs, \ext, \ftwofs, \xfs, \zfs, aged, unaged},
+      legend columns=8,
       legend cell align=center,
       legend pos=north west,
       legend to name=mailserverplotslegend_#1_#2,
@@ -115,9 +110,10 @@ cost.
 % args are: hardware partition-size
 \newcommandx{\startmslayoutplot}[2]
 {
-	\begin{tikzpicture}[xscale = 0.825, yscale = 0.825, trim axis left, trim axis right]
+	\begin{tikzpicture}
     \begin{axis}[
-      width=1.21\columnwidth,
+      width=\hsize,
+      height=0.45\textheight,
       % scale only axis,
       % title=Insertion per second against Load Factor, 
       xlabel={Operations performed}, 
@@ -128,6 +124,7 @@ cost.
       % ymax=50, 
       % xtick={0,20,40,60,80,100},
       % ytick={0,5,10,15,20,25,30,35,40,45,50},
+      yticklabel style={rotate=90, anchor=south},
       grid=major, 
       scaled x ticks=false,
       scaled y ticks=false,
@@ -144,7 +141,7 @@ cost.
 
 \begin{figure}
   {\centering
-    ~~~~~\ref{mailserverplotslegend_hdd_20gb}\\
+   \ref{mailserverplotslegend_hdd_20gb}\\
     \begin{subfigure}{\columnwidth}
       \centering
 	  \tikzsetnextfilename{mailserver-hdd}

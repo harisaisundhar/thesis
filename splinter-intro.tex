@@ -1,8 +1,5 @@
 \section{Introduction}\label{Introduction}
 
-% should move this to paper.tex, using this locally to avoid conflict.
-\newcommand{\sref}[1]{\S\ref{#1}}
-
 Key-value stores form an integral part of system infrastructure.  Google's
 LevelDB and Facebook's RocksDB are widely used, both within and outside of
 their companies. Their importance has spurred research into several aspects of
@@ -237,12 +234,12 @@ design spectrum for key-value stores.
 
 In summary, the contributions of \sysname are as follows:
 \begin{itemize}
-\item We introduce the \datastruct, which reduces write amplification and
-enables fine-grained concurrency in compaction operations (\S\ref{sec:design}-\ref{sec:splitting}).
-
-\item We design and build a highly-concurrent memtable that is able to
-drive enough operations to the underlying \datastruct (\S\ref{sec:details}).
-
-\item We combine the \datastruct, memtable, and user-level cache in \sysname, 
-a key-value store that can fully utilize NVMe SSD bandwidth. (\S\ref{sec:eval}).
+   \item We introduce the \datastruct, which reduces write amplification and
+      enables fine-grained concurrency in compaction operations
+      (\cref{sec:design,sec:flush-compact,sec:splitting}).
+   \item We design and build a highly-concurrent memtable that is able to drive
+      enough operations to the underlying \datastruct (\cref{sec:details}).
+   \item We combine the \datastruct, memtable, and user-level cache in
+      \sysname, a key-value store that can fully utilize NVMe SSD bandwidth.
+      (\cref{sec:eval}).
 \end{itemize}

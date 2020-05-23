@@ -217,7 +217,7 @@ utilize full NVMe bandwidth.  It has an in-memory B-tree index that maps all
 keys to disk page offsets.  It does well on large (4KiB) key-value pairs, but
 on small key-value pairs, the overhead of the in-memory index becomes a
 significant fraction of the dataset size.  In particular, it was impossible to
-run KVell in a memory \texttt{cgroup} of 4GiB.  Figure~\ref{fig:kvell} shows
+run KVell in a memory \texttt{cgroup} of 4GiB.  \Cref{fig:kvell} shows
 KVell's performance on the YCSB workload with 100B values, for different memory
 sizes. At 22GiB, which is around the size of the in-memory index, KVell's
 performance starts to drop. At 20GiB, KVell becomes unusable. Therefore in

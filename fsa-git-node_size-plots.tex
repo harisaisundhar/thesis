@@ -22,8 +22,6 @@
   /btrfs-nodesize-names/64k/.initial=64Kib
 }
 
-
-
 %
 % File parsing definitions
 %
@@ -47,13 +45,12 @@
 % args are: hardware partition-size git-gc-mode
 \newcommandx{\startbtrfsblockswrittenplot}[3]
 {
-  \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+  \begin{tikzpicture}
     \begin{axis}[
-      width=1.21\columnwidth,
-      % scale only axis,
-      % title=Insertion per second against Load Factor, 
+      width=\hsize,
+      height=0.45\textheight,
       xlabel={Pulls accrued}, 
-	  ylabel={Number of 4KiB blocks written (thousands)}, 
+      ylabel={Number of 4KiB blocks written (thousands)}, 
       xmin=0,
       xmax=10000, 
       ymin=0, 
@@ -63,7 +60,8 @@
       grid=major, 
       scaled x ticks=false,
       scaled y ticks=false,
-      legend columns=3,
+      yticklabel style={rotate=90, anchor=south},
+      legend columns=6,
       legend cell align=left,
       legend pos=north west,
       legend to name=btrfsNSBlocksWrittenplotslegend_#1_#2_#3,
@@ -92,11 +90,10 @@
 % args are: hardware partition-size git-gc-mode
 \newcommandx{\startbtrfsGrepTimeplot}[3]
 {
-  \begin{tikzpicture}[yscale=0.825, xscale=0.825, trim axis left, trim axis right]
+  \begin{tikzpicture}
     \begin{axis}[
-      width=1.21\columnwidth,
-      % scale only axis,
-      % title=Insertion per second against Load Factor, 
+      width=\hsize,
+      height=0.45\textheight,
       xlabel={Pulls Accrued}, 
       ylabel={Grep cost (secs/GB)}, 
       xmin=0,
@@ -108,13 +105,14 @@
       grid=major, 
       scaled x ticks=false,
       scaled y ticks=false,
-      legend columns=3,
+      yticklabel style={rotate=90, anchor=south},
+      legend columns=6,
       legend cell align=left,
       legend pos=north west,
       legend to name=btrfsNSGrepTimeplotslegend_#1_#2_#3,
       %transpose legend,
       ]
-    }
+   }
 
 \NewEnviron{btrfsGrepTimeplot}{\expandafter\startbtrfsGrepTimeplot\BODY
 \end{axis}
@@ -161,34 +159,35 @@
 % btrfs node size figures
 %
 
-\begin{figure}
-  {\centering
-    ~\ref{btrfsNSBlocksWrittenplotslegend_hdd_20gb_off}~\\
-    \begin{subfigure}{\columnwidth}
-		\centering
-		\tikzsetnextfilename{git-btrfs_grep_time}
+\begin{figure}[p]
+   {\centering
+   \ref{btrfsNSBlocksWrittenplotslegend_hdd_20gb_off}\\
+   }
+   \begin{subfigure}{\columnwidth}
+      \tikzsetnextfilename{git-btrfs_grep_time}
       \begin{btrfsGrepTimeplot}{hdd}{20gb}{off}
-        \addbtrfsGrepTimeplot{hdd}{20gb}{off}{4k}
-        \addbtrfsGrepTimeplot{hdd}{20gb}{off}{8k}
-        \addbtrfsGrepTimeplot{hdd}{20gb}{off}{16k}
-        \addbtrfsGrepTimeplot{hdd}{20gb}{off}{32k}
-        \addbtrfsGrepTimeplot{hdd}{20gb}{off}{64k}
+         \addbtrfsGrepTimeplot{hdd}{20gb}{off}{4k}
+         \addbtrfsGrepTimeplot{hdd}{20gb}{off}{8k}
+         \addbtrfsGrepTimeplot{hdd}{20gb}{off}{16k}
+         \addbtrfsGrepTimeplot{hdd}{20gb}{off}{32k}
+         \addbtrfsGrepTimeplot{hdd}{20gb}{off}{64k}
       \end{btrfsGrepTimeplot}
-		\caption{\label{fig:btrfsGrepTime:results:hdd:20gb:off}Grep cost at different node sizes (lower is better).}
-    \end{subfigure}\\
-    \begin{subfigure}{\columnwidth}
-		\centering
-		\tikzsetnextfilename{git-btrfs_blocks_written}
+      \caption{\label{fig:btrfsGrepTime:results:hdd:20gb:off}Grep cost at
+      different node sizes (lower is better).}
+   \end{subfigure}\\
+   \begin{subfigure}{\columnwidth}
+      \tikzsetnextfilename{git-btrfs_blocks_written}
       \begin{btrfsBlocksWrittenplot}{hdd}{20gb}{off}
-        \addbtrfsBlocksWrittenplot{hdd}{20gb}{off}{4k}
-        \addbtrfsBlocksWrittenplot{hdd}{20gb}{off}{8k}
-        \addbtrfsBlocksWrittenplot{hdd}{20gb}{off}{16k}
-        \addbtrfsBlocksWrittenplot{hdd}{20gb}{off}{32k}
-        \addbtrfsBlocksWrittenplot{hdd}{20gb}{off}{64k}
+         \addbtrfsBlocksWrittenplot{hdd}{20gb}{off}{4k}
+         \addbtrfsBlocksWrittenplot{hdd}{20gb}{off}{8k}
+         \addbtrfsBlocksWrittenplot{hdd}{20gb}{off}{16k}
+         \addbtrfsBlocksWrittenplot{hdd}{20gb}{off}{32k}
+         \addbtrfsBlocksWrittenplot{hdd}{20gb}{off}{64k}
       \end{btrfsBlocksWrittenplot}
-      \caption{\label{fig:btrfsBlocksWritten:results:hdd:20gb:off}Write amplification at different node sizes (lower is better).}
-    \end{subfigure}
-    \caption{\label{fig:btrfsNodesize} Aging and write amplification on \btrfs, with varying node sizes, under the git aging benchmark.}
-  }
+      \caption{\label{fig:btrfsBlocksWritten:results:hdd:20gb:off}Write
+      amplification at different node sizes (lower is better).}
+   \end{subfigure}
+   \caption{\label{fig:btrfsNodesize} Aging and write amplification on \btrfs,
+   with varying node sizes, under the git aging benchmark.}
 \end{figure}
 
