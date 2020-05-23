@@ -67,7 +67,7 @@ By using the same data structure, memtables can be incorporated into the
 \datastruct directly as branch trees with no serialization. The only processing
 needed is the construction of a quotient filter.
 
-\paragraph{Branch trees.}
+\paragraph{Branch trees}
 When a branch is created from a compaction, its key-value pairs are packed into
 the leaves of the B-tree, and the leading edge of internal nodes are created to
 index them. The nodes in each level are allocated in extents of 32 pages, and
@@ -81,7 +81,7 @@ extent.
 %The extent length is configurable to tune to the latency of
 %the storage device.
 
-\paragraph{Memtables.}
+\paragraph{Memtables}
 The basic design of the memtables mirrors that of the branch B-trees, but
 includes some optimizations designed to increase their insertion performance
 and concurrency.

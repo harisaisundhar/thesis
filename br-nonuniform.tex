@@ -61,7 +61,7 @@ strategy. In order to understand the intuition behind \Cref{lem:freqbound},
 consider a given bin $i$. Intuitively, it makes sense to think that for a
 reasonable recycling strategy the recycling rate of the other bins in the
 system will go down as the number of balls $X_i$ in bin $i$ grows.  After all,
-the $X_i$ balls in bin $i$ aren't available for recycling, until bin $i$ is
+the $X_i$ balls in bin $i$ aren't available for recycling until bin $i$ is
 selected. If we assume this intuition as fact for the moment, this suggests
 that the expected number of balls in bin $i$ should be greater than half the
 recycling rate of bin $i$, perhaps excluding the last ball to land in the bin.
@@ -117,47 +117,37 @@ then $X_\ell = R^A(X)$.
 	In a ball-recycling game with $m$ balls, $n$ bins and probability
 	distribution $\mathbf{p}$, if a strategy $A$ recycles bin $\ell$ in state
 	$X$, then for $j \neq \ell$,
-	\begin{multline}
-		\E{(AX)_j^2}=X_j^2 + 2X_j\p_jR^A(X) \\
-		+ \p_j(1-\p_j)R^A(X) + \p_j^2R^A(X)^2,
-	\end{multline}
+        \[\E{(AX)_j^2}=X_j^2 + 2X_j\p_jR^A(X)
+              + \p_j(1-\p_j)R^A(X) + \p_j^2R^A(X)^2, \]
 	where $R^A(X) = X_\ell$ is the number of balls recycled.
 \end{lemma}
 
 \begin{proof}
-	\begin{align*}
-		\E{(AX)_j^2} &= \E{(X_j+B(j,R^A(X)))^2} \\[1ex]
-					 &= \begin{multlined}[t] X_j^2 + 2X_j\E{B(j,R^A(X))}\\
-						 +\E{B(j,R^A(X))^2} \end{multlined} \\[1ex]
-					 &= \begin{multlined}[t] X_j^2 + 2X_j\p_jR^A(X)\\+\p_j(1-\p_j)R^A(X)
-						 + \p_j^2\left(R^A(X)\right)^2 \end{multlined}
-	\end{align*}
+   \begin{align*}
+      \E{(AX)_j^2} &= \E{(X_j+B(j,R^A(X)))^2} \\
+                   &= X_j^2 + 2X_j\E{B(j,R^A(X))} +\E{B(j,R^A(X))^2} \\
+                   &= X_j^2 + 2X_j\p_jR^A(X) + \p_j(1-\p_j)R^A(X) + \p_j^2\left(R^A(X)\right)^2
+   \end{align*}
 \end{proof}
 
 We now can use this result to compute the result of applying $A$ to $Z$. 
 \begin{lemma}
-	In a ball-recycling game with $m$ balls, $n$ bins and probability
-	distribution $\mathbf{p}$, if a strategy $A$ recycles bin $\ell$ in state
-	$X$, then
-	\begin{multline}
-		\E{Z(AX)}=Z(X) - \left(1+\frac{1}{\p_\ell}\right)\left(R^A(X)\right)^2 \\
-		+ (2m+n-1)R^A(X)
-	\end{multline}
+   In a ball-recycling game with $m$ balls, $n$ bins and probability
+   distribution $\mathbf{p}$, if a strategy $A$ recycles bin $\ell$ in state
+   $X$, then
+   \[\E{Z(AX)}=Z(X) - \left(1+\frac{1}{\p_\ell}\right)\left(R^A(X)\right)^2 + (2m+n-1)R^A(X)\]
 \end{lemma}
 
 \begin{proof}
-	\begin{align*}
-		\E{Z(AX)} 
-		&= \sum_{j=1}^n \E{(AX)_j^2/\p_j} \\
+   \begin{align*}
+      \E{Z(AX)} &= \sum_{j=1}^n \E{(AX)_j^2/\p_j} \\
 		&= \frac{\E{(AX)_\ell^2}}{\p_\ell} + \sum_{j \neq \ell} \frac{\E{(AX)_j^2}}{\p_j} \\
 		&= \begin{multlined}[t][6.25cm](1-\p_\ell)R^A(X) + \p_\ell\left(R^A(X)\right)^2 \\[0.75ex]
-			\vspace*{-1.5ex}\shoveleft[0.25cm]{+ \sum_{j \neq \ell} \left( X_j^2/\p_j + 2X_jR^A(X)} \vphantom{\left(R^A(X)\right)^2}\right.\\
-			\left.+ (1-\p_j)R^A(X) + \p_j\left(R^A(X)\right)^2 \right) \end{multlined} \\
+			\vspace*{-1.5ex}\shoveleft[0.25cm]{+ \sum_{j \neq \ell} \left( X_j^2/\p_j + 2X_jR^A(X)} + (1-\p_j)R^A(X) + \p_j\left(R^A(X)\right)^2 \right) \end{multlined} \\
 		&= Z(X) - \left(2 + \frac{1}{\p_\ell}\right)\left(R^A(X)\right)^2 + 2mR^A(X) \\
-		&\qquad+ \sum_j \left((1-\p_j)R^A(X) + \p_j\left(R^A(X)\right)^2\right) \\
-		&= \begin{multlined}[t]Z(X) - \left(1+\frac{1}{\p_\ell}\right)\left(R^A(X)\right)^2 \\
-			+ (2m+n-1)R^A(X) \end{multlined}
-	\end{align*}
+		&\qquad\quad+ \sum_j \left((1-\p_j)R^A(X) + \p_j\left(R^A(X)\right)^2\right) \\
+		&= Z(X) - \left(1+\frac{1}{\p_\ell}\right)\left(R^A(X)\right)^2 + (2m+n-1)R^A(X)
+   \end{align*}
 \end{proof}
 
 Now, we can prove \Cref{lem:freqbound}.
@@ -172,24 +162,16 @@ Now, we can prove \Cref{lem:freqbound}.
 
 	\begin{align*}
 	\E{Z(\chi^A)} &= \E{Z(A\chi^A)}\\
-	  			  &= \sum_j f_j \E{Z(A\chi^A)|\phi_j} \\
-				  &= \begin{multlined}[t][6.5cm]\sum_j f_j \left(\E{Z(\chi^A)|\phi_j}
-					  \vphantom{\left(1+\frac{1}{\p_j}\right)} \right. \\
-					  - \left(1+\frac{1}{\p_j}\right)\E{\left(R_j^A\right)^2} \\
-					  \left. \vphantom{\left(1+\frac{1}{\p_j}\right)} + (2m+n-1)\mathcal{R}_j^A\right) \end{multlined} \\
-				  &\leq \begin{multlined}[t][6.5cm]\E{Z(\chi^A)} + (2m+n-1)\mathcal{R}^A \\
-					  - \sum_j f_j\left(1 +\frac{1}{\p_j}\right)\left(\mathcal{R}_j^A\right)^2 \end{multlined} \\
-				  &= \begin{multlined}[t][6.5cm]\E{Z(\chi^A)} + (2m+n-1)\mathcal{R}^A \\
-					  - \sum_j \frac{1}{f_j}\left(\p_j^2 +\p_j\right)\left(\mathcal{R}^A\right)^2, \end{multlined}
+	  	      &= \sum_j f_j \E{Z(A\chi^A)|\phi_j} \\
+		      &= \sum_j f_j \left(\E{Z(\chi^A)|\phi_j} - \left(1+\frac{1}{\p_j}\right)\E{\left(R_j^A\right)^2} + (2m+n-1)\mathcal{R}_j^A\right) \\
+		      &\leq \E{Z(\chi^A)} + (2m+n-1)\mathcal{R}^A - \sum_j f_j\left(1 +\frac{1}{\p_j}\right)\left(\mathcal{R}_j^A\right)^2 \\
+		      &= \E{Z(\chi^A)} + (2m+n-1)\mathcal{R}^A - \sum_j \frac{1}{f_j}\left(\p_j^2 +\p_j\right)\left(\mathcal{R}^A\right)^2,
 	\end{align*}
 	where the inequality is due to the Cauchy-Schwartz Inequality and the last
 	line is because of the Flow Equation.
 	
 	Thus we have:
-	\begin{align*}
-		\mathcal{R}^A &\leq \frac{2m+n-1}{\sum_j \frac{1}{f_j}\left(\p_j^2 +\p_j\right)} \\
-					&\leq \frac{2m+n-1}{\sum_j \frac{\p_j}{f_j}}
-	\end{align*}
+        \[ \mathcal{R}^A \leq \frac{2m+n-1}{\sum_j \frac{1}{f_j}\left(\p_j^2 +\p_j\right)} \leq \frac{2m+n-1}{\sum_j \frac{\p_j}{f_j}}. \]
 \end{proof}
 
 \Cref{lem:freqbound} applies to the optimal deterministic strategy $\opt$
@@ -235,11 +217,8 @@ optimality when $m = \Omega(n)$.
 
 	using Jensen's Inequality. Clearing denominators, taking square roots and
 	summing across $i$, we have
-	\begin{align*}
-		\left(\sum_{j=1}^n \E{\left(\chi_j^\mathrm{RB}\right)^2}\right)^{\hspace*{-0.5ex}\frac{1}{2}} \hspace*{-0.5ex}\sum_{i=1}^n \p_i^\frac{1}{2}
-		&= \sum_{i=1}^n \left( \p_i\sum_{j=1}^n {\E{\left(\chi_j^\mathrm{RB}\right)^2}} \right )^{\hspace*{-0.5ex}\frac{1}{2}} \\
-		&\geq \sum_{i=1}^n \E{\chi_i^\mathrm{RB}} = m.
-	\end{align*}
+        \[ \left(\sum_{j=1}^n \E{\left(\chi_j^\mathrm{RB}\right)^2}\right)^{\frac{1}{2}} \sum_{i=1}^n \p_i^\frac{1}{2}
+        = \sum_{i=1}^n \left( \p_i\sum_{j=1}^n {\E{\left(\chi_j^\mathrm{RB}\right)^2}} \right )^{\frac{1}{2}} \geq \sum_{i=1}^n \E{\chi_i^\mathrm{RB}} = m. \]
 	Therefore the expected recycle rate is
 	\[ \sum_{j=1}^n \frac{\E{\left(\chi_j^\mathrm{RB}\right)^2}}{m}
 	\geq \frac{m}{\left(\sum_{i=1}^n \sqrt{\p_i}\right)^2}
@@ -350,10 +329,7 @@ of $S$ on the induced ball-recycling game on $L$.
 	For large enough $t$, $b = \Theta\left(t\mathcal{R}^S\right)$ and
 	$a = \Theta\left(tq\mathcal{R}^S\right)$, so the overall recycle rate
 	$\mathcal{R}^\textrm{AE}$ therefore satisfies
-	\begin{align*}
-		\mathcal{R}^\textrm{AE} &= \Theta\left(\frac{t\mathcal{R}^S + tq\mathcal{R}^S/(1 - q)}{t + tq\mathcal{R}^S/(1 - q)}\right) \\
-		&= \Theta\left(\frac{1}{(1 - q)/\mathcal{R}^S + q}\right)
-	\end{align*}
+        \[ \mathcal{R}^\textrm{AE} = \Theta\left(\frac{t\mathcal{R}^S + tq\mathcal{R}^S/(1 - q)}{t + tq\mathcal{R}^S/(1 - q)}\right) = \Theta\left(\frac{1}{(1 - q)/\mathcal{R}^S + q}\right). \]
 \end{proof}
 
 \subsection{\RB is Optimal}\label{sec:br-rboptproof}
@@ -397,10 +373,8 @@ satisfies this criterion.
 	Now, using \Cref{lem:aggroopt}, let $L$ and $T$ be such that $L,T$-\AE is
 	asymptotically optimal, and let $\mathcal{R}^\textrm{AE}$ be its expected
 	recycle rate. By \Cref{lem:aggro-empty-bounds},
-	\begin{align*} 
-		\mathcal{R}^\mathrm{AE} &= \Theta\left( \frac{1}{(1-q)/\mathcal{R}^T + q}\right) \\
-		&= O\left(\mathcal{R}^T\right) = O\left(\mathcal{R}_L^S\right) = O\left(\mathcal{R}^S\right),\label{eqn:RAE}
-	\end{align*} 
+        \[ \mathcal{R}^\mathrm{AE} = \Theta\left( \frac{1}{(1-q)/\mathcal{R}^T + q}\right) = O\left(\mathcal{R}^T\right) = O\left(\mathcal{R}_L^S\right) = O\left(\mathcal{R}^S\right),\label{eqn:RAE}
+        \]
 	so $S$ must be asymptotically optimal.
 
 	If $\mathcal{R}_L^S = \Omega\left(\frac{1}{q}\right)$, then
@@ -441,21 +415,14 @@ We can now prove \Cref{thm:random-opt}.
 	more than $\frac{m}{2}$.
 
 	Now analogously to the proof of \Cref{lem:random-ball-lower}, we have:
-	\begin{align*}
-		\p_i\left(\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} + \sum_{j=|L|+1}^n \E{\chi_j^\mathrm{RB}}\right) &= \E{\left(\chi_i^\mathrm{RB}\right)^2} \\
-		&\geq \E{\chi_i^\mathrm{RB}}^2.
-	\end{align*}
+        \[ \p_i\left(\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} + \sum_{j=|L|+1}^n \E{\chi_j^\mathrm{RB}}\right) = \E{\left(\chi_i^\mathrm{RB}\right)^2} \geq \E{\chi_i^\mathrm{RB}}^2.\]
 
 	Thus,
 	\[ \E{\chi_i^\mathrm{RB}} \leq \sqrt{\p_i}\left(\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} + \frac{m}{2}\right)^{\frac{1}{2}}.\]
 	Summing over $i \leq |L|$ yields
 	\[ \E{\chi_L^\mathrm{RB}} \leq \left(\sum_{i=1}^{|L|} \sqrt{\p_i}\right)\left(\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} + \frac{m}{2}\right)^\frac{1}{2}, \]
 	where $\chi_L^\mathrm{RB}$ is the expected number of balls in $L$. Now,
-	\begin{align*}
-		\mathcal{R}_L^\mathrm{RB} &\geq \frac{1}{m}\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} \\
-								  &\geq \frac{\E{\chi_L^\mathrm{RB}}^2}{m\left(\sum_{i=1}^{|L|} \sqrt{\p_i}\right)^2} - \frac{1}{2} \\
-								  &> \frac{m}{4\halfnorm{\mathbf{p}_L}} - \frac{1}{2},
-	\end{align*}
+        \[ \mathcal{R}_L^\mathrm{RB} \geq \frac{1}{m}\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} \geq \frac{\E{\chi_L^\mathrm{RB}}^2}{m\left(\sum_{i=1}^{|L|} \sqrt{\p_i}\right)^2} - \frac{1}{2} > \frac{m}{4\halfnorm{\mathbf{p}_L}} - \frac{1}{2}, \]
 	where $\p_L$ is the conditional probability distribution on $L$ obtained
 	from $\mathbf{p}$. The last inequality holds because there are at least
 	$\frac{m}{2}$ balls in $L$ in expectation.
@@ -464,11 +431,3 @@ We can now prove \Cref{thm:random-opt}.
 	system of $L$, and therefore \RB is asymptotically optimal by
 	\Cref{lem:rl-opt}.
 \end{proof}
-
-
-
-
-%%% Local Variables:
-%%% mode: latex
-%%% TeX-master: "paper.tex"
-%%% End:

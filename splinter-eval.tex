@@ -16,7 +16,7 @@ RocksDB and PebblesDB.  The following questions drive our evaluation:
    \item Does increasing insert performance come at a cost to [range] query
      performance?  In particular, do queries in \sysname require more I/O, due to
      size tiering, than in non-size-tiered systems?
-   \item Are sequential (or otherwise local) insertions faster as predicted on
+   \item Are sequential (or otherwise local) insertions faster, as predicted on
      \sysname? Do they have lower write amplification?
    \item Can \sysname utilize device bandwidth for large range queries?
    \item \sysname is designed to be highly concurrent; do point lookups scale
@@ -194,7 +194,7 @@ and workload F is read-modify-writes (50\% reads, 50\% RMWs).
    measured with iostat. Lower is better.}\label{fig:ycsb-amp-100B}
 \end{figure}
 
-We perform the benchmark with 24B keys and two different value sizes
+We perform the benchmark with 24B keys and two different value size
 configurations: one with small 100B values, shown in
 \cref{fig:ycsb-100B,fig:ycsb-amp-100B} and one with large 1KiB values, shown in
 \cref{fig:ycsb-1KiB}.
@@ -498,7 +498,7 @@ almost all contention between threads.
 
 \paragraph{Read Concurrency}
 We test the read concurrency scaling of \sysname{} by running YCSB
-workload C with 160M key-value pairs, where (as in \cref{fig:ycsb-100B} each
+workload C with 160M key-value pairs, where (as in \cref{fig:ycsb-100B}) each
 instance of the test divides the keys into $N$ evenly divided batches, which
 are then performed in parallel by $N$ threads. The results are in
 \cref{fig:read-concurrency}.
@@ -511,7 +511,7 @@ capability.
 
 While RocksDB also scales well, its throughput with 24 threads is 17.4$\times$
 its single-threaded throughput, and with 32 threads it uses 91\% of the
-device's advertized random read capability. Therefore, even though \sysname can
+device's advertised random read capability. Therefore, even though \sysname can
 perform more operations per second, RocksDB is still making nearly full use of
 the device for reads. We conclude here that SplinterDB is making better use of
 the available memory for caching, since it has noticeably lower read
@@ -522,7 +522,7 @@ amplification.
 \paragraph{Insertion Concurrency}
 We test the insertion concurrency scaling of \sysname by running the YCSB load
 workload with 673M key-value pairs divided into $N$ batches, each of which
-is inserted in parallel by a different thread. \cref{fig:write-concurrency}
+is inserted in parallel by a different thread. \Cref{fig:write-concurrency}
 shows selected $N$ for each system, including its peak throughput.
 
 The results show that \sysname scales almost linearly up to 10 threads. With
@@ -530,7 +530,7 @@ The results show that \sysname scales almost linearly up to 10 threads. With
 around 7.5, which implies that it uses 1.9-2.2GiB/sec of bandwidth, which is at
 or near the device's sequential bandwidth of 2.2GiB/sec.
 
-RocksDB's insertion performance also scales as the number of threads increase
+RocksDB's insertion performance also scales as the number of threads increases
 up to 14 threads, by a factor of 2.7. At its peak, it uses 754GiB/sec of
 bandwidth. PebblesDB scales slightly as well.  For both RocksDB and PebblesDB,
 as many background threads as available are used for flushing and compaction
@@ -742,7 +742,7 @@ branch along the root-to-leaf path to the starting key. Each of these searches
 is likely to incur an IO to the device. As a result, as seen in
 \cref{fig:ycsb-100B}, \sysname{} with 124B key-value pairs has scan throughput
 on small ranges that is about 85\% that of RocksDB. During that workload,
-\sysname performed 2.26 GiB/sec of IO, which is within 96\% of the devices
+\sysname performed 2.26 GiB/sec of IO, which is within 96\% of the device's
 advertised random read capability (short scans of small key-value pairs are
 essentially random reads).
 

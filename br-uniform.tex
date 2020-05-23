@@ -83,10 +83,7 @@ We begin with the following lemma:
 	and creates
 	\[\sum_{k=0}^{\mathcal{R} - 1} \frac{m - \mathcal{R}^\textrm{RB} + k}{n}\]
 	such pairs. In the stationary distribution, these must be equal, so
-	\begin{multline*}
-		\frac{\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2}}{2} - \frac{\mathcal{R}^\textrm{RB}}{2} \\
-		= \frac{(2m-1)\mathcal{R}^\textrm{RB}}{2n} - \frac{\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2}}{2n}.
-	\end{multline*}
+        \[ \frac{\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2}}{2} - \frac{\mathcal{R}^\textrm{RB}}{2} = \frac{(2m-1)\mathcal{R}^\textrm{RB}}{2n} - \frac{\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2}}{2n}.\]
 	After rearranging we have the result.
 \end{proof}
 
@@ -148,10 +145,7 @@ Since $\epsilon, \delta$ are constants greater than $0$, we have our contradicti
 	be the random variable of the number of distinct unordered pairs of balls
 	that are in the same light bin in the stationary distribution. Applying \RB
 	in expectation creates at most
-	\begin{multline*}
-          \E{\sum_{k=0}^{\mathcal{R}^\textrm{RB}-1}\frac{L + k}{n}} \\
-		  = \E{\frac{2LR^\textrm{RB}\left(\chi^\textrm{RB}\right) + R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2 - R^\textrm{RB}\left(\chi^\textrm{RB}\right)}{2n}}
-	\end{multline*}
+        \[ \E{\sum_{k=0}^{\mathcal{R}^\textrm{RB}-1}\frac{L + k}{n}} = \E{\frac{2LR^\textrm{RB}\left(\chi^\textrm{RB}\right) + R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2 - R^\textrm{RB}\left(\chi^\textrm{RB}\right)}{2n}} \]
 	such pairs, and eliminates at least
 	\[ \E{\frac{Y}{1+\frac{cm}{n}}\binom{1+\frac{cm}{n}}{2}}.\]
 	In the stationary distribution these quantities must be equal, so

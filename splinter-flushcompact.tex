@@ -1,6 +1,6 @@
 \section{Size-Tiering with Workload-Driven Compaction}\label{sec:flush-compact}
 
-One of the goals of \sysname is to get both the benefits of size
+One of the goals of \sysname is to get both the benefits of size-
 tiering and the benefits of \bet's workload-driven compaction and
 flushing.  Size-tiering reduces write amplification of all
 workloads. Workload-driven compaction and flushing further reduces
@@ -76,7 +76,7 @@ possible do we begin performing compactions.  This will enable some
 branches to skip intermediate compactions within the tree.
 
 Once all the flushes from a node have completed, \sysname initiates
-background compactions on all the nodes that recieved new branches.
+background compactions on all the nodes that received new branches.
 Each background compaction compacts only the new branches in that node.
 Thus no message gets compacted twice without being flushed from one
 trunk node to another.
@@ -98,7 +98,7 @@ Note that compactions skip over portions of the branches that are not
 relevant to the compaction.  For example, when we flush branches from
 the root to one of its children, the branches may contain keys outside
 the range covered by that child.  When these branches get
-compacted in the child, tthe compaction process won't
+compacted in the child, the compaction process won't
 even look at those keys.  We can do this efficiently because branches
 are B-trees that support iterators starting anywhere in the branch.
 
