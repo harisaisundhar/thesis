@@ -4,17 +4,16 @@
 \centering
 	\ref{synth-legend}\\
         \begin{subfigure}{0.49\linewidth}
-	%\subfloat[Uniform key distribution]{
 		\tikzsetnextfilename{synthetic-uniform}
 		\begin{tikzpicture}%[trim axis left, trim axis right]
 		\begin{axis}[
-				width=0.47\textwidth,
-				height=0.31\textheight,
+				width=\hsize,
+				height=0.28\textheight,
 				xlabel=Rows inserted in millions,
 				xlabel near ticks,
 				ylabel near ticks,
-				ylabel style={align=center, text width=0.27\textheight},
-				ylabel=Recycle rate (last {50,000} insertions),
+				ylabel style={align=center},
+				ylabel=Recycle rate ,
 				xmin=0.05,
 				xmax=5,
 				ymin=0,
@@ -32,21 +31,20 @@
 				\addlegendentry{Fullest Bin}
 			\end{axis}
 		\end{tikzpicture}
-		\label{fig:synth-uni}
+           \caption{Uniform key distribution}\label{fig:synth-uni}
         \end{subfigure}
 	\hfill
         \begin{subfigure}{0.49\linewidth}
-	%\subfloat[Pareto-0.5 key distribution]{
 		\tikzsetnextfilename{synthetic-pareto-5}
 		\begin{tikzpicture}%[trim axis left, trim axis right]
 			\begin{axis}[
-				width=0.47\textwidth,
-				height=0.31\textheight,
+				width=\hsize,
+				height=0.28\textheight,
 				xlabel=Rows inserted in millions,
 				xlabel near ticks,
 				ylabel near ticks,
-				ylabel style={align=center, text width=0.27\textheight},
-				ylabel=Recycle rate (last {50,000} insertions),
+				ylabel style={align=center},
+				ylabel=Recycle rate ,
 				xmin=0.05,
 				xmax=5,
 				ymin=0,
@@ -59,21 +57,20 @@
 				\addplot [mark=triangle*, green, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./br-data/simulations/fb_par5.csv};
 			\end{axis}
 		\end{tikzpicture}
-		\label{fig:synth-par5}
+           \caption{Pareto-0.5 key distribution}\label{fig:synth-par5}
         \end{subfigure}
 	\\
         \begin{subfigure}{0.49\linewidth}
-	%\subfloat[Pareto-1 key distribution]{
 		\tikzsetnextfilename{synthetic-pareto-1}
 		\begin{tikzpicture}%[trim axis left, trim axis right]
 			\begin{axis}[
-				width=0.47\textwidth,
-				height=0.31\textheight,
+				width=\hsize,
+				height=0.28\textheight,
 				xlabel=Rows inserted in millions,
 				xlabel near ticks,
 				ylabel near ticks,
-				ylabel style={align=center, text width=0.27\textheight},
-				ylabel=Recycle rate (last {50,000} insertions),
+				ylabel style={align=center},
+				ylabel=Recycle rate ,
 				xmin=0.05,
 				xmax=5,
 				ymin=0,
@@ -86,20 +83,20 @@
 				\addplot [mark=triangle*, green, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./br-data/simulations/fb_par1.csv};
 			\end{axis}
 		\end{tikzpicture}
+           \caption{Pareto-1 key distribution}\label{fig:synth-par1}
         \end{subfigure}
 	\hfill
         \begin{subfigure}{0.49\linewidth}
-	%\subfloat[Pareto-2 key distribution]{
 		\tikzsetnextfilename{synthetic-pareto-2}
 		\begin{tikzpicture}%[trim axis left, trim axis right]
 			\begin{axis}[
-				width=0.47\textwidth,
-				height=0.31\textheight,
+				width=\hsize,
+				height=0.28\textheight,
 				xlabel=Rows inserted in millions,
 				xlabel near ticks,
 				ylabel near ticks,
-				ylabel style={align=center, text width=0.27\textheight},
-				ylabel=Recycle rate (last {50,000} insertions),
+				ylabel style={align=center},
+				ylabel=Recycle rate ,
 				xmin=0.05,
 				xmax=5,
 				ymin=0,
@@ -112,21 +109,20 @@
 				\addplot [mark=triangle*, green, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./br-data/simulations/fb_par2.csv};
 			\end{axis}
 		\end{tikzpicture}
-		\label{fig:synth-par2}
+           \caption{Pareto-2 key distribution}\label{fig:synth-par2}
         \end{subfigure}
 	\\
         \begin{subfigure}{0.49\linewidth}
-	%\subfloat[Normal key distribution]{
 		\tikzsetnextfilename{synthetic-normal}
 		\begin{tikzpicture}%[trim axis left, trim axis right]
 			\begin{axis}[
-				width=0.47\textwidth,
-				height=0.31\textheight,
+				width=\hsize,
+				height=0.28\textheight,
 				xlabel=Rows inserted in millions,
 				xlabel near ticks,
 				ylabel near ticks,
-				ylabel style={align=center, text width=0.27\textheight},
-				ylabel=Recycle rate (last {50,000} insertions),
+				ylabel style={align=center},
+				ylabel=Recycle rate ,
 				xmin=0.05,
 				xmax=5,
 				ymin=0,
@@ -139,24 +135,23 @@
 				\addplot [mark=triangle*, green, mark size=2] table [x=insertions, y expr=50000.0/\thisrow{flushes}, col sep=comma] {./br-data/simulations/fb_norm.csv};
 			\end{axis}
 		\end{tikzpicture}
-		\label{fig:synth-norm}
+           \caption{Normal key distribution}\label{fig:synth-norm}
         \end{subfigure}
 	\hfill
         \begin{subfigure}{0.49\linewidth}
-	%\subfloat[Ratio of golden gate to random ball (normally distributed keys)]{
 		\tikzsetnextfilename{synthetic-norm-ratio}
 		\pgfplotstableread[col sep = comma]{./br-data/simulations/gg_norm.csv}\goldengate
 		\pgfplotstableread[col sep = comma]{./br-data/simulations/rb_norm.csv}\randomball
 		\pgfplotstablecreatecol[copy column from table={\randomball}{flushes}] {rb_flushes} {\goldengate}
 		\begin{tikzpicture}%[trim axis left, trim axis right]
 			\begin{axis}[
-				width=0.47\textwidth,
-				height=0.31\textheight,
+				width=\hsize,
+				height=0.28\textheight,
 				xlabel=Rows inserted in millions,
 				xlabel near ticks,
 				ylabel near ticks,
-				ylabel style={align=center, text width=0.30\textheight},
-				ylabel=Recycle rate ratio (last {5,000} insertions),
+                                ylabel style={align=center},
+				ylabel=Recycle rate ratio ,
 				xmin=0.05,
 				xmax=5,
 				ymin=0.8,
@@ -166,9 +161,9 @@
 				\addplot [mark=*, Plum, no marks] table [x=insertions, y expr=\thisrow{rb_flushes}/\thisrow{flushes}] \goldengate;
 			\end{axis}
 		\end{tikzpicture}
-		\label{fig:synth-ratio}
+           \caption{Ratio of golden gate to random ball (normally distributed keys)}\label{fig:synth-ratio}
         \end{subfigure}
-	\caption{\label{fig:synth}Simulated results with various key distributions and recycling strategies. (Higher is better)}
+	\caption{\label{fig:synth}Simulated results with various key distributions and recycling strategies. Recycle rates are taken over the latest 50,000 insertions. (Higher is better)}
 \end{figure*}
 
 

@@ -1,11 +1,14 @@
 % !TEX root =  paper.tex
 
-\begin{figure}[h!]
+\begin{figure}
 {\centering
-\hspace*{33pt}\ref{full_distro_legend}\\
+\ref{full_distro_legend}\\
+   }
 \tikzsetnextfilename{insertion-sim-max}
 	\begin{tikzpicture}%[trim axis left, trim axis right]
 		\begin{axis}[
+                        width=\hsize,
+                        height=0.6\hsize,
 			%title=Uniform Key Distribution,
 			xlabel=Rows inserted in millions,
 			xlabel near ticks,
@@ -14,9 +17,10 @@
 			xmin=0,
 			xmax=5,
 			ymin=1,
+                        ymax=2,
 			mark repeat={25},
 			legend to name=full_distro_legend,
-			legend columns=2,
+			legend columns=5,
 			]
 			\addplot [mark=*, Blue, mark size=2] table [x=insertions, y=max_alpha, col sep=comma] {./br-data/simulations/noop_uni.csv};
 			\addlegendentry{Uniform}
@@ -33,19 +37,18 @@
 	\end{tikzpicture}
 \caption{Deviation of the maximum weight leaf from uniform in simulation}
 \label{fig:simalpha}
-}
 \end{figure}
 
 \begin{figure}
 \centering
-\hspace*{35pt}\ref{full_distro_legend}\\
-   \begin{subfigure}{0.49\linewidth}
+\ref{full_distro_legend}\\
+\begin{subfigure}{0.49\linewidth}
 %\subfloat[Maximum leaf weight relative to uniform]{
 \tikzsetnextfilename{insertion-inno-max}
 \begin{tikzpicture}%[trim axis left, trim axis right]
 \begin{axis}[
 	%title=Uniform Key Distribution,
-    width=0.47\textwidth,
+        width=\hsize,
 	xlabel=Rows inserted in millions,
 	xlabel near ticks,
 	ylabel near ticks,
@@ -53,6 +56,7 @@
 	xmin=0,
 	xmax=5,
 	ymin=1,
+        yticklabel style={rotate=90, anchor=south},
 	mark repeat={25},
 	legend columns=2,
 	legend to name=distro_legend
@@ -78,11 +82,12 @@
 \begin{tikzpicture}%[trim axis left, trim axis right]
 \begin{axis}[
 	%title=Uniform Key Distribution,
-	width=0.47\textwidth,
+	width=\hsize,
 	xlabel=Rows inserted in millions,
 	xlabel near ticks,
 	ylabel near ticks,
 	ylabel=Ratio of 95th percentile leaf weight to $1/n$,
+        yticklabel style={rotate=90, anchor=south},
 	xmin=0,
 	xmax=5,
 	ymin=1,
@@ -97,8 +102,8 @@
 \end{axis}
 \end{tikzpicture}
 \label{fig:perc}
-	\caption{Deviation of the maximum and 95th percentile weight leaves from uniform as observed in \innodb{}.}\label{fig:deviation}
 \end{subfigure}
+	\caption{Deviation of the maximum and 95th percentile weight leaves from uniform as observed in \innodb{}.}\label{fig:deviation}
 \end{figure}
 
 
