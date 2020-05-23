@@ -1,6 +1,6 @@
 \section{Database Experiments}\label{sec:br-experiments}
 In this section, we consider insertion buffers as they are used in practice. We
-demonstrate through simulations as well as experiments on real-world systems,
+demonstrate, through simulations as well as experiments on real-world systems,
 that the theoretical results in the prior sections hold and can be used to
 improve performance.
 
@@ -47,7 +47,7 @@ when the database grows larger than RAM.  This improvement explains the
 popularity of insertion buffers in database design.
 
 However, in our experiment, as the database continues to grow, the efficacy of
-the insertion buffer declines.  \cref{fig:introbuffer} shows the time per
+the insertion buffer declines.  \Cref{fig:introbuffer} shows the time per
 10,000 insertions as the database grows to 50M rows.  Although the performance
 without the insertion buffer drops more quickly early on, it remains relatively
 stable thereafter.  Performance with the insertion buffer, on the other hand,
@@ -56,6 +56,8 @@ faster than without the insertion buffer.  This is well below the $5-80\times$
 speedups reported above.
 
 \input{br-intro-plots}
+
+\hanna{fix these plots}
 
 As these experiments show, it can be difficult to extrapolate from small
 examples the performance gains that insertion buffers can provide for large
@@ -96,7 +98,7 @@ structures, such as LSM-trees and B$^\epsilon$-trees.
 
 \subsection{Insertion-Buffer Background}\label{sec:br-exp-deployed}
 
-This section describes insertion buffers are actually implemented and used in
+This section describes insertion buffers that are actually implemented and used in
 deployed systems and recent research prototypes.
 
 \paragraph{SAP:} The SAP IQ database supports an in-memory row-level versioning
@@ -131,7 +133,7 @@ InnoDB structures its insertion buffer as a \btree{}.  When the insertion
 buffer becomes full, it selects the items to be flushed by performing a random
 walk from the root to a leaf.  The random walk is performed by selecting, at
 each step, uniformly randomly from among the children of the current node.
-Once it gets to a leaf, it it picks a single item to insert into the on-disk
+Once it gets to a leaf, it picks a single item to insert into the on-disk
 \btree{}.  This item, along with any other items in the insertion buffer that
 belong in that leaf, are inserted into the leaf and removed from the insertion
 buffer.
@@ -158,7 +160,7 @@ property by simulating insertions into the leaves of a \btree{}. We insert
 real-valued keys i.i.d.\ according to uniform, Pareto (real-valued Zipfian) and
 normal distributions; the leaves of the \btree{} split when they are full, and
 we measure the ratio of the maximal weight leaf to $1/n$.
-\cref{lem:uniform-leaves} tells us that this ratio should be asymptotically at
+\Cref{lem:uniform-leaves} tells us that this ratio should be asymptotically at
 most constant, but as \cref{fig:simalpha} shows, our experimental analysis
 shows further that this constant is generally less than 2. Because leaves
 generally split in 2, this makes some intuitive sense.
@@ -168,7 +170,7 @@ generally split in 2, this makes some intuitive sense.
 We also verify the these results using the \innodb{} storage engine. We insert
 5 million rows into a database using uniform, Pareto and normal distributions
 on the keys. the results are summarized in \cref{fig:alpha}. The maximum ratio
-does not exceed 2.3, and the 95th percentile ratio does exceed 1.6. Thus the
+does not exceed 2.3, and the 95th percentile ratio does exceed 1.6. \hanna{is does exceed right?}Thus the
 distribution of the keys to the leaves is in fact almost uniform.
 
 \subsection{Simulating Insertion Buffers}\label{sec:br-exp-synthetic}
@@ -196,11 +198,11 @@ distribution (all distributions perform very similarly), \cref{fig:synth-ratio}
 shows that golden gate initially outperforms random ball by about 30\%, which
 then decreases as the number of bins grows.
 
-\input{br-synthetic-plots}
+\input{br-synthetic-plots} \hanna{fix}
 
 \subsection{Real-World Performance (InnoDB)}\label{sec:br-exp-innodb}
 
-In this section, we empirically the performance of insertion buffers in
+In this section, we empirically \hanna{evaluate?} the performance of insertion buffers in
 \innodb{}, the default storage engine in \mysql{}.
 
 Analogously to the experiments in \cref{sec:br-exp-synthetic}, we insert rows into
@@ -222,7 +224,7 @@ and while there is more noise, the overall picture is similar to the plots in
 \cref{fig:synth}. 
 
 If we were to hold the number of leaves roughly constant and change the buffer
-size, \cref{lem:unilowerbound} suggests that the relationship with recycle rate
+size, \Cref{lem:unilowerbound} suggests that the relationship with recycle rate
 would be roughly linear. To test this, we ran the above experiment with buffer
 sizes from 8mb to 128mb in 2mb increments. We performed 11 million insertions
 with uniformly distributed keys each time, and then took the average recycle

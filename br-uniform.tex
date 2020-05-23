@@ -8,14 +8,14 @@ lower-order terms, in this setting, whereas \RB is at least $1/2$- and at most
 $(1-\epsilon)$-optimal, for some constant $\epsilon>0$.
 
 For a ball-recycling game with uniformly distributed balls,
-\cref{lem:upperbound} implies:
+\Cref{lem:upperbound} implies:
 \begin{corollary}\label{cor:uniformupperbound}
 	Consider a ball-recycling game with $m$ balls, $n$ bins and uniform
 	distribution $\uni$. For any recycling strategy $A$, 
 	\[\mathcal{R}^A \leq \frac{2m+n-1}{n} < 2\frac{m}{n} + 1.\]
 \end{corollary}
 
-The average number of balls in a bin is $m/n$, so \cref{cor:uniformupperbound}
+The average number of balls in a bin is $m/n$, so \Cref{cor:uniformupperbound}
 suggests that any ``reasonable'' strategy will be at least $1/2$-optimal in the
 uniform case.
 
@@ -50,19 +50,19 @@ uniform distributions.
 	done.
 \end{proof}
 
-\cref{cor:uniformupperbound} and \cref{lem:unilowerbound}
-together prove \cref{thm:fullestbin}. Despite these strong
+\Cref{cor:uniformupperbound} and \Cref{lem:unilowerbound}
+together prove \Cref{thm:fullestbin}. \hanna{confirm capitals} Despite these strong
 performance bounds, recall that \FB can perform arbitrarily badly on
 non-uniform $\p$. \RB on the other hand is always $\Theta(1)$-optimal.
 
 \subsection{\RB in the Uniform Case}
 
 However, \RB{} does not achieve this level of optimality on uniform
-distributions. In this section we will show in \cref{thm:rbuniform} that \RB
+distributions. In this section we will show in \Cref{thm:rbuniform} that \RB
 recycles at most $1+(2-\epsilon)m/n$ balls per round in expectation, for some
-$\epsilon > 0$.  The upper bound is given in \cref{lem:rbuni-upper} and
-\cref{cor:rbuni-upper-constants}, and the lower bound is given in
-\cref{lem:rbuni-lower}.
+$\epsilon > 0$.  The upper bound is given in \Cref{lem:rbuni-upper} and
+\Cref{cor:rbuni-upper-constants}, and the lower bound is given in
+\Cref{lem:rbuni-lower}.
 
 We begin with the following lemma:
 
@@ -98,7 +98,7 @@ We begin with the following lemma:
 	ball configuration $X$, and $\mathcal{R}^\textrm{RB} =
 	\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)}$ the expected recycle rate
 	of \RB.  We will prove the result by contradiction, so assume that for all 
-	constant $\epsilon > 0$
+	constant $\epsilon > 0$,
 	\[\mathcal{R}^\textrm{RB} \geq 1 + \frac{(2-\epsilon)m}{n}.\]
 
 	Let $c\in(1,2)$ be a constant to be determined later. We say a bin is
@@ -121,7 +121,7 @@ Thus by the definition of variance, we have
 \begin{equation*}
 	\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2} \ge \left(1+\frac{\epsilon^2\delta}{4}\right)\left(\mathcal{R}^\textrm{RB}\right)^2. \label{eqn:expF2l}
 \end{equation*}
-	Now by \cref{lem:pair-flow},
+	Now by \Cref{lem:pair-flow},
 \begin{equation*}
 	\mathcal{R}^\textrm{RB} \le \left(1+\frac{\epsilon^2\delta}{4}\right)^{-1}\left(1+\frac{2m}{n}\right).
 \end{equation*}
@@ -131,7 +131,7 @@ Since $\epsilon, \delta$ are constants greater than $0$, we have our contradicti
 \medskip 
 
 {\bf Case 2.} Otherwise, $\E{L} < \delta m$. Since $L \in [0, m]$, $\E{L^2} <
-	\delta m^2$. \cref{lem:pair-flow} implies $\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2} \le (1+2m/n)^2$. Together H\"{o}lder's inequality we have
+	\delta m^2$. \Cref{lem:pair-flow} implies $\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2} \le (1+2m/n)^2$. Together H\"{o}lder's inequality we have
 \begin{align}
 	\E{LR^\textrm{RB}\left(\chi^\textrm{RB}\right)}
 	&\le \left(\E{L^2}\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2}\right)^{1/2} \nonumber \\
@@ -140,7 +140,7 @@ Since $\epsilon, \delta$ are constants greater than $0$, we have our contradicti
 \end{align}
 
 	Let $Y$ be the random variable of the number of balls in the stationary
-	distribution which start in a light bins, but end up begin among the first
+	distribution which start in a light bin, but end up begin among the first
 	$1 + cm/n$ balls in a heavy bin after an application of \RB.  Let $\Phi$
 	be the random variable of the number of distinct unordered pairs of balls
 	that are in the same light bin in the stationary distribution. Applying \RB
@@ -157,7 +157,7 @@ Since $\epsilon, \delta$ are constants greater than $0$, we have our contradicti
 	&< \frac{2\sqrt{\delta}}{c}\left(1+\frac{2m}{n}\right) + \frac{\E{R^\textrm{RB}\left(\chi^\textrm{RB}\right)^2} - \mathcal{R}^\textrm{RB}}{cm} \\
 	&<\left(1+\frac{2m}{n}\right)\left(\frac{2\sqrt{\delta}}{c}+\frac{2}{cn}\right),  
 \end{align*}
-where we have used \cref{lem:pair-flow} for the last inequality.
+where we have used \Cref{lem:pair-flow} for the last inequality.
 
 We now compute the effect on $\E{L}$ of applying \RB to the stationary
 distribution.  By Markov's inequality, there must be more than $(1-1/c)n$ light
@@ -179,7 +179,7 @@ $$
 $$
 Thus, if we pick a sufficiently small $\delta > 0$, $\epsilon = 0.01$, $c=1.98$
 and $n\geq 3$, we have a contradiction. For $n \le 2$, the contradiction follows
-immediately from \cref{lem:pair-flow}.
+immediately from \Cref{lem:pair-flow}.
 \end{proof}
 
 \begin{corollary}\label{cor:rbuni-upper-constants}
@@ -187,7 +187,7 @@ immediately from \cref{lem:pair-flow}.
 	\begin{equation*}
 		(\epsilon, c, \delta) = (0.001, 1.456, 0.042)
 	\end{equation*}
-	in the proof of \cref{thm:rbuniform}, we obtain 
+	in the proof of \Cref{thm:rbuniform}, we obtain 
 	\begin{equation*}
 		\mathcal{R}^\textrm{RB} < 1 + 1.994\frac{m}{n}.
 	\end{equation*}
@@ -255,7 +255,7 @@ $$
 
 	Given (c), we can find a subset $S_t \subset H_t$ that is composed of
 	$(1/2-2\delta)n$ bins in $H_t$ not recycled during $P$.  Note that which
-	bins are recycled and which are not depend on the random choices made by the
+	bins are recycled and which are not depends on the random choices made by the
 	system. Hence, $S_t$ varies.  
 		
 	Next, we derive a lower bound on the expected number of balls in any $S_t$.
@@ -263,7 +263,7 @@ $$
 	those that stay in $S_t$ at the beginning of the $t$th round, of which
 	there are at least $|S_t|(1-\epsilon)m/n$.  There are also those which are
 	recycled during $P$, of which there are at least
-	$|S_t|(1-\epsilon')|B|/n$ by \cref{lem:MinBin}, to follow.  Combining the
+	$|S_t|(1-\epsilon')|B|/n$ by \Cref{lem:MinBin}, to follow.  Combining the
 	two sources, the expected number of balls in $S_t$ is at least
 	\begin{equation*}
 		\Gamma = (1-\epsilon)\left( \left(\frac{1}{2}-2\delta\right) +
@@ -318,8 +318,8 @@ $$
 	$\epsilon = 1/6$ yields the result.
 \end{proof}
 
-\cref{thm:rbuniform} follows from
-\cref{cor:rbuni-upper-constants,lem:rbuni-lower,cor:uniformupperbound}.
+\Cref{thm:rbuniform} follows from
+\Cref{cor:rbuni-upper-constants,lem:rbuni-lower,cor:uniformupperbound}.
 
 
 %%% Local Variables:
