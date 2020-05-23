@@ -100,6 +100,9 @@ external memory dictionary, the BOA. Pushing these ideas further yields the BOT,
 which is optimal over larger parameter ranges, and the COBOT, which is the
 first optimal cache-oblivious dictionary.
 
+This content was presented at ICALP 2018 by myself, Mart\'in Farach Colton and
+Phillip Shillane.
+
 \paragraph{Chapter 3: SplinterDB}
 
 This chapter introduces SplinterDB: a highly concurrent key-value store
@@ -107,6 +110,9 @@ designed to perform on NVMe. SplinterDB takes the ideas underlying BOAs and
 BOTs, including routing filters, and implements them within a \bet. SplinterDB
 outperforms RocksDB, a state-of-the-art key-value store, by 2--8$\times$ on
 insertions and 1.2--2$\times$ on point lookups.
+
+This content will appear at ATC 2020 and is by myself, Abhishek Gupta, Vijay
+Chidambaram, Mart\'in Farach-Colton, Richard Spillane, Amy Tai and Rob Johnson.
 
 \paragraph{Chapter 4: File System Aging}
 
@@ -126,6 +132,10 @@ data, should not age because it algorithmically moves stored data to maintain
 locality. This is borne out using the git aging tool: BetrFS does not age at
 all under the same workload.
 
+This content was presented at FAST 2017 by myself, Ainesh Bakshi, Yizheng Jiao,
+William Jannen, Yang Zhan, Jun Yuan, Michael A Bender, Rob Johnson, Bradley C
+Kuszmaul, Donald E Porter and Mart\'in Farach-Colton.
+
 \paragraph{Chapter 5: Optimal Ball Recycling}
 
 A popular optimization technique for B-tree-based databases is the use of an
@@ -136,3 +146,6 @@ well as the related update buffers) and provides a tight upper bound of the
 performance improvement that can be obtained. This result undermines the common
 assumption that large caches can be used to fix performance problems in storage
 systems.
+
+This content appeared at SODA 2018 by Michael Bender, Jake Christensen, myself,
+Martin Farach-Colton, Rob Johnsonand Meng-Tsung Tsai.
