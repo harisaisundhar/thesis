@@ -24,7 +24,7 @@ ensures the file system has quiesced.
 
 The aging process this microbenchmark emulates is multiple files growing in
 length. The file system must allocate space for these files somewhere, but
-eventually the file must either be moved or fragment.
+eventually the file must either be moved or fragment. \hanna{fragmented or will fragment?}
 
 Given that the data set size is small and the test is designed to run in a
 short time, an fsync is performed after each file is written in order to defeat
@@ -36,12 +36,12 @@ systems are able to delay allocation, rendering a more contiguous layout.
 \input{fsa-microbenchmarks-intra-plots}
 
 The performance of these file systems on an HDD and SSD are summarized in
-\cref{fig:micro:intra}. On HDD, the layout scores generally correlate
+\cref{fig:micro:intra}. \hanna{why figures plural}On HDD, the layout scores generally correlate
 ($-0.93$) with the performance of the file systems.  On SSD, the file systems
 all perform similarly (note the scale of the y-axis).  In some cases, such as
 \xfs, \ext, and \zfs, there is a correlation, albeit at a small scale.  For
 \btrfs, \ext, \xfs, and \ftwofs, the performance is hidden by read-ahead in the
-OS or in the case of \btrfs also in the file system itself. If we disable
+OS, or in the case of \btrfs, also in the file system itself. If we disable
 read-ahead, shown in \cref{subfig:rr:ssd_raoff}, the performance is more
 clearly correlated ($-.67$) with layout score.  We do note that this
 relationship on an SSD is still not precise; SSDs are sufficiently fast that
@@ -76,7 +76,7 @@ amplification, but, on an HDD, only one seek.
 \paragraph{Interfile Fragmentation.}\label{sec:interfile} Many workloads read
 multiple files with some logical relationship, and frequently those files are
 placed in the same directory. Interfile fragmentation occurs when files which
-are related---in this case being close together in the directory tree---are not
+are related---in this case by being close together in the directory tree---are not
 collocated in the LBA space.
 
 We present a microbenchmark to measure the impact of namespace creation order

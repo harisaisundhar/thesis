@@ -1,6 +1,6 @@
 \section{Conclusion}\label{sec:fsa-conclusion}
 
-The experiments above suggest that conventional wisdom on fragmentation, aging,
+The experiments above suggest that the conventional wisdom on fragmentation, aging,
 allocation and file systems is inadequate in several ways.
 
 First, while it may seem intuitive to write data as few times as possible,
@@ -18,12 +18,12 @@ write-optimized dictionaries.
 
 For example, in \betrfs, data might be written as many as a
 logarithmic number of times, whereas in \ext, it will be written once,
-yet \betrfs in general is able to perform as well as or better than an
+yet \betrfs is able in general to perform as well as or better than an
 unaged \ext file system and significantly outperforms aged \ext file
 systems.
 
 Second, today's file system heuristics are not able to maintain enough
-locality to enable reads to be performed at the disks natural transfer
+locality to enable reads to be performed at the disk's natural transfer
 size.  And since the natural transfer size on a rotating disk is a
 function of the seek time and bandwidth, it will tend to increase with
 time. Thus we expect this problem to possibly become worse with newer

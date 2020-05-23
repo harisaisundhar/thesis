@@ -2,11 +2,11 @@
 addition to the git workload, we evaluate aging with the Dovecot email server.
 Dovecot is configured with the Maildir backend, which stores each message in a
 file, and each inbox in a directory.  We simulate 2 users, each having 80
-mailboxes receiving new email, deleting old emails, and searching through their
+mailboxes, receiving new email, deleting old emails, and searching through their
 mailboxes. 
 
-A cycle or ``day'' for the mailserver comprises of 8,000 operations, where each
-operation is equally likely to be a insert or a delete, corresponding to
+A cycle or ``day'' for the mailserver comprises 8,000 operations, where each
+operation is equally likely to be an insert or a delete, corresponding to
 receiving a new email or deleting an old one. Each email is a string of random
 characters, the length of which is uniformly distributed over the range [1,
 32K]. Each mailbox is initialized with 1,000 messages, and, because inserts and
@@ -20,7 +20,7 @@ on hard disk.  Although the unaged versions of all file systems show consistent
 performance over the life of the benchmark, the aged versions of \ext, \btrfs,
 \xfs and \zfs all show significant degradation over time. In particular, aged
 \ext performance degrades by 4.4$\times$, and is 28$\times$ slower than aged
-\betrfs.  \xfs slows down by a factor of 7 and \btrfs by a factor of 30. \zfs
+\betrfs.  \xfs slows down by a factor of 7 and \btrfs, by a factor of 30. \zfs
 slows down drastically, taking about 20 minutes per GiB by cycle 20.  However,
 the aged version of \betrfs does not slow down. As with the other HDD
 experiments, dynamic layout score is moderately correlated ($-0.63$) with grep

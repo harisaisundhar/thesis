@@ -57,8 +57,6 @@ speedups reported above.
 
 \input{br-intro-plots}
 
-\hanna{fix these plots}
-
 As these experiments show, it can be difficult to extrapolate from small
 examples the performance gains that insertion buffers can provide for large
 databases. Therefore, it is no wonder that reported speedups from insertion
@@ -170,8 +168,8 @@ generally split in 2, this makes some intuitive sense.
 We also verify the these results using the \innodb{} storage engine. We insert
 5 million rows into a database using uniform, Pareto and normal distributions
 on the keys. the results are summarized in \cref{fig:alpha}. The maximum ratio
-does not exceed 2.3, and the 95th percentile ratio does exceed 1.6. \hanna{is does exceed right?}Thus the
-distribution of the keys to the leaves is in fact almost uniform.
+does not exceed 2.3, and the 95th percentile ratio does not exceed 1.6. Thus
+the distribution of the keys to the leaves is in fact almost uniform.
 
 \subsection{Simulating Insertion Buffers}\label{sec:br-exp-synthetic}
 
@@ -198,12 +196,12 @@ distribution (all distributions perform very similarly), \cref{fig:synth-ratio}
 shows that golden gate initially outperforms random ball by about 30\%, which
 then decreases as the number of bins grows.
 
-\input{br-synthetic-plots} \hanna{fix}
+\input{br-synthetic-plots}
 
 \subsection{Real-World Performance (InnoDB)}\label{sec:br-exp-innodb}
 
-In this section, we empirically \hanna{evaluate?} the performance of insertion buffers in
-\innodb{}, the default storage engine in \mysql{}.
+In this section, we empirically evaluate the performance of insertion buffers
+in \innodb{}, the default storage engine in \mysql{}.
 
 Analogously to the experiments in \cref{sec:br-exp-synthetic}, we insert rows into
 the \mysql{} database, and after every 10000 insertions, we check the ``merge
