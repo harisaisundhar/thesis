@@ -9,7 +9,7 @@ it can maintain check characters even when there are collisions.
 
 The $i$th check character $C_i(K)$ of a fingerprint $K$ is the $i$th character
 from the end of the string representation of $K$. As described in
-\Cref{sec:hashing}, we assume that the fingerprints are taken from a universe
+\cref{sec:hashing}, we assume that the fingerprints are taken from a universe
 of size at least $N^2$ so that the check characters do not overlap with the
 characters used in the prefixes of the routing filters, and by $\Theta(\log
 N)$-wise independence, the check characters of $O(1)$ fingerprints are
@@ -24,7 +24,7 @@ checked if the check character matches $C_i(K)$, which reduces the number of
 false positives by a factor of $\lambda$.
 
 \paragraph{Refined Routing Filter}
-The routing filter described in \Cref{sec:boa-routing-filter} handles prefix
+The routing filter described in \cref{sec:boa-routing-filter} handles prefix
 collisions by returning only the last run containing the queried fingerprint
 and then chaining in the runs. Whereas, to support check characters we need to
 return a list instead, while having the same performance guarantees.
@@ -61,7 +61,7 @@ immediately computable.
 	written using $O(\log N)$ bits.
 
 	For each fingerprint in the node, the list contains $O(1)$ characters by
-	\Cref{lem:delta-encoding}, or $O(\log \lambda)$ bits. Additionally, each
+	\cref{lem:delta-encoding}, or $O(\log \lambda)$ bits. Additionally, each
 	pivot prefix has to an initial entry of length $O(\log N)$ bits, so the
 	list all together uses $O(C\log\lambda + \frac{C}{\log_\lambda N} \cdot
 	\log N)= O(C\log\grow{})$ bits.
@@ -76,7 +76,7 @@ immediately computable.
 	ending bit positions in the list. Because the fingerprints are distributed
 	uniformly and are pairwise independent to $K$, there are $O(\log_\lambda
 	N + D_K^*)$ fingerprints matching the pivot prefix in expectation.  From
-	\Cref{lem:chernoff} with $\delta=\log\lambda$, there are $O(\log N +
+	\cref{lem:chernoff} with $\delta=\log\lambda$, there are $O(\log N +
 	D_K^*)$ fingerprints matching the pivot prefix w.h.p. The encoding of each
 	fingerprint is less than a word, and $B=\Omega(\log N)$ by assumption, so
 	this is $O(D_K^*)$ IOs.
@@ -88,14 +88,14 @@ We now can show:
 \boacost*
 
 \begin{proof}
-	The insertion/deletion cost is given by \Cref{lem:refined-routing-filter}
-	and \Cref{thm:boa-cost-expectation}.
+	The insertion/deletion cost is given by \cref{lem:refined-routing-filter}
+	and \cref{thm:boa-cost-expectation}.
 
 	During a query for a fingerprint $K$, the expected number of false positives 
 	on level $i$ (fingerprints which match the prefix $P_i(K)$ and check
 	character $C_i(K)$ but are not $K$) is $O\left(\frac{1}{\lambda}\right)$.
 	Thus, the number of false positives across levels is
-	$O\left(\frac{\log_\lambda N}{\lambda}\right)$, so by \Cref{lem:chernoff},
+	$O\left(\frac{\log_\lambda N}{\lambda}\right)$, so by \cref{lem:chernoff},
 	the number of false positives is $O\left(\log_\lambda N\right)$ w.h.p.
 \end{proof}
 
@@ -107,5 +107,3 @@ Thus, a BOA is optimal for large enough $\lambda$:
 	\frac{\log{N}}{\log\log{N}}\right),$ then $\mathcal{B}$ is an optimal
 	unsorted dictionary.
 \end{corollary}
-
-\hanna{does one do a qed box here?}

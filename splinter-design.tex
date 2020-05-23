@@ -19,7 +19,7 @@ concurrency, without sacrificing lookup performance.
 \end{figure}
 
 At a high level, a \datastruct is a \bet, as shown in
-\Cref{fig:stbetree}, albeit with several modifications to reduce I/O
+\cref{fig:stbetree}, albeit with several modifications to reduce I/O
 amplification and exploit the I/O parallelism of NVMe devices.
 
 On a spinning disk, data locality is paramount.  Thus, \bets designed
@@ -89,7 +89,7 @@ packed.
 \sysname uses write-ahead logical logging for crash recovery.
 \sysname uses per-thread logs to support highly concurrent updates.
 Inter-log ordering is maintained by cross-referencing log entries with
-timestamps on the leaves of the memtable (see \Cref{sec:recovery} for
+timestamps on the leaves of the memtable (see \cref{sec:recovery} for
 details).
 
 Note that all of the above data structures---memtables, trunk nodes,

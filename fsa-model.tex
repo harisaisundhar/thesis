@@ -141,9 +141,8 @@ receive only one change.  Thus, a \bet has asymptotically lower write
 amplification than a B-tree.  Consequently, it can have much larger nodes, and
 typically does in implementation.  \betrfs uses a \bet with 4MiB nodes.  
 
-Since 4MiB is around the NTS for our storage devices,
-
-we expect \betrfs not to age---which we verify below. \hanna{weird spacing}
+Since 4MiB is around the NTS for our storage devices, we expect \betrfs not to
+age---which we verify below.
 
 Log-structured merge trees (LSMs)~\cite{DBLP:journals/acta/ONeilCGO96} and
 other write-optimized dictionaries can resist aging, depending on the

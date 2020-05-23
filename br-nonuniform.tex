@@ -1,17 +1,17 @@
 \section{Random Ball is Optimal}\label{sec:br-nonuniform}
 
-In this section we prove \Cref{thm:random-opt}, showing that \RB{} is
+In this section we prove \cref{thm:random-opt}, showing that \RB{} is
 $\Theta(1)$-optimal. 
 
 \subsection{Outline of Proof}\label{sec:br-nonuni-outline}
-We prove \Cref{thm:random-opt} in the following steps:
+We prove \cref{thm:random-opt} in the following steps:
 \begin{enumerate}
 	\item No recycling strategy has a recycling rate exceeding
 		$(2m+n-1)/\halfnorm{\p}$. (\cref{sec:br-upper-statement})
 	\item \RB{} matches that bound when $m \geq n$, leading to case (1) of
-		\Cref{thm:random-opt}. (\cref{sec:br-randomballwithmanyballs})
+		\cref{thm:random-opt}. (\cref{sec:br-randomballwithmanyballs})
 	\item There is an $\Theta(1)$-optimal strategy, \AE{}, when $m < n$. The
-		recycling rate of \AE matches case (2) of \Cref{thm:random-opt}.
+		recycling rate of \AE matches case (2) of \cref{thm:random-opt}.
 		(\cref{sec:br-randomballaggroempty})
 	\item By comparison to \AE{}, \RB{} is $\Theta(1)$-optimal when $m < n$.
 		(\cref{sec:br-rboptproof})
@@ -46,7 +46,7 @@ net flow must be zero.  We can generalize to any set of bins and get:
 \end{lemma}
 
 We will mostly use the following special case of the
-\Cref{lem:gen-flow-equation}: 
+\cref{lem:gen-flow-equation}: 
 
 \begin{lemma}[The Flow Equation] \label{lem:flow-equation}
 	Let $A$ be a statless recycling strategy for a ball-recycling game with $n$
@@ -57,7 +57,7 @@ We will mostly use the following special case of the
 \end{lemma}
 
 We now describe the main upper bound on the recycling rate of any recycling
-strategy. In order to understand the intuition behind \Cref{lem:freqbound},
+strategy. In order to understand the intuition behind \cref{lem:freqbound},
 consider a given bin $i$. Intuitively, it makes sense to think that for a
 reasonable recycling strategy the recycling rate of the other bins in the
 system will go down as the number of balls $X_i$ in bin $i$ grows.  After all,
@@ -69,13 +69,13 @@ recycling rate of bin $i$, perhaps excluding the last ball to land in the bin.
 By the Flow Equation, this would suggest that
 \[ \E{X_i} \geq \frac{1}{2}(\mathcal{R}_i^A - 1) =
 \frac{1}{2}\left(\frac{\p_i}{f_i}\mathcal{R}^A - 1\right), \]
-so that after summing over $i$, we obtain \Cref{lem:freqbound}.
+so that after summing over $i$, we obtain \cref{lem:freqbound}.
 
 However, the following strategy does not satisfy this assumption: for a given
 bin $i$, have the strategy just pick the least full non-empty bins until $i$
 has a few balls, then pick the fullest ones, then pick $i$ and repeat. Showing
 that better strategies do not do this is non-trivial, and we prove
-\Cref{lem:freqbound} by different means.
+\cref{lem:freqbound} by different means.
 
 \begin{lemma}\label{lem:freqbound}
 	Consider a ball-recycling game with $m$ balls, $n$ bins and distribution
@@ -150,9 +150,9 @@ We now can use this result to compute the result of applying $A$ to $Z$.
    \end{align*}
 \end{proof}
 
-Now, we can prove \Cref{lem:freqbound}.
+Now, we can prove \cref{lem:freqbound}.
 
-\begin{proof}[Proof of \Cref{lem:freqbound}]
+\begin{proof}[Proof of \cref{lem:freqbound}]
 	Let $\chi^A$ be the stationary distribution relative to $A$. Let $\phi_j$
 	be the event that $A$ recycles the $j$th bin of $\chi^A$, $R_j^A$ the
 	random variable of how many balls are recycled given the $j$th bin is
@@ -175,9 +175,9 @@ Now, we can prove \Cref{lem:freqbound}.
 \end{proof}
 
 \Cref{lem:freqbound} applies to the optimal deterministic strategy $\opt$
-promised by \Cref{cor:opt-unique}, and we know that $\mathcal{R}^A\leq
+promised by \cref{cor:opt-unique}, and we know that $\mathcal{R}^A\leq
 \mathcal{R}^\opt$ for \textit{any} recycling strategy $A$.  Thus, by maximizing
-the RHS of \Cref{lem:freqbound}, we can get an upper bound on the recycling
+the RHS of \cref{lem:freqbound}, we can get an upper bound on the recycling
 rate of any recycling strategy.
 
 \begin{lemma}\label{lem:upperbound}
@@ -192,7 +192,7 @@ rate of any recycling strategy.
 
 \subsection{\RB with \texorpdfstring{$m \geq n$}{m >= n}}\label{sec:br-randomballwithmanyballs}
 
-We show the following lower bound, which with \Cref{lem:upperbound}, shows
+We show the following lower bound, which with \cref{lem:upperbound}, shows
 optimality when $m = \Omega(n)$.
 
 \begin{lemma}\label{lem:random-ball-lower}
@@ -269,8 +269,8 @@ wait for more balls to land there.
 \end{lemma}
 
 \begin{proof}
-	By \Cref{lem:deterministic-opt}, there exists an optimal deterministic
-	strategy $\opt$. Using the flow equation, \Cref{lem:freqbound} can be
+	By \cref{lem:deterministic-opt}, there exists an optimal deterministic
+	strategy $\opt$. Using the flow equation, \cref{lem:freqbound} can be
 	rewritten as:
 	\[ \sum_{i=1}^n \mathcal{R}_i^\opt \leq 2m + n. \]
 	Because $\opt$ will never recycle an empty bin, each $\mathcal{R}_i^\opt
@@ -354,7 +354,7 @@ satisfies this criterion.
 \end{lemma}
 
 \begin{proof}
-	By applying \Cref{lem:gen-flow-equation}, the subset variant of the
+	By applying \cref{lem:gen-flow-equation}, the subset variant of the
 	flow equation, to $L$, 
 	\[ f_L \mathcal{R}_L^S = (1-q)(f_L \mathcal{R}_L^S + (1-f_L) \mathcal{R}_{L^c}^S), \]
 	where $f_L$ is the stationary probability of $S$ picking a bin in $L$.
@@ -370,9 +370,9 @@ satisfies this criterion.
 	+ (1-f_L)\mathcal{R}_{L^c}^S$, we must have $\mathcal{R}^S =
 	\Omega(\mathcal{R}_L^S)$.
 
-	Now, using \Cref{lem:aggroopt}, let $L$ and $T$ be such that $L,T$-\AE is
+	Now, using \cref{lem:aggroopt}, let $L$ and $T$ be such that $L,T$-\AE is
 	asymptotically optimal, and let $\mathcal{R}^\textrm{AE}$ be its expected
-	recycle rate. By \Cref{lem:aggro-empty-bounds},
+	recycle rate. By \cref{lem:aggro-empty-bounds},
         \[ \mathcal{R}^\mathrm{AE} = \Theta\left( \frac{1}{(1-q)/\mathcal{R}^T + q}\right) = O\left(\mathcal{R}^T\right) = O\left(\mathcal{R}_L^S\right) = O\left(\mathcal{R}^S\right),\label{eqn:RAE}
         \]
 	so $S$ must be asymptotically optimal.
@@ -394,10 +394,10 @@ satisfies this criterion.
 	so in this case $S$ is asymptotically optimal as well.
 \end{proof}	
 
-We can now prove \Cref{thm:random-opt}.
+We can now prove \cref{thm:random-opt}.
 
-\begin{proof}[Proof of \Cref{thm:random-opt}]
-	If $m=\Omega(n)$, then by \Cref{lem:upperbound,lem:random-ball-lower} we are done.
+\begin{proof}[Proof of \cref{thm:random-opt}]
+	If $m=\Omega(n)$, then by \cref{lem:upperbound,lem:random-ball-lower} we are done.
 
 	Otherwise, let $L$ be a set of $O(m)$ bins for which there exists a
 	strategy $T$ such that $L,T$-\AE is asymptotically optimal. We will prove
@@ -407,14 +407,14 @@ We can now prove \Cref{thm:random-opt}.
 	number the bins so that the first $|L|$ bins comprise $L$.
 	
 	If $\mathcal{R}_L \geq \frac{1-q}{q}$, then we are done by
-	\Cref{lem:rl-opt}. Otherwise, in the stationary distribution, when a
+	\cref{lem:rl-opt}. Otherwise, in the stationary distribution, when a
 	bin in $L$ is recycled, the expected number of balls which land in $L^c$ is
 	$q\mathcal{R}_L < 1-q$. When a bin in $L^c$ is recycled, the expected
 	number of balls which land in $L$ is $1-q$. Thus \RB must pick a bin in $L$
 	more than half the time, and so the expected number of balls in $L$ must be
 	more than $\frac{m}{2}$.
 
-	Now analogously to the proof of \Cref{lem:random-ball-lower}, we have:
+	Now analogously to the proof of \cref{lem:random-ball-lower}, we have:
         \[ \p_i\left(\sum_{j=1}^{|L|} \E{\left(\chi_j^\mathrm{RB}\right)^2} + \sum_{j=|L|+1}^n \E{\chi_j^\mathrm{RB}}\right) = \E{\left(\chi_i^\mathrm{RB}\right)^2} \geq \E{\chi_i^\mathrm{RB}}^2.\]
 
 	Thus,
@@ -427,7 +427,7 @@ We can now prove \Cref{thm:random-opt}.
 	from $\mathbf{p}$. The last inequality holds because there are at least
 	$\frac{m}{2}$ balls in $L$ in expectation.
 
-	Thus by \Cref{lem:upperbound}, \RB is asymptotically optimal on the induced
+	Thus by \cref{lem:upperbound}, \RB is asymptotically optimal on the induced
 	system of $L$, and therefore \RB is asymptotically optimal by
-	\Cref{lem:rl-opt}.
+	\cref{lem:rl-opt}.
 \end{proof}

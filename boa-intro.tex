@@ -44,7 +44,7 @@ here as the \defn{IP hash table}, that performs insertions in
 $O\left(\frac{1}{B}\left(\lambda + \log_{\frac{M}{B}} N + \log\log
 N\right)\right)$ IOs and queries in $O(\log_\lambda N)$ IOs w.h.p. Therefore,
 for $\lambda=\Omega\left(\log_{M/B}N + \log\log{N}\right)$, the IP hash table
-meets the tradeoff curve of \Cref{thm:ip-lower-bound} and is thus optimal.
+meets the tradeoff curve of \cref{thm:ip-lower-bound} and is thus optimal.
 
 In dictionaries that do not support successors and predecessors, we
 can assume that keys are hashed, that is, that they are uniformly
@@ -55,7 +55,7 @@ $\Theta(\log N)$-independent hash function.
 
 The base result of this paper is a simple external-memory
 hashing scheme, the \defn{Bundle of Arrays Hash Table} (BOA),
-that meets the optimal \Cref{thm:ip-lower-bound} trade off curve for
+that meets the optimal \cref{thm:ip-lower-bound} trade off curve for
 large enough $\grow$. Specifically, we show:
 
 \begin{restatable}{theorem}{boacost}\label{thm:boa-cost}
@@ -82,8 +82,6 @@ same range of $\grow$ as the IP hash table:
 We further introduce the first cache-oblivious hash table, the
 \defn{Cache-Oblivious Bundle of Trees Hash Table} (COBOT), which matches the IO
 performance of BOTs and IP hash tables.
-
-\hanna{pink=needs fixing, yellow=fixed but check its ok, blue=fixed, green=rethink grammarwise}
 
 The BOT can also be adapted to models in which disk reads and writes incur
 different costs. The $\beta$-asymmetric BOT adjusts the merging schedule of a

@@ -53,9 +53,9 @@ We refer to this modified BOT as an \defn{$\beta$-asymmetric BOT}.
 	insertion in total.
 
 	The per-insertion read and write cost of building the routing filters is
-	$\Theta(\lambda/B)$ as in the proof of \Cref{thm:bot-cost}.
+	$\Theta(\lambda/B)$ as in the proof of \cref{thm:bot-cost}.
 
-	The cost per query is the same as in \Cref{thm:bot-cost}.
+	The cost per query is the same as in \cref{thm:bot-cost}.
 \end{proof}
 
 \Cref{thm:bot-asymmetric} can improve the write cost when $\grow =
@@ -64,7 +64,7 @@ that case, $\beta$ can be tuned to optimize insertion performance relative to
 the $\omega$ of the AEMM by solving the quadratic equation $\beta = \omega
 \cdot \left(\lambda + \frac{1}{\beta}\log_{\grow}{N} \right)$. 
 
-In particular, an interesting consequence of \Cref{thm:bot-asymmetric} is
+In particular, an interesting consequence of \cref{thm:bot-asymmetric} is
 in the case where $N$ is polynomial in $M$. Then insertions can be performed
 into a $(\log_\grow{M/B})$-asymmetric BOT with growth factor $\lambda = O(1)$
 with constant write amplification. This does come at the cost of more reads

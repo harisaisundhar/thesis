@@ -2,9 +2,9 @@
 
 A \defn{Bundle of Arrays Hash Table} (\boa{}) is an external-memory dictionary
 based on ST-LSMs. In this section, we describe a simple version which is
-optimal in the sense of \Cref{thm:ip-lower-bound}, but where the query cost
-meets the bound only in expectation, not w.h.p. In \Cref{sec:boa-refined}, we
-give a version that satisfies \Cref{thm:boa-cost}.
+optimal in the sense of \cref{thm:ip-lower-bound}, but where the query cost
+meets the bound only in expectation, not w.h.p. In \cref{sec:boa-refined}, we
+give a version that satisfies \cref{thm:boa-cost}.
 
 As a first step, we show that runs with uniformly distributed, $\Theta(\log
 N)$-wise independent fingerprints can be searched more quickly than in an
@@ -19,7 +19,7 @@ ST-LSMs.
 \end{lemma}
 
 \begin{proof}
-  First note that, by \Cref{lem:chernoff} and Bonferroni's inequality,
+  First note that, by \cref{lem:chernoff} and Bonferroni's inequality,
   if $N$ balls are thrown into $\Theta(N/\log{N})$ bins uniformly
   and $\Theta(\log N)$-wise independently, then every bin has
   $\Theta(\log{N})$ balls with high probability.
@@ -47,7 +47,7 @@ ST-LSMs.
 \end{corollary} 
 
 While the query performance improves by a factor of $\log{N}$, the ST-LSM
-is still off of the optimal tradeoff curve of \Cref{thm:ip-lower-bound}. In
+is still off of the optimal tradeoff curve of \cref{thm:ip-lower-bound}. In
 particular, queries can be at least exponentially slower than optimal. The
 \boa{} uses additional structure in order to reduce this query cost.
 
@@ -87,7 +87,7 @@ Such routing filters induce a space/cost tradeoff. The greater $h_\ell$ is, the
 more space the table takes but the less likely it is that many runs will have
 false positives. The rest of this section shows that when $h_\ell=\log_\lambda
 B + \ell$, in other words, when prefixes grow by a character per level, the BOA
-lies on the optimal tradeoff curve of \Cref{thm:ip-lower-bound}.
+lies on the optimal tradeoff curve of \cref{thm:ip-lower-bound}.
 
 Define $\beta$, the \defn{routing table ratio}, to be the ratio of the number
 of buckets in the routing filter to the size of a run. The number of entries in
@@ -148,14 +148,14 @@ positives in order to analyze the overall query cost.
 
 \begin{proof}
 	Because a \boa{} has $\log_\lambda N$ levels, the insertion cost follows from
-	\Cref{lem:boa-insertion-cost}.
+	\cref{lem:boa-insertion-cost}.
 
 	To query for a fingerprint $K$, the routing filter on each level is
 	checked, which incurs $O(\log_\lambda N)$ IOs. These routing filters return
 	a collection of runs which contain up to $D_K$ true positives and an
 	expected $O\left(\frac{\lambda}{\beta}\log_\lambda N\right)$ false
-	positives, by \Cref{lem:boa-false-positive}. By
-	\Cref{lem:interpolation-search}, each run can be checked in $O(1)$ IOs.
+	positives, by \cref{lem:boa-false-positive}. By
+	\cref{lem:interpolation-search}, each run can be checked in $O(1)$ IOs.
 \end{proof}
 
 So for a fixed $\grow$, there is no advantage to choosing $\beta =
