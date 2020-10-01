@@ -1,5 +1,6 @@
 \section{Bundle of Trees Hashing}\label{sec:boa-bot}
 
+\sloppy
 In order for a BOA to be an optimal dictionary, its growth factor $\grow{}$
 must be $\Omega(\log{N}/\log\log{N})$. Otherwise, the cost of insertion is
 dominated by the cost of merging, which is slow because it effectively sorts
@@ -12,6 +13,7 @@ and a data structure needed to merge routing trees (the \defn{character
 queue}).  The character queue performs a delayed sort on the characters needed
 at each level, thus increasing the arity of the sort and decreasing the IOs.
 
+\fussy
 A BOT has $s = \lceil \log_\lambda N/B \rceil$ levels, each of which contains a
 routing tree. The root of the routing tree has degree less than $\lambda$ and
 all internal nodes have degree $\lambda$. Each node of a routing tree contains
@@ -40,7 +42,7 @@ the tree in the 1st level of the BOT.
 	\end{minipage}\hfill
 	\begin{minipage}[t]{0.55\textwidth}
 		\centering
-		\includegraphics[height=0.4\textwidth]{figures/routing_tree_merge.pdf}
+		\includegraphics[height=0.37\textwidth]{figures/routing_tree_merge.pdf}
 		\caption{When the routing tree on level $i$ fills, it is merged into
 			the routing tree on level $i+1$. The now-full routing tree from
 			level $i+1$ becomes a child of the root on level $i+1$. Its
@@ -217,7 +219,7 @@ We now analyze the cost of maintaining the character queues.
 
 \begin{proof}
 	When $\sigma_j$ is merged, $\lambda^{2^\rho(j)}$ runs are merged, which has
-	a cost of
+	a cost of\\
 	$O\left(\frac{2^{\rho(j)}}{B}\left\lceil\log_{M/B}\left(\lambda^{2^\rho(j)}\right)\right\rceil\right)$
 	characters per fingerprint.
 

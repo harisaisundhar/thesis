@@ -7,11 +7,13 @@ key-value store design, such as increasing write throughput, reducing write
 amplification, and increasing
 concurrency~\cite{DBLP:conf/usenix/PapagiannisSGB16,cassandra,scylla,DBLP:conf/sosp/RajuKCA17,facebook-rocksdb2018,DBLP:conf/sigmod/DayanI18,DBLP:conf/sigmod/DayanI19,DBLP:conf/sigmod/DayanAI17,DBLP:conf/spaa/BenderFFFKN07,DBLP:conf/soda/BrodalF03,DBLP:conf/pods/BenderBJKMPSSZ16:set,DBLP:conf/pods/BenderFJMMPX17,DBLP:journals/tos/LuPGAA17,DBLP:conf/usenix/ChanLLX18,DBLP:conf/icalp/ConwayFS18,DBLP:conf/soda/IaconoP12,DBLP:conf/usenix/WuXSJ15,DBLP:conf/usenix/MarmolSTR15,DBLP:conf/cloud/VasudevanKA12,DBLP:conf/fast/ShettySMASZ13,DBLP:conf/eurosys/Golan-GuetaBHK15,DBLP:journals/tos/ZuoHW19,DBLP:conf/fast/YaoWHZLXH19,DBLP:conf/fast/KourtisIK19,DBLP:conf/fast/KaiyrakhmetLNNC19,leveldb,bradleywhitepaper,DBLP:conf/usenix/BalmauDGZYAGK17}.
 
+\sloppy
 Existing key-value stores face new challenges with the increasing use of
 high-performance NVMe solid state drives (SSDs) in industry. NVMe SSDs offer
 substantially higher bandwidth (500K-600K IOPS) and lower latency (10-20
 micro-seconds) than other SSDs.
 
+\fussy
 These key-value stores struggle to utilize all the available bandwidth in
 modern SSDs.  For example, we find that for the common case of small key-value
 pairs, RocksDB is able to use only 30\% of the bandwidth supplied by an
